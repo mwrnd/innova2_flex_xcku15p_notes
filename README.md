@@ -1,6 +1,6 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADL](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox ConnectX-5 MT27808 and Xilinx Ultrascale+ XCKU15P. It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5.
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADL](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
@@ -11,17 +11,20 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
 * 3.3V FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
-* Xilinx-compatible JTAG Adapter
+* Xilinx-compatible **1.8V** JTAG Adapter
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
-* [25G SFP28 Direct-Attach Cable DAC](https://www.fs.com/products/65841.html) to test network ports
+* 25G SFP28/SFP+ Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
 
 
 ## Cooling Solution
 
-The card is designed for use in servers and requires up to 800 LFM of air flow. I run the board in an open air PC case and attached a hard drive heat sink to it and placed a 12V 1.3A blower fan from a server in line with the card. The two main ICs are different heights so I needed 0.8mm and 2mm thermal pads. I run the blower fan from a 5V power rail and get acceptable noise and performance when using only the FPGA. I need to run the fan at 12V when testing the network interfaces. The board otherwise overheats and the interfaces shut down.
+The card is designed for use in servers and requires up to 800 LFM of air flow. I run the board in an open air PC case and attached a hard drive heat sink to it and placed a 12V 1.3A blower fan from a server in line with the card. I run the blower fan from a 5V power rail and get acceptable noise and performance when using only the FPGA. I need to run the fan at 12V when testing the network interfaces. The board otherwise overheats and the interfaces shut down.
 
 ![Cooling Setup](img/Cooling_Setup.png)
 
+The two main ICs are different heights so I needed 0.8mm and 2mm thermal pads.
+
+![ICs are Different Heights](img/Cooling_Solution_Thermal_Pads.png)
 
 ## System Setup
 
@@ -112,7 +115,7 @@ dpkg -l | grep linux-image | grep "^ii"
 
 Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers will install custom versions of some of the libraries that get pulled into this install. By installing everything first you can avoid library incompatibility issues and `MLNX_OFED` reinstallations. `libibverbs` is one package that gets updated and pulled in by almost every piece of networking software and `MLNX_OFED` requires a custom version.
 ```Shell
-sudo apt install    apt autoconf automake binfmt-support \
+sudo apt install    alien apt autoconf automake binfmt-support \
     binutils-riscv64-unknown-elf binwalk bison bpfcc-tools \
     build-essential bzip2 chrpath clang clinfo cmake coreutils \
     curl cycfx2prog dapl2-utils debhelper dh-autoreconf dh-python \
@@ -648,7 +651,7 @@ Results should approach about 23Gbits/sec as there is some overhead. Change the 
 
 ### Initial Loading of the Flex Image
 
-In order for `innova2_flex_app` to program a User Image into the FPGA's configuration memory it must communicate with the Flex Image running in the FPGA. The Flex and Factory Images must get into FPGA configuration memory and reproduce the Memory Layout as pictured below. The `innova2_flex_app` is faster at programming a User Image than JTAG. Refer to the [Innova-2 User Guide](https://docs.nvidia.com/networking/display/Innova2Flex/Using+the+Mellanox+Innova-2+Flex+Open+Bundle#UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) for more info.
+In order for `innova2_flex_app` to program a User Image into the FPGA's configuration memory it must communicate with the Flex Image running in the FPGA. The Flex and Factory Images must get into FPGA configuration memory and reproduce the Memory Layout as pictured below. The `innova2_flex_app` is faster at programming a User Image than JTAG as the Flex Image provides a PCIe interface to the FPGA's Configuration Memory FLASH ICs. Refer to the [Innova-2 User Guide](https://docs.nvidia.com/networking/display/Innova2Flex/Using+the+Mellanox+Innova-2+Flex+Open+Bundle#UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) for more info.
 
 ![FPGA Configuration Memory Layout](img/FPGA_Configuration_Memory_Layout.png)
 
@@ -721,9 +724,13 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 #### Programming the Factory and Flex Images
 
-Connect your Xilinx-Compatible JTAG Adapter to your Innova-2 and a second computer. Or, figure out some way to power the Innova-2 outside of the system running the JTAG such as by using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and possibly crash Ubuntu.
+Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power the Innova-2 from a second computer or using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and possibly crash Ubuntu.
 
 ![JTAG Connected](img/JTAG_Connected.png)
+
+Powered PCIe Extender:
+
+![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.png)
 
 Start Vivado Hardware Manager. Any recent version of [Vivado Lab Edition](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2021-2.html) or full Vivado is enough for this task.
 
@@ -773,9 +780,22 @@ After Vivado generates a programming Bitstream, run *Write Memory Configuration 
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
-The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Reboot your system for the change to take effect.
+The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and . Reboot your system for the change to take effect.
+```
+sudo mst start
+sudo ~/Innova_2_Flex_Open_18_12/driver/make_device
+sudo insmod mlx5_fpga_tools
 
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
 ![Set Flex Image Active](img/Activate_Flex_Image_for_Programming.png)
+
+After rebooting, the Flex Image should be active, check with `lspci`.
+```
+lspci | grep -i Mellanox
+```
+
+![lspci Innova-2 Flex Burn Image](img/lspci_Innova-2_Flex_Burn_Image.png)
 
 The commands below clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for testing. Run the `innova2_flex_app` with appropriate `-b` commands to program the design. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit. After rebooting your system the new User Image should be running.
 ```Shell
@@ -800,7 +820,18 @@ sudo reboot
 
 ![Program Innova-2 User Image](img/Program_User_Image.png)
 
-After rebooting, run the Xilinx XDMA Test programs. The commands below generate 8kb of random data, then send it to a BRAM in the XCKU15P, then read it back and confirm the data is identical. The address used is specific to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project. Note `h2c` is *Host-to-Card* and `c2h` is *Card-to-Host*
+### Testing a Loaded User Image
+
+After rebooting the User Image should be active. Check with `lspci`. It shows up at PCIe Bus Address `03:00` for me. Change the commands below appropriately.
+```
+lspci | grep -i Xilinx
+sudo lspci  -s 03:00  -v
+sudo lspci  -s 03:00  -vvv | grep "LnkCap\|LnkSta"
+```
+
+![lspci Xilinx RAM Device](img/lspci_Xilinx_RAM_Device.png)
+
+Run the Xilinx XDMA Test programs. The commands below generate 8kb of random data, then send it to a BRAM in the XCKU15P, then read it back and confirm the data is identical. The address used is specific to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project. Note `h2c` is *Host-to-Card* and `c2h` is *Card-to-Host*
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -832,10 +863,12 @@ sudo ./mlxup
 * [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/)
 * [Mellanox OFED Drivers](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/)
 * [Innova-2 Flex User Guide](https://docs.nvidia.com/networking/display/Innova2Flex)
+* [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
+* [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
 * [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf)
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
-* [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235)
+* [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
 * [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
 * [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
@@ -856,6 +889,25 @@ sudo lspci | grep -i mellanox
 ```
 
 ![lspci for failed FLASH IC](img/lspci_results_when_FLASH_IC_fails.png)
+
+
+### Board Works But Not JTAG
+
+Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part giving larger values with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf).
+
+![SC70 MOSFET with MXX Marking](img/MOSFET_MXX_Marking_DMN63D8LW.png)
+
+
+### Nothing Seems to Work
+
+While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) and the board was saved. I got lucky. If I had shorted a voltage rail further down in the heirarchy I would not have been able to fix it as easily.
+
+![1206 Fuse F1](img/Fuse_1206_F1.png)
+
+The board is well designed with all voltage rails exposed on test points. Carefully measure each one.
+
+![Voltage Test Points](img/Voltage_Test_Points.png)
+
 
 ### Disable or Enable Above-4G Memory Decoding
 
