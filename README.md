@@ -79,6 +79,13 @@ After reboot run Ubuntu *Software Updater* and reboot when it finishes.
 
 ![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
 
+After reboot confirm you are on kernel `5.8.0-43-generic`
+```
+uname -s -r -m
+dpkg -l | grep linux-image | grep "^ii"
+```
+
+![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
 #### Remove all Kernels other than 5.8.0-43
 
@@ -101,15 +108,8 @@ sudo apt remove \
        linux-modules-extra-5.13.0-30-generic linux-tools-5.13.0-30-generic
 
 sudo apt autoremove
+sudo reboot
 ```
-
-Reboot and confirm you are on kernel `5.8.0-43-generic`
-```
-uname -s -r -m
-dpkg -l | grep linux-image | grep "^ii"
-```
-
-![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
 
 ### Install All Prerequisites
@@ -917,7 +917,5 @@ The board is well designed with all voltage rails exposed on test points. Carefu
 It should have no effect when running a 64-Bit OS but sometimes it does. Flip this setting in your BIOS if you have any problems or throughput bandwidth seems low.
 
 ![Disable Above-4G Memory](img/Above-4G_Memory_in_BIOS.png)
-
-
 
 
