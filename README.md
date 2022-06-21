@@ -75,6 +75,11 @@ sudo update-grub
 sudo reboot
 ```
 
+After reboot run Ubuntu *Software Updater* and reboot when it finishes.
+
+![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
+
+
 #### Remove all Kernels other than 5.8.0-43
 
 List all installed Linux Kernels:
@@ -98,11 +103,7 @@ sudo apt remove \
 sudo apt autoremove
 ```
 
-Run Ubuntu *Software Updater* and reboot.
-
-![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
-
-Confirm you are on kernel `5.8.0-43-generic`
+Reboot and confirm you are on kernel `5.8.0-43-generic`
 ```
 uname -s -r -m
 dpkg -l | grep linux-image | grep "^ii"
@@ -422,7 +423,7 @@ sudo dkms status
 
 ### Set up Innova-2 Flex Application
 
-The `innova2_flex_app`, part of the [Innova-2 Flex Firmware Release](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/), allows software update of the XCKU15P FPGA user image as well as basic diagnostics of the Innova-2.
+The `innova2_flex_app`, part of the [Innova-2 Flex Firmware Release](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/), allows software update of the XCKU15P FPGA User Image as well as basic diagnostics of the Innova-2.
 
 ![Innova-2 Flex Firmware 18.12](img/Innova-2_Flex_Release_18_12.png)
 
@@ -431,6 +432,8 @@ The following commands download and install *Innova_2_Flex_Open_18_12*.
 ```Shell
 cd ~
 wget http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz
+md5sum Innova_2_Flex_Open_18_12.tar.gz
+echo fdb96d4e02de11ef32bf3007281bfa53 should be the MD5 Checksum
 tar -xvf Innova_2_Flex_Open_18_12.tar.gz
 cd Innova_2_Flex_Open_18_12/driver/
 make
@@ -440,7 +443,7 @@ make
 cd ~
 ```
 
-### Install Vivado
+### Install Vivado or Vivado Lab Edition
 
 Create a symbolic link for `gmake` which Vivado requires but Ubuntu already includes as `make`.
 ```Shell
@@ -486,7 +489,7 @@ sudo mst status -v
 
 ### Innova-2 ConnectX-5 Firmware
 
-Run Mellanox's Flash Interface Tool (`flint`) for information on the Innova-2's ConnectX-5 firmware.
+Run Mellanox's Flash Interface Tool `flint` for information on the Innova-2's ConnectX-5 firmware.
 ```Shell
 sudo mst start
 sudo flint --device /dev/mst/mt4119_pciconf0 query
@@ -728,7 +731,7 @@ Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power 
 
 ![JTAG Connected](img/JTAG_Connected.png)
 
-Powered PCIe Extender:
+Powered PCIe Riser for Graphics Card:
 
 ![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.png)
 
@@ -752,7 +755,7 @@ Program the complete memory images.
 
 ![Program Complete Memory Image](img/Program_Complete_Memory_Image.png)
 
-Once the programming finishes, which can take hours, power down the system with the Innova-2 and disconnect the JTAG adapter.
+Once programming finishes, which can take hours, power everything down and disconnect the JTAG adapter.
 
 ![Successful FPGA Configuration Memory Programming](img/FPGA_Configuration_Memory_Programmed.png)
 
@@ -780,7 +783,7 @@ After Vivado generates a programming Bitstream, run *Write Memory Configuration 
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
-The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and . Reboot your system for the change to take effect.
+The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect.
 ```
 sudo mst start
 sudo ~/Innova_2_Flex_Open_18_12/driver/make_device
@@ -847,7 +850,7 @@ Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova
 
 ## Upgrading the ConnectX5 Firmware
 
-Once you have tested an Innova-2 using the current working firmware, consider upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY) It has an `--online` option.
+Once you have tested an Innova-2 using the current working firmware, consider upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). It has an `--online` option.
 ```
 cd ~
 wget https://www.mellanox.com/downloads/firmware/mlxup/4.20.0/SFX/linux_x64/mlxup
@@ -876,7 +879,7 @@ sudo ./mlxup
 
 ## Projects Tested to Work with the Innova2
 
-* [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple XDMA (PCIe) to DDR4 and GPIO Demo
+* [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
 
 
 ## Troubleshooting
@@ -893,14 +896,14 @@ sudo lspci | grep -i mellanox
 
 ### Board Works But Not JTAG
 
-Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part giving larger values with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf).
+Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf).
 
 ![SC70 MOSFET with MXX Marking](img/MOSFET_MXX_Marking_DMN63D8LW.png)
 
 
 ### Nothing Seems to Work
 
-While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) and the board was saved. I got lucky. If I had shorted a voltage rail further down in the heirarchy I would not have been able to fix it as easily.
+While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) and the board was saved. I got lucky. If I had shorted a voltage rail further down in the heirarchy I would not have been able to fix it as easily. A blown fuse is either a simple fix or a sign of catastrophic failure.
 
 ![1206 Fuse F1](img/Fuse_1206_F1.png)
 
