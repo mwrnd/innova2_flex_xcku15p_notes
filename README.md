@@ -913,7 +913,7 @@ sudo ./mlxup
 
 The latest firmware directy downloadable from Nvidia/Mellanox is **16.26.4012**.
 
-![Firmware 16.26.4012](MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
+![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
 
 ## Useful Links
 
