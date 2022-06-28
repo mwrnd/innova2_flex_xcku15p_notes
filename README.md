@@ -1,6 +1,6 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADL](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html).
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
@@ -503,7 +503,7 @@ Make sure to **write down the GUID and MAC values**.
 
 If the FW Version is `16.24.4020` or newer then proceed to [Testing The Network Ports](#testing-the-network-ports) as firmware is already up-to-date.
 
-Attempt to program the firmware using `flint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADL* with DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDL* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+Attempt to program the firmware using `flint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin --allow_rom_change burn
@@ -570,7 +570,7 @@ od -A x -t x1z -v W25Q128save.bin  |  head
 
 Abort this entire procedure if the FLASH contents are not consistent and/or the header is not sensible. Something might be wrong with your programmer or its connections.
 
-Use `flashrom` to write the latest Innova-2 firmware to the W25Q128. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADL* with DDR4 is nicknamed *Morse* while the 100GbE QSFP *MNV303611A-EDL* is nicknamed *MorseQ*. `cd` into the appropriate directory.
+Use `flashrom` to write the latest Innova-2 firmware to the W25Q128. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP *MNV303611A-EDLT* is nicknamed *MorseQ*. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flashrom --programmer ch341a_spi --write fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin
@@ -992,7 +992,7 @@ sudo ldconfig
 
 ### Create UrJTAG-Compatible JTAG Definition Files from BSDL Files
 
-Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) inlcude `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included *xcku15p_ffve1517_bsd.patch* is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included *xcku15p_ffve1517.jtag* file.
+Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) include `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included *xcku15p_ffve1517_bsd.patch* is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included *xcku15p_ffve1517.jtag* file.
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
@@ -1021,7 +1021,6 @@ cd ~/Innova_2_Flex_Open_18_12/driver/
 sudo ./make_device
 sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 lsmod | grep mlx
-
 cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
@@ -1030,11 +1029,11 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 #### Disconnect the Innova-2 FPGA from the PCIe Bridge
 
-`lspci | grep -i Mellanox` shows all connected Mellanox PCIe devices. The PCIe Bridge on the Innova-2 is device `08`, function `0`, `08.0`. In the example below it shows up with Bus ID `02`. Disable the FPGA-to-PCIe connection so that JTAG does not interfere with the PCIe bus.
+`lspci | grep -i Mellanox` shows all connected Mellanox PCIe devices. The PCIe Bridge on the Innova-2 is device `08`, function `0`, `08.0`. In the example below it shows up with Bus ID `02`. Disable the FPGA-to-PCIe connection so that JTAG does not interfere with the PCIe bus. Notice the `(re ff)` on the Xilinx device after disconnection.
 ```Shell
 sudo setpci  -s 02:08.0  0x70.w=0x50
 ```
-It can later be re-enabled with the following command:
+It can later be re-enabled with the following command or a cold reboot.
 ```Shell
 sudo setpci -s 02:08.0 0x70.w=0x40
 ```
@@ -1046,13 +1045,13 @@ sudo setpci -s 02:08.0 0x70.w=0x40
 
 Connect your JTAG Adapter to the Innova-2. If you are using a Platform Cable USB II compatible adapter it will show up under `lsusb` as `03fd:0013 Xilinx, Inc.` In this state it cannot be used for JTAG.
 
-![03fd 0013 Xilinx Inc](Xilinx_Platform_USB_Cable_II_lsusb_Initial.png)
+![03fd 0013 Xilinx Inc](img/Xilinx_Platform_USB_Cable_II_lsusb_Initial.png)
 
 Start Vivado or Vivado Lab Hardware Manager:
 
 ![Vivado Hardware Manager](img/Vivado_Hardware_Manager.png)
 
-Connect to the JTAG Adapter which will update the adapter's firmware.
+Connect to the JTAG Adapter which will update the adapter's SRAM firmware. This change disappears if the JTAG adapter is powered off or unplugged from USB.
 
 ![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
 
@@ -1066,23 +1065,41 @@ Connect to the JTAG Adapter which will update the adapter's firmware.
 `sudo jtag` to start UrJTAG with access to USB. You should see the `jtag> ` command prompt. A [JTAG Overview](https://www.xjtag.com/about-jtag/jtag-a-technical-overview/) may be helpful before you begin.
 
 `cable xpc_ext` selects the Xilinx Platform Cable, external JTAG chain
+
 `detect` finds all devices in the JTAG chain
+
 `print chain` prints all devices in the JTAG chain
+
 `part 0` selects the first JTAG part for communication. Good practise to always make this explicit.
+
 `instruction EXTEST` select the External Test Function
+
 `shift ir` shifts EXTEST into the JTAG Instruction Register to put the device into EXTEST mode
+
 `shift dr` shifts the Data Register containing all pin states into UrJTAG memory
+
 `get signal IO_A6` displays the value of pin A6 (the inverted D19 LED) from the Data Register (1 = off)
+
 `get signal IO_B6` displays the value of pin B6 (the inverted D18 LED) from the Data Register (1 = off)
+
 `set signal IO_A6 out 0` sets pin A6 to output 0 in the Data Register in UrJTAG memory
+
 `shift dr` shifts the Data Register out onto the device which should light up the D19 LED (0 = on)
+
 `set signal IO_B6 out 0` sets pin B6 to output 0 in the Data Register in UrJTAG memory
+
 `shift dr` shifts the Data Register out onto the device which should light up the D18 LED (0 = on)
+
 `get signal IO_A6` displays the value of pin A6 from the last Data Register shift (0 = on)
+
 `get signal IO_B6` displays the value of pin B6 from the last Data Register shift (1=off is an error)
+
 `shift dr` shifts the Data Register from the device into UrJTAG memory
+
 `get signal IO_B6` displays the value of pin B6 from the last Data Register shift (0=on is correct)
+
 `reset` resets the JTAG chain and enters Bypass Mode
+
 `quit` exits UrJTAG
 
 ![UrJTAG Session](img/UrJTAG_Session.png)
