@@ -1,0 +1,247 @@
+984c984
+< use STD_1149_6_2003.all;
+---
+> 
+1909d1908
+< -- Grouped Port Identification
+1911,2024d1909
+< attribute PORT_GROUPING of XCKU15P_FFVE1517 : entity is
+< "DIFFERENTIAL_VOLTAGE (" &
+< "(MGTHRXP0_224, MGTHRXN0_224), " &
+< "(MGTHRXP0_225, MGTHRXN0_225), " &
+< "(MGTHRXP0_226, MGTHRXN0_226), " &
+< "(MGTHRXP0_227, MGTHRXN0_227), " &
+< "(MGTHRXP0_228, MGTHRXN0_228), " &
+< "(MGTHRXP0_229, MGTHRXN0_229), " &
+< "(MGTHRXP0_230, MGTHRXN0_230), " &
+< "(MGTHRXP0_231, MGTHRXN0_231), " &
+< "(MGTHRXP1_224, MGTHRXN1_224), " &
+< "(MGTHRXP1_225, MGTHRXN1_225), " &
+< "(MGTHRXP1_226, MGTHRXN1_226), " &
+< "(MGTHRXP1_227, MGTHRXN1_227), " &
+< "(MGTHRXP1_228, MGTHRXN1_228), " &
+< "(MGTHRXP1_229, MGTHRXN1_229), " &
+< "(MGTHRXP1_230, MGTHRXN1_230), " &
+< "(MGTHRXP1_231, MGTHRXN1_231), " &
+< "(MGTHRXP2_224, MGTHRXN2_224), " &
+< "(MGTHRXP2_225, MGTHRXN2_225), " &
+< "(MGTHRXP2_226, MGTHRXN2_226), " &
+< "(MGTHRXP2_227, MGTHRXN2_227), " &
+< "(MGTHRXP2_228, MGTHRXN2_228), " &
+< "(MGTHRXP2_229, MGTHRXN2_229), " &
+< "(MGTHRXP2_230, MGTHRXN2_230), " &
+< "(MGTHRXP2_231, MGTHRXN2_231), " &
+< "(MGTHRXP3_224, MGTHRXN3_224), " &
+< "(MGTHRXP3_225, MGTHRXN3_225), " &
+< "(MGTHRXP3_226, MGTHRXN3_226), " &
+< "(MGTHRXP3_227, MGTHRXN3_227), " &
+< "(MGTHRXP3_228, MGTHRXN3_228), " &
+< "(MGTHRXP3_229, MGTHRXN3_229), " &
+< "(MGTHRXP3_230, MGTHRXN3_230), " &
+< "(MGTHRXP3_231, MGTHRXN3_231), " &
+< "(MGTHTXP0_224, MGTHTXN0_224), " &
+< "(MGTHTXP0_225, MGTHTXN0_225), " &
+< "(MGTHTXP0_226, MGTHTXN0_226), " &
+< "(MGTHTXP0_227, MGTHTXN0_227), " &
+< "(MGTHTXP0_228, MGTHTXN0_228), " &
+< "(MGTHTXP0_229, MGTHTXN0_229), " &
+< "(MGTHTXP0_230, MGTHTXN0_230), " &
+< "(MGTHTXP0_231, MGTHTXN0_231), " &
+< "(MGTHTXP1_224, MGTHTXN1_224), " &
+< "(MGTHTXP1_225, MGTHTXN1_225), " &
+< "(MGTHTXP1_226, MGTHTXN1_226), " &
+< "(MGTHTXP1_227, MGTHTXN1_227), " &
+< "(MGTHTXP1_228, MGTHTXN1_228), " &
+< "(MGTHTXP1_229, MGTHTXN1_229), " &
+< "(MGTHTXP1_230, MGTHTXN1_230), " &
+< "(MGTHTXP1_231, MGTHTXN1_231), " &
+< "(MGTHTXP2_224, MGTHTXN2_224), " &
+< "(MGTHTXP2_225, MGTHTXN2_225), " &
+< "(MGTHTXP2_226, MGTHTXN2_226), " &
+< "(MGTHTXP2_227, MGTHTXN2_227), " &
+< "(MGTHTXP2_228, MGTHTXN2_228), " &
+< "(MGTHTXP2_229, MGTHTXN2_229), " &
+< "(MGTHTXP2_230, MGTHTXN2_230), " &
+< "(MGTHTXP2_231, MGTHTXN2_231), " &
+< "(MGTHTXP3_224, MGTHTXN3_224), " &
+< "(MGTHTXP3_225, MGTHTXN3_225), " &
+< "(MGTHTXP3_226, MGTHTXN3_226), " &
+< "(MGTHTXP3_227, MGTHTXN3_227), " &
+< "(MGTHTXP3_228, MGTHTXN3_228), " &
+< "(MGTHTXP3_229, MGTHTXN3_229), " &
+< "(MGTHTXP3_230, MGTHTXN3_230), " &
+< "(MGTHTXP3_231, MGTHTXN3_231), " &
+< "(MGTYRXP0_127, MGTYRXN0_127), " &
+< "(MGTYRXP0_128, MGTYRXN0_128), " &
+< "(MGTYRXP0_129, MGTYRXN0_129), " &
+< "(MGTYRXP0_130, MGTYRXN0_130), " &
+< "(MGTYRXP0_131, MGTYRXN0_131), " &
+< "(MGTYRXP0_132, MGTYRXN0_132), " &
+< "(MGTYRXP1_127, MGTYRXN1_127), " &
+< "(MGTYRXP1_128, MGTYRXN1_128), " &
+< "(MGTYRXP1_129, MGTYRXN1_129), " &
+< "(MGTYRXP1_130, MGTYRXN1_130), " &
+< "(MGTYRXP1_131, MGTYRXN1_131), " &
+< "(MGTYRXP1_132, MGTYRXN1_132), " &
+< "(MGTYRXP2_127, MGTYRXN2_127), " &
+< "(MGTYRXP2_128, MGTYRXN2_128), " &
+< "(MGTYRXP2_129, MGTYRXN2_129), " &
+< "(MGTYRXP2_130, MGTYRXN2_130), " &
+< "(MGTYRXP2_131, MGTYRXN2_131), " &
+< "(MGTYRXP2_132, MGTYRXN2_132), " &
+< "(MGTYRXP3_127, MGTYRXN3_127), " &
+< "(MGTYRXP3_128, MGTYRXN3_128), " &
+< "(MGTYRXP3_129, MGTYRXN3_129), " &
+< "(MGTYRXP3_130, MGTYRXN3_130), " &
+< "(MGTYRXP3_131, MGTYRXN3_131), " &
+< "(MGTYRXP3_132, MGTYRXN3_132), " &
+< "(MGTYTXP0_127, MGTYTXN0_127), " &
+< "(MGTYTXP0_128, MGTYTXN0_128), " &
+< "(MGTYTXP0_129, MGTYTXN0_129), " &
+< "(MGTYTXP0_130, MGTYTXN0_130), " &
+< "(MGTYTXP0_131, MGTYTXN0_131), " &
+< "(MGTYTXP0_132, MGTYTXN0_132), " &
+< "(MGTYTXP1_127, MGTYTXN1_127), " &
+< "(MGTYTXP1_128, MGTYTXN1_128), " &
+< "(MGTYTXP1_129, MGTYTXN1_129), " &
+< "(MGTYTXP1_130, MGTYTXN1_130), " &
+< "(MGTYTXP1_131, MGTYTXN1_131), " &
+< "(MGTYTXP1_132, MGTYTXN1_132), " &
+< "(MGTYTXP2_127, MGTYTXN2_127), " &
+< "(MGTYTXP2_128, MGTYTXN2_128), " &
+< "(MGTYTXP2_129, MGTYTXN2_129), " &
+< "(MGTYTXP2_130, MGTYTXN2_130), " &
+< "(MGTYTXP2_131, MGTYTXN2_131), " &
+< "(MGTYTXP2_132, MGTYTXN2_132), " &
+< "(MGTYTXP3_127, MGTYTXN3_127), " &
+< "(MGTYTXP3_128, MGTYTXN3_128), " &
+< "(MGTYTXP3_129, MGTYTXN3_129), " &
+< "(MGTYTXP3_130, MGTYTXN3_130), " &
+< "(MGTYTXP3_131, MGTYTXN3_131), " &
+< "(MGTYTXP3_132, MGTYTXN3_132))";
+4613,4737d4497
+< 
+< -- Advanced I/O Description
+< 
+< attribute AIO_COMPONENT_CONFORMANCE of XCKU15P_FFVE1517 : entity is
+<         "STD_1149_6_2003";
+< 
+< attribute AIO_EXTEST_Pulse_Execution of XCKU15P_FFVE1517 : entity is
+<         "Wait_Duration TCK 15";
+< 
+< attribute AIO_EXTEST_Train_Execution of XCKU15P_FFVE1517 : entity is
+<         "train 30, maximum_time 120.0e-6";
+< 
+< attribute AIO_Pin_Behavior of XCKU15P_FFVE1517 : entity is
+< "MGTHRXP0_224 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_225 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_226 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_227 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_228 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_229 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_230 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP0_231 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_224 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_225 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_226 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_227 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_228 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_229 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_230 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP1_231 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_224 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_225 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_226 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_227 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_228 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_229 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_230 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP2_231 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_224 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_225 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_226 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_227 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_228 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_229 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_230 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHRXP3_231 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTHTXP0_224; " &
+< "MGTHTXP0_225; " &
+< "MGTHTXP0_226; " &
+< "MGTHTXP0_227; " &
+< "MGTHTXP0_228; " &
+< "MGTHTXP0_229; " &
+< "MGTHTXP0_230; " &
+< "MGTHTXP0_231; " &
+< "MGTHTXP1_224; " &
+< "MGTHTXP1_225; " &
+< "MGTHTXP1_226; " &
+< "MGTHTXP1_227; " &
+< "MGTHTXP1_228; " &
+< "MGTHTXP1_229; " &
+< "MGTHTXP1_230; " &
+< "MGTHTXP1_231; " &
+< "MGTHTXP2_224; " &
+< "MGTHTXP2_225; " &
+< "MGTHTXP2_226; " &
+< "MGTHTXP2_227; " &
+< "MGTHTXP2_228; " &
+< "MGTHTXP2_229; " &
+< "MGTHTXP2_230; " &
+< "MGTHTXP2_231; " &
+< "MGTHTXP3_224; " &
+< "MGTHTXP3_225; " &
+< "MGTHTXP3_226; " &
+< "MGTHTXP3_227; " &
+< "MGTHTXP3_228; " &
+< "MGTHTXP3_229; " &
+< "MGTHTXP3_230; " &
+< "MGTHTXP3_231; " &
+< "MGTYRXP0_127 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP0_128 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP0_129 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP0_130 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP0_131 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP0_132 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_127 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_128 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_129 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_130 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_131 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP1_132 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_127 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_128 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_129 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_130 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_131 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP2_132 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_127 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_128 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_129 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_130 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_131 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYRXP3_132 : LP_time=22.5e-9 HP_time=45.0e-9; " &
+< "MGTYTXP0_127; " &
+< "MGTYTXP0_128; " &
+< "MGTYTXP0_129; " &
+< "MGTYTXP0_130; " &
+< "MGTYTXP0_131; " &
+< "MGTYTXP0_132; " &
+< "MGTYTXP1_127; " &
+< "MGTYTXP1_128; " &
+< "MGTYTXP1_129; " &
+< "MGTYTXP1_130; " &
+< "MGTYTXP1_131; " &
+< "MGTYTXP1_132; " &
+< "MGTYTXP2_127; " &
+< "MGTYTXP2_128; " &
+< "MGTYTXP2_129; " &
+< "MGTYTXP2_130; " &
+< "MGTYTXP2_131; " &
+< "MGTYTXP2_132; " &
+< "MGTYTXP3_127; " &
+< "MGTYTXP3_128; " &
+< "MGTYTXP3_129; " &
+< "MGTYTXP3_130; " &
+< "MGTYTXP3_131; " &
+< "MGTYTXP3_132 ";

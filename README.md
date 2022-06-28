@@ -11,9 +11,9 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
 * 3.3V FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
-* Xilinx-compatible **1.8V** JTAG Adapter
+* Xilinx-compatible **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
-* 25G SFP28/SFP+ Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
+* SFP28/SFP+/SFP Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
 
 
 ## Cooling Solution
@@ -163,7 +163,7 @@ sudo apt install    alien apt autoconf automake binfmt-support \
     rdmacm-utils sg3-utils sockperf squashfs-tools \
     squashfs-tools-ng squashfuse strongswan strongswan-charon \
     strongswan-libcharon strongswan-starter swig tcl-dev \
-    tcptraceroute tk-dev udev urjtag v4l2loopback-dkms \
+    tcptraceroute tk-dev udev v4l2loopback-dkms \
     v4l2loopback-utils valgrind valgrind-mpi vbindiff xc3sprog \
     zlib1g zlib1g-dev dpkg-dev:i386 libgtk2.0-0:i386 libstdc++6:i386
 ```
@@ -603,7 +603,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using a 25G SFP28 Direct-Attach Cable (DAC) or appropriate 25GbE optical modules and cables. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -783,7 +783,7 @@ After Vivado generates a programming Bitstream, run *Write Memory Configuration 
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
-The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect.
+Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**. The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect.
 ```
 sudo mst start
 sudo ~/Innova_2_Flex_Open_18_12/driver/make_device
@@ -861,14 +861,19 @@ sudo ./mlxup
 
 ![mlxup](img/mlxup.png)
 
+The latest firmware directy downloadable from Nvidia/Mellanox is **16.26.4012**.
+
+![Firmware 16.26.4012](MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
+
 ## Useful Links
 
 * [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/)
 * [Mellanox OFED Drivers](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/)
 * [Innova-2 Flex User Guide](https://docs.nvidia.com/networking/display/Innova2Flex)
 * [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
-* [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
 * [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf)
+* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki)
+* [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
@@ -886,7 +891,7 @@ sudo ./mlxup
 
 ### W25Q128JVS FLASH Failure
 
-If only the PCIe Bridge shows up in `lspci`, the W25Q128JVS FLASH IC has failed or is written incorrectly.
+If the PCIe Bridge partially shows up in `lspci`, the W25Q128JVS FLASH IC has failed or is written incorrectly.
 ```Shell
 sudo lspci | grep -i mellanox
 ```
@@ -894,11 +899,57 @@ sudo lspci | grep -i mellanox
 ![lspci for failed FLASH IC](img/lspci_results_when_FLASH_IC_fails.png)
 
 
+### Factory Image Running with Flex Image Scheduled
+
+The *Factory Image* (FLASH IC Address `0x00000000`) is *Running* even though the *Flex Image* (FLASH IC Address `0x03000000`) is the *Scheduled* image. This implies there is a fault with the *Flex Image*, or it was overwritten, or a *User Image* was written to address `0x00000000` by mistake, instead of `0x01000000`. The Innova2 Flex App will **not** be able to program a *User Image* into the FPGA Configuration Memory.
+
+![Factory Image is Running](img/Factory_Image_Running.png)
+
+Enable JTAG and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
+
+![Factory Image Running](img/Factory_Image_Running_Enable_JTAG.png)
+
+
+### DDR4 Communication Error
+
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/Troubleshooting/#ddr4-communication-error).
+```Shell
+cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
+dd if=/dev/urandom bs=1 count=8192 of=TEST
+sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x0 --size 8192  -f    TEST
+```
+
+![Error 512](img/XDMA_DDR4_Communication_Failure_Error_512.png)
+
+
+### JTAG Programming Failure
+
+If Vivado finishes Configuration Memory Programming in under a minute with a *\[Labtools 27-3165\] End of startup status: Low* error, it has **not** programmed anything.
+
+![JTAG Programming Failure](img/JTAG_Programming_Failure.png)
+
+**Enable JTAG Access** before attempting JTAG programming.
+```Shell
+sudo mst start
+sudo mst status
+sudo mst status -v
+sudo flint -d /dev/mst/mt4119_pciconf0 q
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+lsmod | grep mlx
+
+cd ~
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+![Enable JTAG Access](img/Enable_JTAG_Access.png)
+
 ### Board Works But Not JTAG
 
 Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf).
 
-![SC70 MOSFET with MXX Marking](img/MOSFET_MXX_Marking_DMN63D8LW.png)
+![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.png)
 
 
 ### Nothing Seems to Work
@@ -917,5 +968,122 @@ The board is well designed with all voltage rails exposed on test points. Carefu
 It should have no effect when running a 64-Bit OS but sometimes it does. Flip this setting in your BIOS if you have any problems or throughput bandwidth seems low.
 
 ![Disable Above-4G Memory](img/Above-4G_Memory_in_BIOS.png)
+
+
+## JTAG Using UrJTAG
+
+[UrJTAG](http://urjtag.org) is a low-level tool for communicating with JTAG devices. It supports [Xilinx Platform Cable USB II](https://docs.xilinx.com/v/u/en-US/ds593) adapters and [clones](https://www.waveshare.com/platform-cable-usb.htm). Main use is *EXTEST* pin toggling although it is theoretically possible to program the FPGA using a Vivado-generated *SVF* file.
+
+### Compile and Install UrJTAG
+
+```Shell
+cd ~
+wget https://downloads.sourceforge.net/project/urjtag/urjtag/2021.03/urjtag-2021.03.tar.xz
+sha256sum urjtag-2021.03.tar.xz
+b0a2eaa245513af096dc4d770109832335c694c6c12aa5e92fefae8685416f1c should be the SHA256 Checksum
+tar -xvf urjtag-2021.03.tar.xz
+cd urjtag-2021.03/
+./configure
+make
+sudo make install
+sudo ldconfig
+```
+
+### Create UrJTAG-Compatible JTAG Definition Files from BSDL Files
+
+Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) inlcude `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included *xcku15p_ffve1517_bsd.patch* is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included *xcku15p_ffve1517.jtag* file.
+
+### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
+
+From the directory containing *xcku15p_ffve1517.jtag* run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P.
+```Shell
+sudo su
+echo "# Kintex Ultrascale+ (XCKUxxP)" >>/usr/local/share/urjtag/xilinx/PARTS
+echo "0100101001010110        xcku15p_1517   xcku15p_ffve1517" >>/usr/local/share/urjtag/xilinx/PARTS
+mkdir /usr/local/share/urjtag/xilinx/xcku15p_1517
+touch /usr/local/share/urjtag/xilinx/xcku15p_1517/STEPPINGS
+echo "0000 xcku15p_1517 0" >>/usr/local/share/urjtag/xilinx/xcku15p_1517/STEPPINGS
+echo "0001 xcku15p_1517 1" >>/usr/local/share/urjtag/xilinx/xcku15p_1517/STEPPINGS
+cp xcku15p_ffve1517.jtag /usr/local/share/urjtag/xilinx/xcku15p_1517/xcku15p_1517
+exit
+```
+
+### Connect JTAG Adapter
+
+JTAG Communication is controlled by the ConnectX-5 on the Innova-2. Enable JTAG using `innova2_flex_app`.
+```Shell
+sudo mst start
+sudo mst status
+sudo mst status -v
+sudo flint -d /dev/mst/mt4119_pciconf0 q
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+lsmod | grep mlx
+
+cd ~
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+![Enable JTAG on the Innova-2](img/UrJTAG_Enable_JTAG_on_Innova2_Flex.png)
+
+#### Disconnect the Innova-2 FPGA from the PCIe Bridge
+
+`lspci | grep -i Mellanox` shows all connected Mellanox PCIe devices. The PCIe Bridge on the Innova-2 is device `08`, function `0`, `08.0`. In the example below it shows up with Bus ID `02`. Disable the FPGA-to-PCIe connection so that JTAG does not interfere with the PCIe bus.
+```Shell
+sudo setpci  -s 02:08.0  0x70.w=0x50
+```
+It can later be re-enabled with the following command:
+```Shell
+sudo setpci -s 02:08.0 0x70.w=0x40
+```
+
+![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_XCKU15P_from_Mellanox_Bridge.png)
+
+
+#### Allow Vivado to Update Platform Cable USB II Firmware
+
+Connect your JTAG Adapter to the Innova-2. If you are using a Platform Cable USB II compatible adapter it will show up under `lsusb` as `03fd:0013 Xilinx, Inc.` In this state it cannot be used for JTAG.
+
+![03fd 0013 Xilinx Inc](Xilinx_Platform_USB_Cable_II_lsusb_Initial.png)
+
+Start Vivado or Vivado Lab Hardware Manager:
+
+![Vivado Hardware Manager](img/Vivado_Hardware_Manager.png)
+
+Connect to the JTAG Adapter which will update the adapter's firmware.
+
+![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
+
+Disconnect from the adapter and exit Vivado. `lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`.
+
+![03fd 0008 Xilinx Inc Platform Cable USB II](img/Xilinx_Platform_USB_Cable_II_lsusb_After_Update.png)
+
+
+#### Begin a UrJTAG Session
+
+`sudo jtag` to start UrJTAG with access to USB. You should see the `jtag> ` command prompt. A [JTAG Overview](https://www.xjtag.com/about-jtag/jtag-a-technical-overview/) may be helpful before you begin.
+
+`cable xpc_ext` selects the Xilinx Platform Cable, external JTAG chain
+`detect` finds all devices in the JTAG chain
+`print chain` prints all devices in the JTAG chain
+`part 0` selects the first JTAG part for communication. Good practise to always make this explicit.
+`instruction EXTEST` select the External Test Function
+`shift ir` shifts EXTEST into the JTAG Instruction Register to put the device into EXTEST mode
+`shift dr` shifts the Data Register containing all pin states into UrJTAG memory
+`get signal IO_A6` displays the value of pin A6 (the inverted D19 LED) from the Data Register (1 = off)
+`get signal IO_B6` displays the value of pin B6 (the inverted D18 LED) from the Data Register (1 = off)
+`set signal IO_A6 out 0` sets pin A6 to output 0 in the Data Register in UrJTAG memory
+`shift dr` shifts the Data Register out onto the device which should light up the D19 LED (0 = on)
+`set signal IO_B6 out 0` sets pin B6 to output 0 in the Data Register in UrJTAG memory
+`shift dr` shifts the Data Register out onto the device which should light up the D18 LED (0 = on)
+`get signal IO_A6` displays the value of pin A6 from the last Data Register shift (0 = on)
+`get signal IO_B6` displays the value of pin B6 from the last Data Register shift (1=off is an error)
+`shift dr` shifts the Data Register from the device into UrJTAG memory
+`get signal IO_B6` displays the value of pin B6 from the last Data Register shift (0=on is correct)
+`reset` resets the JTAG chain and enters Bypass Mode
+`quit` exits UrJTAG
+
+![UrJTAG Session](img/UrJTAG_Session.png)
 
 
