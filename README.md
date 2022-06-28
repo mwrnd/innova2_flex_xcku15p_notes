@@ -786,7 +786,8 @@ After Vivado generates a programming Bitstream, run *Write Memory Configuration 
 Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**. The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect.
 ```
 sudo mst start
-sudo ~/Innova_2_Flex_Open_18_12/driver/make_device
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
 sudo insmod mlx5_fpga_tools
 
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
@@ -912,7 +913,7 @@ Enable JTAG and [program the FPGA Configuration Memory to factory default](#prog
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/Troubleshooting/#ddr4-communication-error).
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/tree/main/Troubleshooting).
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -1055,7 +1056,7 @@ Connect to the JTAG Adapter which will update the adapter's firmware.
 
 ![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
 
-Disconnect from the adapter and exit Vivado. `lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`.
+*Close Target* and exit Vivado. `lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`.
 
 ![03fd 0008 Xilinx Inc Platform Cable USB II](img/Xilinx_Platform_USB_Cable_II_lsusb_After_Update.png)
 
