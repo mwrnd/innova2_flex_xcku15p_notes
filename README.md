@@ -5,6 +5,55 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
 
+# Table of Contents
+
+   * [Required Materials](#required-materials)
+   * [Cooling Solution](#cooling-solution)
+   * [System Setup](#system-setup)
+      * [Linux Kernel](#linux-kernel)
+         * [GRUB Bootloader Configuration](#grub-bootloader-configuration)
+         * [Remove all Kernels other than 5.8.0-43](#remove-all-kernels-other-than-580-43)
+      * [Install All Prerequisites](#install-all-prerequisites)
+      * [Install Mellanox OFED](#install-mellanox-ofed)
+      * [Install Xilinx PCIe DMA IP Drivers](#install-xilinx-pcie-dma-ip-drivers)
+         * [Install and Set Up DPDK](#install-and-set-up-dpdk)
+         * [Generate Personal Signing Key](#generate-personal-signing-key)
+         * [Build and Install Xilinx XDMA Drivers](#build-and-install-xilinx-xdma-drivers)
+      * [Set up Innova-2 Flex Application](#set-up-innova-2-flex-application)
+      * [Install Vivado or Vivado Lab Edition](#install-vivado-or-vivado-lab-edition)
+   * [Test the Innova-2](#test-the-innova-2)
+      * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
+         * [Programming the ConnectX5 Firmware FLASH IC Directly](#programming-the-connectx5-firmware-flash-ic-directly)
+      * [Testing The Network Ports](#testing-the-network-ports)
+   * [Programming the FPGA](#programming-the-fpga)
+      * [Initial Loading of the Flex Image](#initial-loading-of-the-flex-image)
+         * [Generate Configuration Images for the Full Memory Array](#generate-configuration-images-for-the-full-memory-array)
+         * [Enable JTAG Access to the XCKU15P](#enable-jtag-access-to-the-xcku15p)
+         * [Programming the Factory and Flex Images](#programming-the-factory-and-flex-images)
+      * [Loading a User Image](#loading-a-user-image)
+      * [Testing a Loaded User Image](#testing-a-loaded-user-image)
+   * [Upgrading the ConnectX5 Firmware](#upgrading-the-connectx5-firmware)
+   * [Useful Links](#useful-links)
+   * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
+   * [Troubleshooting](#troubleshooting)
+      * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
+      * [Factory Image Running with Flex Image Scheduled](#factory-image-running-with-flex-image-scheduled)
+      * [DDR4 Communication Error](#ddr4-communication-error)
+      * [JTAG Programming Failure](#jtag-programming-failure)
+      * [Board Works But Not JTAG](#board-works-but-not-jtag)
+      * [Nothing Seems to Work](#nothing-seems-to-work)
+      * [Disable or Enable Above-4G Memory Decoding](#disable-or-enable-above-4g-memory-decoding)
+   * [JTAG Using UrJTAG](#jtag-using-urjtag)
+      * [Compile and Install UrJTAG](#compile-and-install-urjtag)
+      * [Create UrJTAG-Compatible JTAG Definition Files from BSDL Files](#create-urjtag-compatible-jtag-definition-files-from-bsdl-files)
+      * [Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG](#add-xcku15p-ffve1517-jtag-bit-definitions-to-urjtag)
+      * [Connect JTAG Adapter](#connect-jtag-adapter)
+         * [Disconnect the Innova-2 FPGA from the PCIe Bridge](#disconnect-the-innova-2-fpga-from-the-pcie-bridge)
+         * [Allow Vivado to Update Platform Cable USB II Firmware](#allow-vivado-to-update-platform-cable-usb-ii-firmware)
+         * [Begin a UrJTAG Session](#begin-a-urjtag-session)
+
+
+
 ## Required Materials
 
 * Innova-2 Flex
