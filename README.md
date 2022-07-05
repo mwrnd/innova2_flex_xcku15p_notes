@@ -1,9 +1,8 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html).
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). Also known as the [Lenovo IBM 4XC7A16683](http://lenovopress.com/lp1169.pdf).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
-
 
 # Table of Contents
 
@@ -59,7 +58,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 * Innova-2 Flex
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
-* 3.3V FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
+* **3.3V** SPI FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
 * Xilinx-compatible **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
 * SFP28/SFP+/SFP Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
@@ -71,7 +70,7 @@ The card is designed for use in servers and requires up to 800 LFM of air flow. 
 
 ![Cooling Setup](img/Cooling_Setup.png)
 
-The two main ICs are different heights so I needed 0.8mm and 2mm thermal pads.
+The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
 ![ICs are Different Heights](img/Cooling_Solution_Thermal_Pads.png)
 
@@ -90,7 +89,7 @@ sudo apt-get update  ;  sudo apt-get upgrade
 sudo reboot
 ```
 
-Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work.
+Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work. It is the kernel released with Ubuntu 20.04 and appears to be the only kernel Mellanox tested against.
 ```Shell
 sudo apt-get install   linux-buildinfo-5.8.0-43-generic \
        linux-cloud-tools-5.8.0-43-generic linux-headers-5.8.0-43-generic \
@@ -307,10 +306,7 @@ git describe --tags
 git clone git://dpdk.org/dpdk-kmods
 cp -r ../dma_ip_drivers/QDMA/DPDK/drivers/net/qdma ./drivers/net/
 cp -r ../dma_ip_drivers/QDMA/DPDK/examples/qdma_testapp ./examples/
-```
-
-Configure DPDK for more ethernet ports.
-```Shell
+echo Configure DPDK for more ethernet ports
 echo "dpdk_conf.set('RTE_MAX_ETHPORTS', 256)"     >>config/meson.build
 echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
 ```
@@ -843,7 +839,7 @@ lspci | grep -i Mellanox
 
 ![lspci Innova-2 Flex Burn Image](img/lspci_Innova-2_Flex_Burn_Image.png)
 
-The commands below clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for testing. Run the `innova2_flex_app` with appropriate `-b` commands to program the design. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit. After rebooting your system the new User Image should be running.
+Start MST and load FPGA Tool modules.
 ```Shell
 cd ~
 sudo mst start
@@ -853,15 +849,20 @@ sudo flint -d /dev/mst/mt4119_pciconf0 q
 cd ~/Innova_2_Flex_Open_18_12/driver/
 sudo ./make_device
 sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
-lsmod | grep mlx
 cd ~
+```
+
+For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries.
+```Shell
 git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
+```
+
+Run `innova2_flex_app` with appropriate `-b` commands to program a design. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
+```Shell
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
   -b innova2_xcku15p_ddr4_bram_gpio_primary.bin,0       \
   -b innova2_xcku15p_ddr4_bram_gpio_secondary.bin,1
-
-sudo reboot
 ```
 
 ![Program Innova-2 User Image](img/Program_User_Image.png)
@@ -999,7 +1000,7 @@ Everything but JTAG was working so I began by trying to trace out all the JTAG c
 
 ### Nothing Seems to Work
 
-While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) and the board was saved. I got lucky. If I had shorted a voltage rail further down in the heirarchy I would not have been able to fix it as easily. A blown fuse is either a simple fix or a sign of catastrophic failure.
+While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) Fast 1206 10A SMT fuse and the board was saved. I got lucky. A blown fuse is either a simple fix or a sign of catastrophic failure.
 
 ![1206 Fuse F1](img/Fuse_1206_F1.png)
 
@@ -1040,7 +1041,7 @@ Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/dow
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
-From the directory containing [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P.
+From the directory containing [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P. These commands assume UrJTAG installed support files to the default `/usr/local/share/` directory.
 ```Shell
 sudo su
 echo "# Kintex Ultrascale+ (XCKUxxP)" >>/usr/local/share/urjtag/xilinx/PARTS
@@ -1073,13 +1074,13 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 #### Disconnect the Innova-2 FPGA from the PCIe Bridge
 
-`lspci | grep -i Mellanox` shows all connected Mellanox PCIe devices. The PCIe Bridge on the Innova-2 is device `08`, function `0`, `08.0`. In the example below it shows up with Bus ID `02`. Disable the FPGA-to-PCIe connection so that JTAG does not interfere with the PCIe bus. Notice the `(re ff)` on the Xilinx device after disconnection.
+`lspci | grep -i Mellanox` shows all connected Mellanox PCIe devices. The PCIe Bridge on the Innova-2 is device `08`, function `0`, `:08.0`. In the example below it shows up with Bus ID `02`. Disable the FPGA-to-PCIe connection so that JTAG does not interfere with the PCIe bus. Notice the `(rev ff)` on the Xilinx device after disconnection.
 ```Shell
 sudo setpci  -s 02:08.0  0x70.w=0x50
 ```
 It can later be re-enabled with the following command or a cold reboot.
 ```Shell
-sudo setpci -s 02:08.0 0x70.w=0x40
+sudo setpci  -s 02:08.0  0x70.w=0x40
 ```
 
 ![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_XCKU15P_from_Mellanox_Bridge.png)
