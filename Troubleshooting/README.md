@@ -13,6 +13,8 @@ sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x0 --size 
 
 ![Error 512](img/XDMA_DDR4_Communication_Failure_Error_512.png)
 
+See the [UltraScale+ DDR4 Memory IP Interface Calibration and Hardware Debug Guide](support.xilinx.com/s/article/68937?language=en_US) for more support.
+
 #### Connect JTAG
 
 Connect JTAG to view calibration status.
@@ -25,6 +27,38 @@ A *Write Leveling* failure is unfortunately a hardware issue. Refer to [Xilinx's
 
 ![CAL FAIL Write Leveling](img/DDR4_PG150_DDR_CAL_ERROR_1.png)
 
+Write Leveling calibrates clock and Data Strobe (DQS) signals. DDR4 uses a fly-by wiring topology for control and address signals but point-to-point for Data Strobe, Data Mask, and Data Byte Lanes. It is worthwhile to test individual byte lanes on a Write Leveling error as it is unlikely every memory IC is broken. Some of the memory address space may still be usable.
+
+There are five [MT40A1G16KNR-075 ICs](https://www.micron.com/products/dram/ddr4-sdram/part-catalog/mt40a1g16knr-075) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA) on the board which each have two x8 dies. The full memory interface is 72-Bit (64-Bit + ECC) so only 9 of the 10 dies are used.
+
+![DDR4 Memory ICs](img/DDR4_ICs.png)
+
+The Xilinx DDR4 Interface only allows 8, 16, 32, 64, and 72 bit (64-bit with ECC) wide DDR4 interfaces. Therefore you can have 1GB, 2GB, 4GB, 8GB, and 8GB with ECC of memory space. Bank 66 is the main Address/Control/Byte-Lane-0 bank while Bank 67 is for Byte Lanes 3, 4, 5, and 6. Bank 68 is for Byte Lanes 1, 2, 7, and 8.
+
+![DDR4 Banks](img/DDR4_Full_72Bit_Byte-Lanes.png)
+
+I first tested a slower version of the DDR4 memory interface, DDR4-1400. I also got a Write Leveling Calibration error.
+
+![DDR4-1400](img/DDR4-1400_MT40A1G16WBU-083E_Basic_Configuration.png)
+
+I also connected *ddr4_ui_clk* to the divide-by-2^27 counter to blink the D18 LED if the DDR4 block is active.
+
+![ddr4_ui_clk connect to counter](img/DDR4-1400_MT40A1G16WBU-083E_Counter_to_ddr4_ui_clk.png)
+
+I then tested an 8-Bit wide version, *innova2_constraints_ddr4_8bit_byte-lane-0.xdc*, that uses only Byte Lane 0. It worked! My board has at least 1GB of working DDR4.
+
+I then tested 8-Bit wide versions of the DDR4 interface using different Byte Lanes from Bank 67. Each 8-Bit interface using Byte Lanes from Bank 67 worked!
+
+I then tested a 32-Bit wide version of the DDR4 interface using all four Byte Lanes from Bank 67. It worked! At least 4GB of DDR4 is usable.
+
+I then tested 16-Bit wide versions of the DDR4 interface using different Byte Lanes from Bank 67 and Bank 68. Banks used must be contiguous. You cannot skip Bank 67 and use Banks 66 and 68. Bank 67 must be used for Bank 68 Byte Lanes to be tested so I used known-working Byte Lane 3 from Bank 67 to test Bank 68 lanes. Byte Lanes 1+3 failed but Byte Lanes 2+3 worked! Byte Lane 1 is broken.
+
+I then tested 3+7 and 3+8 and both worked. Only Byte Lane 1 is broken.
+
+I then tested 64-Bit versions of the DDR4 memory interface without Byte Lane 1 at two speeds, DDR4-1600 (**1428**ps) and DDR4-2400 (**833**ps). Both worked!
+
+
+
 #### Recreating ddr4_0_ex Example Design
 
 The included `ddr4_0_ex_example_design.xdc` constraints file has the correct pin mappings when creating the DDR4 Example Design using **Vivado 2021.2**.
@@ -33,7 +67,11 @@ Begin by `source`ing the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwr
 
 ![DDR4 Basic Options](img/DDR4_Troubleshooting_Options_Setup.png)
 
-Right-click on the DDR4 Block and choose *Generate Example Design*. After Vivado generates the Example Design, update the Constraints File *example_design.xdc* with the contents of the included `ddr4_0_ex_example_design.xdc` file. Also, the `sys_rst` signal must be inverted in *example_top.sv*.
+Right-click on the DDR4 Block and choose *Open IP Example Design*.
+
+![Open IP Example Design](img/Vivado_Open_IP_Example_Design.png)
+
+After Vivado generates the Example Design, update the Constraints File *example_design.xdc* with the contents of the included `ddr4_0_ex_example_design.xdc` file. Also, the `sys_rst` signal must be inverted in *example_top.sv*.
 
 ![Invert sys_rst](img/ddr4_0_ex_Inverted_PCIe_Reset_for_sys_rst.png)
 
@@ -42,5 +80,11 @@ Right-click on the DDR4 Block and choose *Generate Example Design*. After Vivado
 
 Xilinx's *ddr4_0_ex* Example Design includes additional testing infrastructure.
 
-![JTAG ddr4_0_ex Example Design](img/DDR4_CAL_Fail_Hardware_Manager_ddr4_0_ex.png)
+CAL Pass:
+
+![JTAG ddr4_0_ex Success](img/Vivado_JTAG_Debug_CAL_PASS_ddr4_0_ex.png)
+
+CAL Fail:
+
+![JTAG ddr4_0_ex Fail](img/DDR4_CAL_Fail_Hardware_Manager_ddr4_0_ex.png)
 

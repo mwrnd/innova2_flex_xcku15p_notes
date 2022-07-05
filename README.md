@@ -904,7 +904,7 @@ sudo ./mlxup
 
 ![mlxup](img/mlxup.png)
 
-The latest firmware directy downloadable from Nvidia/Mellanox is **16.26.4012**.
+The latest firmware [directy downloadable](http://www.mellanox.com/downloads/firmware/fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip) from Nvidia/Mellanox is **16.26.4012**.
 
 ![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
 
@@ -920,7 +920,8 @@ The latest firmware directy downloadable from Nvidia/Mellanox is **16.26.4012**.
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
-* If, after fully testing your board, you are looking for throughput performance improvements, consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt). This requires a server class system with 64GB+ of RAM.
+* DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075 with D9WFR FBGA Code](https://www.micron.com/products/dram/ddr4-sdram/part-catalog/mt40a1g16knr-075)
+* Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
 * [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
 * [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
@@ -1016,7 +1017,7 @@ It should have no effect when running a 64-Bit OS but sometimes it does. Flip th
 
 ## JTAG Using UrJTAG
 
-[UrJTAG](http://urjtag.org) is a low-level tool for communicating with JTAG devices. It supports [Xilinx Platform Cable USB II](https://docs.xilinx.com/v/u/en-US/ds593) adapters and [clones](https://www.waveshare.com/platform-cable-usb.htm). Main use is *EXTEST* pin toggling although it is theoretically possible to program the FPGA using a Vivado-generated *SVF* file.
+[UrJTAG](http://urjtag.org) is a low-level tool for communicating with JTAG devices. It supports [Xilinx Platform Cable USB II](https://docs.xilinx.com/v/u/en-US/ds593) adapters and [clones](https://www.waveshare.com/platform-cable-usb.htm). Main use is *EXTEST* pin toggling although it is theoretically possible to program the FPGA using an *SVF* file.
 
 ### Compile and Install UrJTAG
 
@@ -1098,7 +1099,11 @@ Connect to the JTAG Adapter which will update the adapter's SRAM firmware. This 
 
 ![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
 
-*Close Target* and exit Vivado. `lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`.
+*Close Target* and exit Vivado.
+
+![Vivado Close Target](img/Vivado_Hardware_Manager_Close_Target.png)
+
+`lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`. The JTAG adapter is now ready to be used by UrJTAG.
 
 ![03fd 0008 Xilinx Inc Platform Cable USB II](img/Xilinx_Platform_USB_Cable_II_lsusb_After_Update.png)
 
