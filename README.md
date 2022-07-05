@@ -113,10 +113,10 @@ GRUB_HIDDEN_TIMEOUT_QUIET=false
 GRUB_TIMEOUT=3
 GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
-GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0 default_hugepagesz=1GB hugepagesz=1GB hugepages=20"
+GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"
 ```
 
-The `net.ifnames=0 biosdevname=0` options allow default network interface names. The `hugepages` options speed up allocation of memory for throughput testing.
+The `net.ifnames=0 biosdevname=0` options allow default network interface names.
 
 Update and reboot.
 ```Shell
@@ -296,13 +296,6 @@ mv dma_ip_drivers-785995783c78b2cbec6458141c4395e204c5bd9b dma_ip_drivers
 ```
 
 #### Install and Set Up DPDK
-
-Increase hugepages support in kernel for throughput testing.
-```Shell
-sudo su
-echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-exit
-```
 
 [DPDK](https://doc.dpdk.org/guides/linux_gsg/linux_drivers.html) v20.11 is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`.
 ```Shell
@@ -927,6 +920,7 @@ The latest firmware directy downloadable from Nvidia/Mellanox is **16.26.4012**.
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
+* If, after fully testing your board, you are looking for throughput performance improvements, consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt). This requires a server class system with 64GB+ of RAM.
 * [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
 * [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
