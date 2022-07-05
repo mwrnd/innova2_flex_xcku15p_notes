@@ -49,13 +49,13 @@ I then tested an 8-Bit wide version, [innova2_constraints_ddr4_8bit_byte-lane-0.
 
 I then tested 8-Bit wide versions of the DDR4 interface using different Byte Lanes from Bank 67. Each 8-Bit interface using Byte Lanes from Bank 67 worked!
 
-I then tested a 32-Bit wide version of the DDR4 interface using all four Byte Lanes from Bank 67. It worked! At least 4GB of DDR4 is usable.
+I then tested a 32-Bit wide version of the DDR4 interface using [all four Byte Lanes from Bank 67](https://github.com/mwrnd/innova2_flex_xcku15p_notes/blob/a80d521a60757b3b8c5ceabf8a41422d13a8c0a1/Troubleshooting/innova2_constraints_ddr4_32bit_byte-lanes-3-4-5-6-Bank67.xdc#L138). It worked! At least 4GB of DDR4 is usable.
 
-I then tested 16-Bit wide versions of the DDR4 interface using different Byte Lanes from Bank 67 and Bank 68. Banks used must be contiguous. You cannot skip Bank 67 and use Banks 66 and 68. Bank 67 must be used for Bank 68 Byte Lanes to be tested so I used the known-working Byte Lane 3 from Bank 67 to test Bank 68 lanes. Byte Lanes 1+3 failed but Byte Lanes 2+3 worked! Byte Lane 1 is broken.
+I then tested 16-Bit wide versions of the DDR4 interface using different Byte Lanes from Bank 67 and Bank 68. Banks used must be contiguous. You cannot skip Bank 67 and use Banks 66 and 68. Bank 67 must be used for Bank 68 Byte Lanes to be tested so I used the known-working Byte Lane 3 from Bank 67 to test Bank 68 lanes. Byte Lanes [1+3](innova2_constraints_ddr4_16bit_byte-lanes-1-3.xdc) failed but Byte Lanes [2+3](innova2_constraints_ddr4_16bit_byte-lanes-2-3.xdc) worked! Byte Lane 1 is broken.
 
-I then tested 3+7 and 3+8 and both worked. Only Byte Lane 1 is broken. Bank 68 otherwise works. This is not a power supply issue.
+I then tested [3+7](innova2_constraints_ddr4_16bit_byte-lanes-3-7.xdc) and [3+8](innova2_constraints_ddr4_16bit_byte-lanes-3-8.xdc) and both worked. Only Byte Lane 1 is broken. Bank 68 otherwise works.
 
-I then tested 64-Bit versions of the DDR4 memory interface without Byte Lane 1 at two speeds, DDR4-1600 (**1428**ps) and DDR4-2400 (**833**ps). Both worked! 
+I then tested 64-Bit versions of the DDR4 memory interface without Byte Lane 1 at two speeds, DDR4-1400 (**1428**ps) and DDR4-2400 (**833**ps). Both worked! Since I do not have access to a schematic I cannot further investigate this Byte Lane issue. However, I do not need ECC so having 8GB of working RAM is good enough.
 
 
 
