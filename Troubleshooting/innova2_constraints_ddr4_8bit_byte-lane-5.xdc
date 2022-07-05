@@ -165,19 +165,19 @@ set_property PACKAGE_PIN AV26 [get_ports {ddr4_rtl_0_adr[16]}]
 # set_property PACKAGE_PIN AR36 [get_ports {ddr4_rtl_0_dq[39]}]
 
 
-# Byte Lane 5 - Bank 67
-# set_property PACKAGE_PIN AV32 [get_ports {ddr4_rtl_0_dqs_t[5]}]
-# set_property PACKAGE_PIN AV33 [get_ports {ddr4_rtl_0_dqs_c[5]}]
-# set_property PACKAGE_PIN AV35 [get_ports {ddr4_rtl_0_dm_n[5]}]
+# Byte Lane 5 - Bank 67 - For 8bit DDR4 Test, Use as Byte Lane 0
+set_property PACKAGE_PIN AV32 [get_ports {ddr4_rtl_0_dqs_t[0]}]
+set_property PACKAGE_PIN AV33 [get_ports {ddr4_rtl_0_dqs_c[0]}]
+set_property PACKAGE_PIN AV35 [get_ports {ddr4_rtl_0_dm_n[0]}]
 
-# set_property PACKAGE_PIN AU33 [get_ports {ddr4_rtl_0_dq[40]}]
-# set_property PACKAGE_PIN AU35 [get_ports {ddr4_rtl_0_dq[41]}]
-# set_property PACKAGE_PIN AU32 [get_ports {ddr4_rtl_0_dq[42]}]
-# set_property PACKAGE_PIN AW34 [get_ports {ddr4_rtl_0_dq[43]}]
-# set_property PACKAGE_PIN AT35 [get_ports {ddr4_rtl_0_dq[44]}]
-# set_property PACKAGE_PIN AW35 [get_ports {ddr4_rtl_0_dq[45]}]
-# set_property PACKAGE_PIN AU34 [get_ports {ddr4_rtl_0_dq[46]}]
-# set_property PACKAGE_PIN AT36 [get_ports {ddr4_rtl_0_dq[47]}]
+set_property PACKAGE_PIN AU33 [get_ports {ddr4_rtl_0_dq[0]}]
+set_property PACKAGE_PIN AU35 [get_ports {ddr4_rtl_0_dq[1]}]
+set_property PACKAGE_PIN AU32 [get_ports {ddr4_rtl_0_dq[2]}]
+set_property PACKAGE_PIN AW34 [get_ports {ddr4_rtl_0_dq[3]}]
+set_property PACKAGE_PIN AT35 [get_ports {ddr4_rtl_0_dq[4]}]
+set_property PACKAGE_PIN AW35 [get_ports {ddr4_rtl_0_dq[5]}]
+set_property PACKAGE_PIN AU34 [get_ports {ddr4_rtl_0_dq[6]}]
+set_property PACKAGE_PIN AT36 [get_ports {ddr4_rtl_0_dq[7]}]
 
 
 # Byte Lane 6 - Bank 67

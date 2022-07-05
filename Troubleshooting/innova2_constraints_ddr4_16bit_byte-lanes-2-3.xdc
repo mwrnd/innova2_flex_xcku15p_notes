@@ -120,34 +120,34 @@ set_property PACKAGE_PIN AV26 [get_ports {ddr4_rtl_0_adr[16]}]
 # set_property PACKAGE_PIN AH32 [get_ports {ddr4_rtl_0_dq[15]}]
 
 
-# Byte Lane 2 - Bank 68
-# set_property PACKAGE_PIN AN30 [get_ports {ddr4_rtl_0_dqs_t[2]}]
-# set_property PACKAGE_PIN AN31 [get_ports {ddr4_rtl_0_dqs_c[2]}]
-# set_property PACKAGE_PIN AM28 [get_ports {ddr4_rtl_0_dm_n[2]}]
+# Byte Lane 2 - Bank 68 - For 16Bit, use as Byte Lane 0
+set_property PACKAGE_PIN AN30 [get_ports {ddr4_rtl_0_dqs_t[0]}]
+set_property PACKAGE_PIN AN31 [get_ports {ddr4_rtl_0_dqs_c[0]}]
+set_property PACKAGE_PIN AM28 [get_ports {ddr4_rtl_0_dm_n[0]}]
 
-# set_property PACKAGE_PIN AN33 [get_ports {ddr4_rtl_0_dq[16]}]
-# set_property PACKAGE_PIN AN32 [get_ports {ddr4_rtl_0_dq[17]}]
-# set_property PACKAGE_PIN AM30 [get_ports {ddr4_rtl_0_dq[18]}]
-# set_property PACKAGE_PIN AP29 [get_ports {ddr4_rtl_0_dq[19]}]
-# set_property PACKAGE_PIN AL29 [get_ports {ddr4_rtl_0_dq[20]}]
-# set_property PACKAGE_PIN AP28 [get_ports {ddr4_rtl_0_dq[21]}]
-# set_property PACKAGE_PIN AM29 [get_ports {ddr4_rtl_0_dq[22]}]
-# set_property PACKAGE_PIN AL30 [get_ports {ddr4_rtl_0_dq[23]}]
+set_property PACKAGE_PIN AN33 [get_ports {ddr4_rtl_0_dq[0]}]
+set_property PACKAGE_PIN AN32 [get_ports {ddr4_rtl_0_dq[1]}]
+set_property PACKAGE_PIN AM30 [get_ports {ddr4_rtl_0_dq[2]}]
+set_property PACKAGE_PIN AP29 [get_ports {ddr4_rtl_0_dq[3]}]
+set_property PACKAGE_PIN AL29 [get_ports {ddr4_rtl_0_dq[4]}]
+set_property PACKAGE_PIN AP28 [get_ports {ddr4_rtl_0_dq[5]}]
+set_property PACKAGE_PIN AM29 [get_ports {ddr4_rtl_0_dq[6]}]
+set_property PACKAGE_PIN AL30 [get_ports {ddr4_rtl_0_dq[7]}]
 
 
-# Byte Lane 3 - Bank 67
-# set_property PACKAGE_PIN AU38 [get_ports {ddr4_rtl_0_dqs_t[3]}]
-# set_property PACKAGE_PIN AV38 [get_ports {ddr4_rtl_0_dqs_c[3]}]
-# set_property PACKAGE_PIN AR37 [get_ports {ddr4_rtl_0_dm_n[3]}]
+# Byte Lane 3 - Bank 67 - For 16Bit, use as Byte Lane 1
+set_property PACKAGE_PIN AU38 [get_ports {ddr4_rtl_0_dqs_t[1]}]
+set_property PACKAGE_PIN AV38 [get_ports {ddr4_rtl_0_dqs_c[1]}]
+set_property PACKAGE_PIN AR37 [get_ports {ddr4_rtl_0_dm_n[1]}]
 
-# set_property PACKAGE_PIN AP38 [get_ports {ddr4_rtl_0_dq[24]}]
-# set_property PACKAGE_PIN AV37 [get_ports {ddr4_rtl_0_dq[25]}]
-# set_property PACKAGE_PIN AR39 [get_ports {ddr4_rtl_0_dq[26]}]
-# set_property PACKAGE_PIN AT39 [get_ports {ddr4_rtl_0_dq[27]}]
-# set_property PACKAGE_PIN AP39 [get_ports {ddr4_rtl_0_dq[28]}]
-# set_property PACKAGE_PIN AU37 [get_ports {ddr4_rtl_0_dq[29]}]
-# set_property PACKAGE_PIN AR38 [get_ports {ddr4_rtl_0_dq[30]}]
-# set_property PACKAGE_PIN AU39 [get_ports {ddr4_rtl_0_dq[31]}]
+set_property PACKAGE_PIN AP38 [get_ports {ddr4_rtl_0_dq[8]}]
+set_property PACKAGE_PIN AV37 [get_ports {ddr4_rtl_0_dq[9]}]
+set_property PACKAGE_PIN AR39 [get_ports {ddr4_rtl_0_dq[10]}]
+set_property PACKAGE_PIN AT39 [get_ports {ddr4_rtl_0_dq[11]}]
+set_property PACKAGE_PIN AP39 [get_ports {ddr4_rtl_0_dq[12]}]
+set_property PACKAGE_PIN AU37 [get_ports {ddr4_rtl_0_dq[13]}]
+set_property PACKAGE_PIN AR38 [get_ports {ddr4_rtl_0_dq[14]}]
+set_property PACKAGE_PIN AU39 [get_ports {ddr4_rtl_0_dq[15]}]
 
 
 # Byte Lane 4 - Bank 67

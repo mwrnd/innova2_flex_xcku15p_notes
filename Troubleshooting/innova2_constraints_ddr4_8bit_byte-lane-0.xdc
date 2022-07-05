@@ -91,18 +91,18 @@ set_property PACKAGE_PIN AV26 [get_ports {ddr4_rtl_0_adr[16]}]
 # Bank 68 - Byte Lanes 1, 2, 7, 8
 
 # Byte Lane 0 - Bank 66
-# set_property PACKAGE_PIN AH26 [get_ports {ddr4_rtl_0_dqs_t[0]}]
-# set_property PACKAGE_PIN AH27 [get_ports {ddr4_rtl_0_dqs_c[0]}]
-# set_property PACKAGE_PIN AL25 [get_ports {ddr4_rtl_0_dm_n[0]}]
+set_property PACKAGE_PIN AH26 [get_ports {ddr4_rtl_0_dqs_t[0]}]
+set_property PACKAGE_PIN AH27 [get_ports {ddr4_rtl_0_dqs_c[0]}]
+set_property PACKAGE_PIN AL25 [get_ports {ddr4_rtl_0_dm_n[0]}]
 
-# set_property PACKAGE_PIN AJ26 [get_ports {ddr4_rtl_0_dq[0]}]
-# set_property PACKAGE_PIN AK28 [get_ports {ddr4_rtl_0_dq[1]}]
-# set_property PACKAGE_PIN AJ28 [get_ports {ddr4_rtl_0_dq[2]}]
-# set_property PACKAGE_PIN AK27 [get_ports {ddr4_rtl_0_dq[3]}]
-# set_property PACKAGE_PIN AN27 [get_ports {ddr4_rtl_0_dq[4]}]
-# set_property PACKAGE_PIN AN26 [get_ports {ddr4_rtl_0_dq[5]}]
-# set_property PACKAGE_PIN AL27 [get_ports {ddr4_rtl_0_dq[6]}]
-# set_property PACKAGE_PIN AK26 [get_ports {ddr4_rtl_0_dq[7]}]
+set_property PACKAGE_PIN AJ26 [get_ports {ddr4_rtl_0_dq[0]}]
+set_property PACKAGE_PIN AK28 [get_ports {ddr4_rtl_0_dq[1]}]
+set_property PACKAGE_PIN AJ28 [get_ports {ddr4_rtl_0_dq[2]}]
+set_property PACKAGE_PIN AK27 [get_ports {ddr4_rtl_0_dq[3]}]
+set_property PACKAGE_PIN AN27 [get_ports {ddr4_rtl_0_dq[4]}]
+set_property PACKAGE_PIN AN26 [get_ports {ddr4_rtl_0_dq[5]}]
+set_property PACKAGE_PIN AL27 [get_ports {ddr4_rtl_0_dq[6]}]
+set_property PACKAGE_PIN AK26 [get_ports {ddr4_rtl_0_dq[7]}]
 
 
 # Byte Lane 1 - Bank 68
