@@ -1036,11 +1036,11 @@ sudo ldconfig
 
 ### Create UrJTAG-Compatible JTAG Definition Files from BSDL Files
 
-Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) include `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included *xcku15p_ffve1517_bsd.patch* is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included *xcku15p_ffve1517.jtag* file.
+Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) include `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included [xcku15p_ffve1517_bsd.patch](xcku15p_ffve1517_bsd.patch) is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) file.
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
-From the directory containing *xcku15p_ffve1517.jtag* run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P.
+From the directory containing [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P.
 ```Shell
 sudo su
 echo "# Kintex Ultrascale+ (XCKUxxP)" >>/usr/local/share/urjtag/xilinx/PARTS
@@ -1095,7 +1095,7 @@ Start Vivado or Vivado Lab Hardware Manager:
 
 ![Vivado Hardware Manager](img/Vivado_Hardware_Manager.png)
 
-Connect to the JTAG Adapter which will update the adapter's SRAM firmware. This change disappears if the JTAG adapter is powered off or unplugged from USB.
+Connect to the JTAG Adapter (*Open Target* then *Auto Connect*) which will update the adapter's SRAM firmware. This change disappears if the JTAG adapter is powered off or unplugged from USB.
 
 ![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
 
