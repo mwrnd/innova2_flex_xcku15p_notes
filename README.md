@@ -59,7 +59,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
 * **3.3V** SPI FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
-* Xilinx-compatible **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
+* Xilinx-Compatible **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
 * SFP28/SFP+/SFP Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
 
@@ -310,6 +310,12 @@ mv dma_ip_drivers-785995783c78b2cbec6458141c4395e204c5bd9b dma_ip_drivers
 
 #### Install and Set Up DPDK
 
+DPDK requires hugepages.
+```Shell
+sudo su
+echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+exit
+```
 
 [DPDK](https://doc.dpdk.org/guides/linux_gsg/linux_drivers.html) v20.11.5 is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`.
 ```Shell
@@ -656,7 +662,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). [Another such cable](https://www.fs.com/products/65841.html).
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -941,7 +947,7 @@ The latest firmware [directy downloadable](http://www.mellanox.com/downloads/fir
 * DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf?rev=a7b695ebf7a4498fb40244f2afd6b512) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
 * Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
 * [Mipsology's Zebra AI Accelerator](https://web.archive.org/web/20220706190619/https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
-* [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing
+* [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
 * [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
@@ -1046,7 +1052,7 @@ It should have no effect when running a 64-Bit OS but sometimes it does. Flip th
 cd ~
 wget https://downloads.sourceforge.net/project/urjtag/urjtag/2021.03/urjtag-2021.03.tar.xz
 sha256sum urjtag-2021.03.tar.xz
-b0a2eaa245513af096dc4d770109832335c694c6c12aa5e92fefae8685416f1c should be the SHA256 Checksum
+echo b0a2eaa245513af096dc4d770109832335c694c6c12aa5e92fefae8685416f1c should be the SHA256 Checksum
 tar -xvf urjtag-2021.03.tar.xz
 cd urjtag-2021.03/
 ./configure
