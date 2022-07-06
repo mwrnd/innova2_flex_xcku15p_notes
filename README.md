@@ -1,6 +1,6 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). Also known as the [Lenovo IBM 4XC7A16683](http://lenovopress.com/lp1169.pdf).
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). Also known as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
@@ -790,7 +790,7 @@ Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power 
 
 ![JTAG Connected](img/JTAG_Connected.png)
 
-Powered PCIe Riser for Graphics Card:
+If you do not have a second computer to power the Innova-2 while JTAG programming, use a Powered PCIe Riser/Extender:
 
 ![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.png)
 
