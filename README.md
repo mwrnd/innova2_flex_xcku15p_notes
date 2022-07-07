@@ -322,8 +322,9 @@ cd dpdk-stable
 git checkout v20.11.5
 git describe --tags
 git clone git://dpdk.org/dpdk-kmods
-cp -r ../dma_ip_drivers/QDMA/DPDK/drivers/net/qdma ./drivers/net/
-cp -r ../dma_ip_drivers/QDMA/DPDK/examples/qdma_testapp ./examples/
+echo Copy QDMA-related files from dma_ip_drivers
+cp -r ~/dma_ip_drivers/QDMA/DPDK/drivers/net/qdma ./drivers/net/
+cp -r ~/dma_ip_drivers/QDMA/DPDK/examples/qdma_testapp ./examples/
 echo Configure DPDK for more ethernet ports
 echo "dpdk_conf.set('RTE_MAX_ETHPORTS', 256)"     >>config/meson.build
 echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
@@ -662,7 +663,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). [Another such cable](https://www.fs.com/products/65841.html).
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). Any DAC cable that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -713,13 +714,13 @@ Results should approach about 23Gbits/sec as there is some overhead. Change the 
 
 ### Initial Loading of the Flex Image
 
-In order for `innova2_flex_app` to program a User Image into the FPGA's configuration memory it must communicate with the Flex Image running in the FPGA. The Flex and Factory Images must get into FPGA configuration memory and reproduce the Memory Layout as pictured below. The `innova2_flex_app` is faster at programming a User Image than JTAG as the Flex Image provides a PCIe interface to the FPGA's Configuration Memory FLASH ICs. Refer to the [Innova-2 User Guide](https://docs.nvidia.com/networking/display/Innova2Flex/Using+the+Mellanox+Innova-2+Flex+Open+Bundle#UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) for more info.
+In order for `innova2_flex_app` to program a User Image into the FPGA's configuration memory it must communicate with the Flex Image running in the FPGA. The Flex and Factory Images must get into FPGA Configuration Memory and reproduce the Memory Layout as pictured below. The `innova2_flex_app` is faster at programming a User Image than JTAG as the Flex Image provides a PCIe interface to the FPGA's Configuration Memory FLASH ICs. Refer to the [Innova-2 User Guide](https://docs.nvidia.com/networking/display/Innova2Flex/Using+the+Mellanox+Innova-2+Flex+Open+Bundle#UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) for more info.
 
 ![FPGA Configuration Memory Layout](img/FPGA_Configuration_Memory_Layout.png)
 
 #### Generate Configuration Images for the Full Memory Array
 
-Create configuration images that span the entire memory map as in the layout pictured above. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. Note that the configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8.
+Create configuration images that span the entire memory map as in the layout pictured above. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. Note that the configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8 during loading.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FPGA_image
 
@@ -945,6 +946,7 @@ The latest firmware [directy downloadable](http://www.mellanox.com/downloads/fir
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
 * DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
+* FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
 * Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
 * [Mipsology's Zebra AI Accelerator](https://web.archive.org/web/20220706190619/https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
