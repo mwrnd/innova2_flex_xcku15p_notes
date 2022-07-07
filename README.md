@@ -1,6 +1,6 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). Also known as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). It is also sold as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
@@ -76,27 +76,24 @@ The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
 ## System Setup
 
-The Innova-2 requires a specific system setup. [Ubuntu 20.04](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is the most recent combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
+The Innova-2 requires a specific system setup. [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is the most recent combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
 
-I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full *Vivado* 2021.2. 64GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
+I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full *Vivado 2021.2*. 64GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
 
 
 ### Linux Kernel
 
-Begin by updating and upgrading your [Ubuntu 20.04](https://releases.ubuntu.com/20.04.4/) install but make sure to stay on **20.04**, no `dist-upgrade`. Run the following in a terminal. Run `sudo ls` before copy-and-pasting a large block of commands to prime `sudo` and avoid copying commands into the password field.
+Begin by updating and upgrading your [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) install but make sure to stay on **20.04**, no `dist-upgrade`. Run the following in a terminal. Run `sudo ls` before copy-and-pasting a large block of commands to prime `sudo` and avoid copying commands into the password field.
 ```Shell
 sudo apt-get update  ;  sudo apt-get upgrade
-sudo reboot
 ```
 
-Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work. It is the kernel released with Ubuntu 20.04 and appears to be the only kernel Mellanox tested against.
+Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work.
 ```Shell
 sudo apt-get install   linux-buildinfo-5.8.0-43-generic \
        linux-cloud-tools-5.8.0-43-generic linux-headers-5.8.0-43-generic \
        linux-image-5.8.0-43-generic linux-modules-5.8.0-43-generic \
        linux-modules-extra-5.8.0-43-generic linux-tools-5.8.0-43-generic
-
-sudo reboot
 ```
 
 #### GRUB Bootloader Configuration
@@ -111,7 +108,7 @@ GRUB_TIMEOUT_STYLE=menu
 GRUB_HIDDEN_TIMEOUT_QUIET=false
 GRUB_TIMEOUT=3
 GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
-GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX_DEFAULT=""
 GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"
 ```
 
@@ -210,7 +207,7 @@ sudo apt install    alien apt autoconf automake binfmt-support \
     python-zope.interface quilt rdmacm-utils sg3-utils sockperf \
     squashfs-tools squashfs-tools-ng squashfuse strongswan \
     strongswan-charon strongswan-libcharon strongswan-starter swig \
-    tcl-dev tcptraceroute thermald tk-dev udev v4l2loopback-dkms \
+    tcl-dev tcptraceroute tk-dev udev v4l2loopback-dkms \
     v4l2loopback-utils valgrind valgrind-mpi vbindiff xc3sprog \
     zlib1g zlib1g-dev dpkg-dev:i386 libgtk2.0-0:i386 libstdc++6:i386
 ```
@@ -228,7 +225,7 @@ sudo apt-get remove  openmpi-bin libcoarrays-openmpi-dev \
        libbibutils6 libosmcomp4 libscalapack-mpi-dev libiscsi7 \
        mpi-default-bin
 
-sudo apt-get update  ;  sudo apt-get upgrade
+sudo apt-get update  ;  sudo apt autoremove  ;  sudo apt-get upgrade
 ```
 
 Install `libpng12` which is required by Vivado.
@@ -275,7 +272,7 @@ sudo reboot
 
 ![MLNX OFED Install Successful](img/Mellanox_OFED_Install_Successful.png)
 
-`apt-mark hold` should prevent `apt` from updating any of the packages installed by the `MLNX_OFED` drivers.
+`apt-mark hold` should prevent `apt` from updating any of the packages installed by `MLNX_OFED`.
 ```Shell
 sudo  apt-mark  hold     5.8.0-43-generic linux-image-generic \
     linux-headers-generic ofed-scripts mlnx-ofed-kernel-utils \
@@ -317,7 +314,7 @@ echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 exit
 ```
 
-[DPDK](https://doc.dpdk.org/guides/linux_gsg/linux_drivers.html) v20.11.5 is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`.
+[DPDK](https://www.dpdk.org/) [v20.11.5](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`.
 ```Shell
 cd ~
 git clone --recursive -b v20.11.5 --single-branch http://dpdk.org/git/dpdk-stable
@@ -469,6 +466,9 @@ cd ~/dma_ip_drivers/XDMA/linux-kernel/xdma
 make
 sudo make install
 sudo depmod -a
+sudo ldconfig
+cd ~/dma_ip_drivers/XDMA/linux-kernel/tools
+make
 sudo reboot
 ```
 
@@ -873,7 +873,7 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 cd ~
 ```
 
-For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries.
+For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA.
 ```Shell
 git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
@@ -944,7 +944,7 @@ The latest firmware [directy downloadable](http://www.mellanox.com/downloads/fir
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
-* DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf?rev=a7b695ebf7a4498fb40244f2afd6b512) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
+* DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
 * Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
 * [Mipsology's Zebra AI Accelerator](https://web.archive.org/web/20220706190619/https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
