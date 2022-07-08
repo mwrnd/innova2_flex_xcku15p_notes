@@ -32,8 +32,6 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
       * [Loading a User Image](#loading-a-user-image)
       * [Testing a Loaded User Image](#testing-a-loaded-user-image)
    * [Upgrading the ConnectX5 Firmware](#upgrading-the-connectx5-firmware)
-   * [Useful Links](#useful-links)
-   * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
    * [Troubleshooting](#troubleshooting)
       * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
       * [Factory Image Running with Flex Image Scheduled](#factory-image-running-with-flex-image-scheduled)
@@ -50,6 +48,8 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
          * [Disconnect the Innova-2 FPGA from the PCIe Bridge](#disconnect-the-innova-2-fpga-from-the-pcie-bridge)
          * [Allow Vivado to Update Platform Cable USB II Firmware](#allow-vivado-to-update-platform-cable-usb-ii-firmware)
          * [Begin a UrJTAG Session](#begin-a-urjtag-session)
+   * [Useful Links](#useful-links)
+   * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
 
 
 
@@ -78,7 +78,7 @@ The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
 The Innova-2 requires a specific system setup. [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is the most recent combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
 
-I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full *Vivado 2021.2*. 64GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
+I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full *Vivado 2021.2*. 50GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
 
 
 ### Linux Kernel
@@ -112,24 +112,12 @@ GRUB_CMDLINE_LINUX_DEFAULT=""
 GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"
 ```
 
-The `net.ifnames=0 biosdevname=0` options allow default network interface names.
+The `net.ifnames=0 biosdevname=0` options allow traditional network interface names, such as `eth0`. This is required for older versions of Vivado, such as *2017.2*.
 
-Update and reboot.
+Update `grub`.
 ```Shell
 sudo update-grub
-sudo reboot
 ```
-
-After reboot run Ubuntu *Software Updater* and reboot when it finishes.
-
-![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
-
-After reboot confirm you are on kernel `5.8.0-43-generic`
-```
-uname -s -r -m
-```
-
-![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
 #### Remove all Kernels other than 5.8.0-43
 
@@ -155,8 +143,19 @@ sudo apt autoremove
 sudo reboot
 ```
 
+After reboot run Ubuntu *Software Updater*.
+
+![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
+
 
 ### Install All Prerequisites
+
+Confirm you are on kernel `5.8.0-43-generic`
+```
+uname -s -r -m
+```
+
+![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
 Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers will install custom versions of some of the libraries that get pulled into this install. By installing everything first you can avoid library incompatibility issues and `MLNX_OFED` reinstallations. `libibverbs` is one package that gets updated and pulled in by almost every piece of networking software and `MLNX_OFED` requires a custom version.
 ```Shell
@@ -224,8 +223,12 @@ sudo apt-get remove  openmpi-bin libcoarrays-openmpi-dev \
        libscalapack-openmpi-dev libvma8 libfabric1 libmumps-dev \
        libbibutils6 libosmcomp4 libscalapack-mpi-dev libiscsi7 \
        mpi-default-bin
+```
 
+Run `update`, `autoremove`, and `upgrade` one last time. Reboot.
+```Shell
 sudo apt-get update  ;  sudo apt autoremove  ;  sudo apt-get upgrade
+sudo reboot
 ```
 
 Install `libpng12` which is required by Vivado.
@@ -238,8 +241,6 @@ sudo mv  tmppng12/lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu
 sudo chown root:root /lib/x86_64-linux-gnu/libpng12.so.0.54.0
 sudo ln -r -s /lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu/libpng12.so.0
 rm -Rf tmppng12/
-
-sudo reboot
 ```
 
 ### Install Mellanox OFED
@@ -330,7 +331,7 @@ echo "dpdk_conf.set('RTE_MAX_ETHPORTS', 256)"     >>config/meson.build
 echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
 ```
 
-`gedit drivers/net/meson.build` and add QDMA support to your DPDK build in `drivers/net/meson.build`. After `'mlx5',` add `'qdma',`
+`gedit drivers/net/meson.build` and add QDMA support to your DPDK build in `meson.build`. After `'mlx5',` add `'qdma',`
 
 `gedit config/rte_config.h` and search for `EAL defines` in `rte_config.h` to change/add the following values:
 ```C
@@ -495,15 +496,18 @@ wget http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz
 md5sum Innova_2_Flex_Open_18_12.tar.gz
 echo fdb96d4e02de11ef32bf3007281bfa53 should be the MD5 Checksum
 tar -xvf Innova_2_Flex_Open_18_12.tar.gz
-cd Innova_2_Flex_Open_18_12/driver/
+cd ~/Innova_2_Flex_Open_18_12/driver/
 make
 sudo depmod -a
-cd ../app/
+cd ~/Innova_2_Flex_Open_18_12/app/
 make
-cd ~
+
+sudo reboot
 ```
 
 ### Install Vivado or Vivado Lab Edition
+
+Vivado is not strictly required on the system with the Innova-2. A seperate computer with Vivado can be used for development and JTAG. However, if you intend to use any of Xilinx's [Accelerator Projects](https://www.xilinx.com/products/design-tools/vitis/vitis-ai.html), they require the [Xilinx Runtime XRT](https://xilinx.github.io/XRT/2021.2/html/index.html) which requires Vitis, which requires Vivado.
 
 Create a symbolic link for `gmake` which Vivado requires but Ubuntu already includes as `make`.
 ```Shell
@@ -931,35 +935,6 @@ The latest firmware [directy downloadable](http://www.mellanox.com/downloads/fir
 
 ![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
 
-## Useful Links
-
-* [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/)
-* [Mellanox OFED Drivers](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/)
-* [Innova-2 Flex User Guide](https://docs.nvidia.com/networking/display/Innova2Flex)
-* [Lenovo Innova-2 Product Page](https://lenovopress.lenovo.com/lp1169-thinksystem-mellanox-innova-2-connectx-5-fpga-25gbe-2-port-adapter)
-* [Lenovo Version of User Guide](https://download.lenovo.com/servers/mig/2019/05/15/20295/mlnx-lnvgy_utl_nic_in2-18.12_manual_2.0.pdf)
-* [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
-* [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf)
-* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki)
-* [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
-* OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
-* OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
-* [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
-* DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
-* FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
-* Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
-* [Mipsology's Zebra AI Accelerator](https://web.archive.org/web/20220706190619/https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
-* [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
-* [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
-* [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
-* [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
-* [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
-
-
-## Projects Tested to Work with the Innova2
-
-* [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
-
 
 ## Troubleshooting
 
@@ -1181,4 +1156,34 @@ Connect to the JTAG Adapter (*Open Target* then *Auto Connect*) which will updat
 
 ![UrJTAG Session](img/UrJTAG_Session.png)
 
+
+## Useful Links
+
+* [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/)
+* [Mellanox OFED Drivers](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/)
+* [Innova-2 Flex User Guide](https://docs.nvidia.com/networking/display/Innova2Flex)
+* [Lenovo Innova-2 Product Page](https://lenovopress.lenovo.com/lp1169-thinksystem-mellanox-innova-2-connectx-5-fpga-25gbe-2-port-adapter)
+* [Lenovo Version of User Guide](https://download.lenovo.com/servers/mig/2019/05/15/20295/mlnx-lnvgy_utl_nic_in2-18.12_manual_2.0.pdf)
+* [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
+* [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf)
+* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki)
+* [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
+* OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
+* OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
+* [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
+* According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: 01PG974 SN37A28065 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS IBM 01FT833_Ax NV303212A
+* DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
+* FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
+* Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
+* [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
+* [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
+* [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
+* [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
+* [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
+* [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
+
+
+## Projects Tested to Work with the Innova2
+
+* [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
 
