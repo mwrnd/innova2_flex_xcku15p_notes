@@ -211,7 +211,7 @@ sudo apt install    alien apt autoconf automake binfmt-support \
     zlib1g zlib1g-dev dpkg-dev:i386 libgtk2.0-0:i386 libstdc++6:i386
 ```
 
-Restart the system. Need to remove some extra packages that conflict with Mellanox OFED.
+Need to remove some extra packages that conflict with Mellanox OFED.
 ```Shell
 sudo apt-get remove  openmpi-bin libcoarrays-openmpi-dev \
        libiscsi-bin dpdk-dev libmumps-5.2.1 librte-pmd-mlx4-20.0 \
