@@ -72,7 +72,9 @@ Begin by `source`ing the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwr
 
 ![DDR4 Basic Options](img/DDR4_Troubleshooting_Options_Setup.png)
 
-Select the option to include *Debug Signals* in the DDR4 IP.
+Select the option to enable Debug Signals under Advanced Options in the DDR4 IP Customizer.
+
+![Enable Debug Signals](img/ddr4_0_ex_Enable_Debug_Signals.png)
 
 Right-click on the DDR4 Block and choose *Open IP Example Design*.
 
