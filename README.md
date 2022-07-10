@@ -1,6 +1,6 @@
 # Innova-2 Flex XCKU15P Setup and Usage Notes
 
-The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html). It is also sold as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
+The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 bridge in the ConnectX-5. Its capabilities are between that of an [Alveo U25N](https://www.xilinx.com/products/boards-and-kits/alveo/u25n.html#overview) and the [Alveo U55C](https://www.xilinx.com/products/boards-and-kits/alveo/u55c.html).
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
@@ -39,6 +39,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
       * [JTAG Programming Failure](#jtag-programming-failure)
       * [Board Works But Not JTAG](#board-works-but-not-jtag)
       * [Nothing Seems to Work](#nothing-seems-to-work)
+      * [Disable or Enable Resize BAR Support](#disable-or-enable-resize-bar-support)
       * [Disable or Enable Above-4G Memory Decoding](#disable-or-enable-above-4g-memory-decoding)
    * [JTAG Using UrJTAG](#jtag-using-urjtag)
       * [Compile and Install UrJTAG](#compile-and-install-urjtag)
@@ -48,6 +49,9 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
          * [Disconnect the Innova-2 FPGA from the PCIe Bridge](#disconnect-the-innova-2-fpga-from-the-pcie-bridge)
          * [Allow Vivado to Update Platform Cable USB II Firmware](#allow-vivado-to-update-platform-cable-usb-ii-firmware)
          * [Begin a UrJTAG Session](#begin-a-urjtag-session)
+   * [FPGA Design Notes](#fpga-design-notes)
+      * [Design Does Not Meet Timing Requirements](#design-does-not-meet-timing-requirements)
+   * [Useful Commands](#useful-commands)
    * [Useful Links](#useful-links)
    * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
 
@@ -59,14 +63,14 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
 * **3.3V** SPI FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
-* Xilinx-Compatible **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
+* [Xilinx-Compatible](https://docs.xilinx.com/v/u/en-US/ds593) **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
 * SFP28/SFP+/SFP Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
 
 
 ## Cooling Solution
 
-The card is designed for use in servers and requires up to 800 LFM of air flow. I run the board in an open air PC case and attached a hard drive heat sink to it and placed a 12V 1.3A blower fan from a server in line with the card. I run the blower fan from a 5V power rail and get acceptable noise and performance when using only the FPGA. I need to run the fan at 12V when testing the network interfaces. The board otherwise overheats and the interfaces shut down.
+The card is designed for use in servers and requires active cooling with up to [800 LFM of air flow](https://docs.nvidia.com/networking/display/Innova2Flex/Specifications#Specifications-MNV303212A-ADLTSpecifications). My Innova-2 came without a cooling solution so I attached a hard drive heat sink to it and placed a 12V 1.3A blower fan from a server in line with the card. I have the board in an open air setup with no enclosure. I run the blower fan from a 5V power rail and get acceptable noise and performance when using only the FPGA. I need to run the fan at 12V when testing the network interfaces. The board otherwise overheats and the interfaces shut down.
 
 ![Cooling Setup](img/Cooling_Setup.png)
 
@@ -126,7 +130,9 @@ List all installed Linux Kernels:
 dpkg -l | grep linux-image | grep "^ii"
 ```
 
-Kernels `5.13.0-30-generic` and `5.13.0-52-generic` show up for me in the above command so I remove them both as they are **not** `5.8.0-43`.
+![dpkg -l Installed Kernel Images](img/dpkg_l_Kernel_Images.png)
+
+Kernels `5.13.0-30-generic` and `5.13.0-52-generic` show up for me in the above command so I remove them both as they are **not** `5.8.0-43`. Mellanox OFED driver installation attempts to compile kernel modules for every kernel on the system and if it cannot it will fail to install properly.
 ```Shell
 sudo apt remove \
        linux-buildinfo-5.13.0-52-generic \
@@ -157,7 +163,7 @@ uname -s -r -m
 
 ![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
-Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers will install custom versions of some of the libraries that get pulled into this install. By installing everything first you can avoid library incompatibility issues and `MLNX_OFED` reinstallations. `libibverbs` is one package that gets updated and pulled in by almost every piece of networking software and `MLNX_OFED` requires a custom version.
+Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers will install custom versions of some of the libraries that get pulled into this install. By installing everything first you can avoid library incompatibility issues and `MLNX_OFED` reinstallations. `libibverbs` is one package that gets updated and pulled in by almost every piece of networking software but `MLNX_OFED` requires a custom version.
 ```Shell
 sudo apt install    alien apt autoconf automake binfmt-support \
     binutils-riscv64-unknown-elf binwalk bison bpfcc-tools \
@@ -231,17 +237,6 @@ sudo apt-get update  ;  sudo apt autoremove  ;  sudo apt-get upgrade
 sudo reboot
 ```
 
-Install `libpng12` which is required by Vivado.
-```Shell
-cd ~
-mkdir tmppng12
-wget http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1_amd64.deb
-dpkg-deb -R  libpng12-0_1.2.54-1ubuntu1_amd64.deb  tmppng12
-sudo mv  tmppng12/lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu/
-sudo chown root:root /lib/x86_64-linux-gnu/libpng12.so.0.54.0
-sudo ln -r -s /lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu/libpng12.so.0
-rm -Rf tmppng12/
-```
 
 ### Install Mellanox OFED
 
@@ -315,7 +310,7 @@ echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 exit
 ```
 
-[DPDK](https://www.dpdk.org/) [v20.11.5](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`.
+[DPDK](https://www.dpdk.org/) [v20.11.5 LTS](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`. DPDK needs to be installed from source as *dma_ip_drivers* require `librte`.
 ```Shell
 cd ~
 git clone --recursive -b v20.11.5 --single-branch http://dpdk.org/git/dpdk-stable
@@ -333,6 +328,9 @@ echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
 
 `gedit drivers/net/meson.build` and add QDMA support to your DPDK build in `meson.build`. After `'mlx5',` add `'qdma',`
 
+![edit meson.build](img/editing_meson_build.png)
+
+
 `gedit config/rte_config.h` and search for `EAL defines` in `rte_config.h` to change/add the following values:
 ```C
 #define RTE_MAX_MEMZONE 20480
@@ -341,7 +339,10 @@ echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
 #define RTE_LIBRTE_QDMA_DEBUG_DRIVER 1
 ```
 
-`gedit usertools/dpdk-devbind.py` and add Xilinx QDMA Vendor and Device IDs amongst similar vendor definitions in `usertools/dpdk-devbind.py`:
+![edit rte_config.h](img/editing_rte_config_h.png)
+
+
+`gedit usertools/dpdk-devbind.py` and add Xilinx QDMA Vendor and Device IDs amongst similar vendor definitions in `dpdk-devbind.py`:
 ```Python
 xilinx_qdma_pf = {'Class': '05', 'Vendor': '10ee',
   'Device': '9011,9111,9211, 9311,9014,9114,9214,9314,9018,9118,
@@ -368,6 +369,9 @@ to
 ```Python
 network_devices = [network_class, cavium_pkx, avp_vnic, ifpga_class, xilinx_qdma_pf, xilinx_qdma_vf]
 ```
+
+![edit dpdk-devbind.py](img/editing_dpdk-devbind_py.png)
+
 
 
 Build DPDK:
@@ -408,7 +412,11 @@ cd ~/dpdk-stable/dpdk-kmods/linux/igb_uio
 make
 ls -la ~/dpdk-stable/build/drivers/  |  grep librte_net_qdma.a
 ```
-Confirm `librte_net_qdma.a` was built and shows up above. Continue to build QDMA test application:
+Confirm `librte_net_qdma.a` was built and shows up above. 
+
+![confirm librte exists](img/librte_exists.png)
+
+Continue to build QDMA test application:
 ```Shell
 cd ~/dpdk-stable/examples/qdma_testapp/
 make  RTE_SDK=`pwd`/../..  RTE_TARGET=build
@@ -430,6 +438,9 @@ Above should produce output similar to:
  EAL: Error - exiting with code: 1
    Cause: No Ethernet devices found. Try updating the FPGA image.
 ```
+
+![QDMA testapp runs](img/qdma_testapp-shared_runs_successfully.png)
+
 
 #### Generate Personal Signing Key
 
@@ -514,12 +525,25 @@ Create a symbolic link for `gmake` which Vivado requires but Ubuntu already incl
 sudo ln -s  /usr/bin/make  /usr/bin/gmake
 ```
 
-Install [Xilinx Vivado ML 2021.2](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2021-2.html). There are only modest savings in bandwidth and space requirements when using the Web Installer so you may as well download the complete 72GB [Xilinx Unified Installer 2021.2 SFD](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2021.2_1021_0703.tar.gz) offline package. Install Vitis and check Kintex Ultrascale+ under device support.  Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info.
+Install `libpng12` which is required by Vivado.
+```Shell
+cd ~
+mkdir tmppng12
+wget http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1_amd64.deb
+dpkg-deb -R  libpng12-0_1.2.54-1ubuntu1_amd64.deb  tmppng12
+sudo mv  tmppng12/lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu/
+sudo chown root:root /lib/x86_64-linux-gnu/libpng12.so.0.54.0
+sudo ln -r -s /lib/x86_64-linux-gnu/libpng12.so.0.54.0  /lib/x86_64-linux-gnu/libpng12.so.0
+rm -Rf tmppng12/
+```
 
-If download size is an issue, download only **Vivado Lab Edition** for now which is enough to test the Innova-2's FPGA.
+Install [Xilinx Vivado ML 2021.2](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2021-2.html). Vivado **2021.2** is the latest version which has successfully synthesized and implemented a basic DDR4 design for me. 2018.3 and 2020.2 also worked. 2021.1 and 2017.2 fail. If download size is an issue, download only **Vivado Lab Edition** for now which is enough to test the Innova-2's FPGA. There are only modest savings in bandwidth and space requirements when using the Web Installer so you may as well download the complete 72GB [Xilinx Unified Installer 2021.2 SFD](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2021.2_1021_0703.tar.gz) offline package.
 
-Vivado **2021.2** is the latest version which has successfully synthesized a basic DDR4 design for me. 2018.3 and 2020.2 also worked. 2021.1 and 2017.2 fail. Run the following commands individually.
+If installing full Vivado, select Vitis and check *Kintex Ultrascale+* and *Zynq Ultrascale+ MPSoC* under device support. Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info.
 
+![Vivado Install Options](img/Vivado_Install_Options.png)
+
+Run the following commands individually.
 ```Shell
 echo c6f91186f332528a7b74a6a12a759fb6 should be the MD5 Checksum Value
 md5sum Xilinx_Unified_2021.2_1021_0703.tar.gz
@@ -529,6 +553,10 @@ sudo ./xsetup
 cd /tools/Xilinx/Vivado/2021.2/data/xicom/cable_drivers/lin64/install_script/install_drivers/
 sudo ./install_drivers
 ```
+
+Note that Vivado requires 4GB of system RAM per Job (Thread) plus a base of 10GB. An Ubuntu system with 16GB of RAM running just Vivado can reliably use only 1 core during synthesis and implementation.
+
+![Vivado Requires 4GB of RAM per Job](img/Vivado_Requires_4GB_of_RAM_per_Job.png)
 
 
 ## Test the Innova-2
@@ -575,7 +603,7 @@ sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020
 
 ![flint burn](img/flint_burn_attempt.png)
 
-If the above works, proceed to [Testing The Network Ports](#testing-the-network-ports). If it fails as above, continue to programming the FLASH IC.
+If the above works, proceed to [Testing The Network Ports](#testing-the-network-ports). If it fails as above due to a `-E- PSID mismatch` error, continue to programming the ConnectX5 Firmware FLASH IC directly.
 
 #### Programming the ConnectX5 Firmware FLASH IC Directly
 
@@ -603,7 +631,7 @@ Abort if anything appears to be incorrect. If you are certain the programmer is 
 
 ![CH341A Programming](img/CH341A_USB_Connected.png)
 
-Use `flashrom` to test the CH341A-to-FLASH connection.
+Use `flashrom` to test the Programmer-to-FLASH connection. The `W25Q128.V` should be found automatically by `flashrom`.
 ```Shell
 sudo flashrom --programmer ch341a_spi
 ```
@@ -654,7 +682,7 @@ sudo flint --device /dev/mst/mt4119_pciconf0 query
 
 ![flint query](img/flint_query_fresh_write.png)
 
-Notice above that the GUID and MAC IDs are blank. Use `flint` to set the values back to those from earlier.
+Notice above that the GUID and MAC IDs are blank. Use `flint` to set the values back to those from earlier. Note the `0x` hex designator prepended to the values.
 ```Shell
 sudo flint --device /dev/mst/mt4119_pciconf0 -guid 0xc0dec0dec0dec0de -mac 0xc0dec0dec0de sg
 sudo mlxfwreset --device /dev/mst/mt4119_pciconf0 reset
@@ -667,7 +695,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). Any DAC cable that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). Any DAC cable that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should also work.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -772,7 +800,7 @@ sha256sum completeimage0.bin completeimage1.bin
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` then proceed to [Loading User a Image](#loading-a-user-image). Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images (notice the `FPGA image version: 0xc1` below) that work with `innova2_flex_app` then proceed to [Loading User a Image](#loading-a-user-image). Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
 ```Shell
 sudo mst start
 sudo mst status
@@ -793,7 +821,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power the Innova-2 from a second computer or using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and possibly crash Ubuntu.
 
-![JTAG Connected](img/JTAG_Connected.png)
+![JTAG Connected](img/JTAG_Adapter_Connected.png)
 
 If you do not have a second computer to power the Innova-2 while JTAG programming, use a Powered PCIe Riser/Extender:
 
@@ -843,7 +871,7 @@ sudo reboot
 
 ### Loading a User Image
 
-After Vivado generates a programming Bitstream, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+These instructions include a link to binaries for a working demo. Otherwise, after Vivado generates a programming Bitstream, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
@@ -878,7 +906,7 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 cd ~
 ```
 
-For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA.
+For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
 ```Shell
 git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
@@ -893,6 +921,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
 
 ![Program Innova-2 User Image](img/Program_User_Image.png)
 
+
 ### Testing a Loaded User Image
 
 After rebooting the User Image should be active. Check with `lspci`. It shows up at PCIe Bus Address `03:00` for me. Change the commands below appropriately.
@@ -904,7 +933,7 @@ sudo lspci  -s 03:00  -vvv | grep "LnkCap\|LnkSta"
 
 ![lspci Xilinx RAM Device](img/lspci_Xilinx_RAM_Device.png)
 
-Run the Xilinx XDMA Test programs. The commands below generate 8kb of random data, then send it to a BRAM in the XCKU15P, then read it back and confirm the data is identical. The address used is specific to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project. Note `h2c` is *Host-to-Card* and `c2h` is *Card-to-Host*
+Run the Xilinx XDMA Test programs. The commands below generate 8kb of random data, then send it to a BRAM in the XCKU15P, then read it back and confirm the data is identical. The address used is specific to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project. Note `h2c` is *Host-to-Card* and `c2h` is *Card-to-Host*.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -915,7 +944,7 @@ sha256sum TEST RECV
 
 ![Test XDMA Communication](img/Test_XDMA_Communication.png)
 
-Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project for further testing of the design.
+If the above works then great! Your Innova-2 has a working FPGA with PCIe. Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-gpio-control) project for further testing of the design, including DDR4.
 
 
 ## Upgrading the ConnectX5 Firmware
@@ -961,7 +990,7 @@ Enable JTAG and [program the FPGA Configuration Memory to factory default](#prog
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/tree/main/Troubleshooting).
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the *Address Editor* that it is still `0x0`. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/tree/main/Troubleshooting) for DDR4 hardware debugging help.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -996,7 +1025,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 ### Board Works But Not JTAG
 
-Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf).
+Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf). Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
 
 ![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.png)
 
@@ -1011,6 +1040,12 @@ The board is well designed with all voltage rails exposed on test points. Carefu
 
 ![Voltage Test Points](img/Voltage_Test_Points.png)
 
+
+### Disable or Enable Resize BAR Support
+
+If you are experiencing PCIe communication problems, flip this setting in your BIOS.
+
+![Enable Resize BAR Support](img/Enable_Re-Size_BAR_Support.png)
 
 ### Disable or Enable Above-4G Memory Decoding
 
@@ -1044,7 +1079,7 @@ Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/dow
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
-From the directory containing [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P. These commands assume UrJTAG installed support files to the default `/usr/local/share/` directory.
+From the directory containing [xcku15p_ffve1517.jtag](https://raw.githubusercontent.com/mwrnd/innova2_flex_xcku15p_notes/main/xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P. These commands assume UrJTAG installed support files to the default `/usr/local/share/` directory. Running the UrJTAG `detect` command reads the `Device Id` from the JTAG chain. First 4 bits (`0001`) are the *STEPPING*, next 16 bits (`0100101001010110`) are the *PART*, last 12 bits (`000010010011`) are the *MANUFACTURER*.
 ```Shell
 sudo su
 echo "# Kintex Ultrascale+ (XCKUxxP)" >>/usr/local/share/urjtag/xilinx/PARTS
@@ -1081,12 +1116,15 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```Shell
 sudo setpci  -s 02:08.0  0x70.w=0x50
 ```
+
+![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_FPGA_from_PCIe_Bridge.png)
+
 It can later be re-enabled with the following command or a cold reboot.
 ```Shell
 sudo setpci  -s 02:08.0  0x70.w=0x40
 ```
 
-![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_XCKU15P_from_Mellanox_Bridge.png)
+![Disconnect FPGA from PCIe Bridge](img/setpci_Reconnect_FPGA_to_PCIe_Bridge.png)
 
 
 #### Allow Vivado to Update Platform Cable USB II Firmware
@@ -1157,30 +1195,63 @@ Connect to the JTAG Adapter (*Open Target* then *Auto Connect*) which will updat
 ![UrJTAG Session](img/UrJTAG_Session.png)
 
 
+
+## FPGA Design Notes
+
+### Design Does Not Meet Timing Requirements
+
+If your DDR4-based design does not meet timing requirements:
+
+![Design Does Not Meet Timing](img/DDR4_Design_Does_NOT_Meet_Timings.png)
+
+The slow down the DDR4:
+
+![Slow Down DDR4](img/DDR4_Slow_Down_to_Meet_Timings.png)
+
+If all goes well your design will meet timing requirements:
+
+![Design Meets Timing](DDR4_Design_Meets_Timings.png)
+
+
+## Useful Commands
+
+`dmesg | grep -i xdma` will show you to whether the Xilinx XDMA driver from *dma_ip_drivers* successully loaded for a PCIe-based FPGA design
+
+![dmesg grep xdma](img/dmesg_xdma.png)
+
+`dmesg | grep -i mlx` will show you to whether the Mellanox OFED drivers successully loaded for the ConnectX-5
+
+![dmesg grep mlx](img/dmesg_mlx.png)
+
+
 ## Useful Links
 
 * [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/)
 * [Mellanox OFED Drivers](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/)
 * [Innova-2 Flex User Guide](https://docs.nvidia.com/networking/display/Innova2Flex)
+* Lenovo sells the Innova-2 as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
 * [Lenovo Innova-2 Product Page](https://lenovopress.lenovo.com/lp1169-thinksystem-mellanox-innova-2-connectx-5-fpga-25gbe-2-port-adapter)
 * [Lenovo Version of User Guide](https://download.lenovo.com/servers/mig/2019/05/15/20295/mlnx-lnvgy_utl_nic_in2-18.12_manual_2.0.pdf)
 * [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
-* [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf)
-* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki)
+* [OpenCAPI Open Source Projects](https://opencapi.github.io/)
+* [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf) mentions the Innova-2
+* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki) has no Innova-2 support and I am unaware of anyone working on it
 * [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
-* According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: 01PG974 SN37A28065 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS IBM 01FT833_Ax NV303212A
+* According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: 01PG974 SN37A28065 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
+* I have also seen the Innova-2 labeled: IBM 01FT833_Ax  MNV303212A-ADL_Ax  DP/N 0NMD3R  FRU PN: 01PG974
 * DDR4 x16 Twin Die Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
 * FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
-* Consider [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt) on server class systems with 64GB+ of RAM
+* If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
-* [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://marksilberstein.com/wp-content/uploads/2021/11/asplos22main-p1364-p-6beb5fa88e-55324-final.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How?
-* [Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) for full licensed access to Vivado
+* A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How? How do you set up the ConnectX-5 to communicate directly with the FPGA without the Host System as an intermediary?
+* [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour full licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
-* [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray)
+* [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray) - not aware of anyone working on this but it is [theoretically possible](https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=8746&context=etd) for an FPGA Soft Processor to partially reconfigure its own FPGA
+
 
 
 ## Projects Tested to Work with the Innova2
