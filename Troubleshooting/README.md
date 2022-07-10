@@ -33,7 +33,7 @@ There are five [MT40A1G16KNR-075 ICs](https://www.micron.com/products/dram/ddr4-
 
 ![DDR4 Memory ICs](img/DDR4_ICs.png)
 
-The Xilinx DDR4 Interface only allows 8, 16, 32, 64, and 72 bit (64-bit with ECC) wide DDR4 interfaces. Therefore you can have 1GB, 2GB, 4GB, 8GB, or 8GB with ECC of memory space. Bank 66 is the main Address/Control/Byte-Lane-0 bank while Bank 67 is for Byte Lanes 3, 4, 5, and 6. Bank 68 is for Byte Lanes 1, 2, 7, and 8.
+The Xilinx DDR4 IP only allows 8, 16, 32, 64, and 72 bit (64-bit with ECC) wide DDR4 interfaces. Therefore you can have 1GB, 2GB, 4GB, 8GB, or 8GB with ECC of memory space. Bank 66 is the main Address/Control/Byte-Lane-0 bank while Bank 67 is for Byte Lanes 3, 4, 5, and 6. Bank 68 is for Byte Lanes 1, 2, 7, and 8.
 
 ![DDR4 Banks](img/DDR4_Full_72Bit_Byte-Lanes.png)
 
