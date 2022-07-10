@@ -26,8 +26,8 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
       * [Testing The Network Ports](#testing-the-network-ports)
    * [Programming the FPGA](#programming-the-fpga)
       * [Initial Loading of the Flex Image](#initial-loading-of-the-flex-image)
-         * [Generate Configuration Images for the Full Memory Array](#generate-configuration-images-for-the-full-memory-array)
          * [Enable JTAG Access to the XCKU15P](#enable-jtag-access-to-the-xcku15p)
+         * [Generate Configuration Images for the Full Memory Array](#generate-configuration-images-for-the-full-memory-array)
          * [Programming the Factory and Flex Images](#programming-the-factory-and-flex-images)
       * [Loading a User Image](#loading-a-user-image)
       * [Testing a Loaded User Image](#testing-a-loaded-user-image)
@@ -132,7 +132,7 @@ dpkg -l | grep linux-image | grep "^ii"
 
 ![dpkg -l Installed Kernel Images](img/dpkg_l_Kernel_Images.png)
 
-Kernels `5.13.0-30-generic` and `5.13.0-52-generic` show up for me in the above command so I remove them both as they are **not** `5.8.0-43`. Mellanox OFED driver installation attempts to compile kernel modules for every kernel on the system and if it cannot it will fail to install properly.
+Kernels `5.13.0-30-generic` and `5.13.0-52-generic` show up for me in the above command so I remove them both as they are **not** `5.8.0-43`. Mellanox OFED driver installation attempts to compile kernel modules for every kernel on the system and it will fail to install properly if it cannot.
 ```Shell
 sudo apt remove \
        linux-buildinfo-5.13.0-52-generic \
@@ -247,7 +247,7 @@ uname -s -r -m
 
 ![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
-`MLNX_OFED-5.2-2.2.4.0` is the latest version that works for me.
+[MLNX_OFED-5.2-2.2.4.0](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) is the latest version that works for me.
 
 ![Mellanox OFED Download](img/Mellanox_OFED_Download.png)
 
@@ -255,7 +255,7 @@ Run the following commands individually, which download and install `MLNX_OFED-5
 
 ```Shell
 cd ~
-wget  https://content.mellanox.com/ofed/MLNX_OFED-5.2-2.2.4.0/MLNX_OFED_LINUX-5.2-2.2.4.0-ubuntu20.04-x86_64.tgz
+wget https://content.mellanox.com/ofed/MLNX_OFED-5.2-2.2.4.0/MLNX_OFED_LINUX-5.2-2.2.4.0-ubuntu20.04-x86_64.tgz
 sha256sum  MLNX_OFED_LINUX-5.2-2.2.4.0-ubuntu20.04-x86_64.tgz
 echo d2f483500afca80d7fe4f836f593016379627a9c7c005585a8ffd5373fc07401 should be the SHA256 checksum
 tar -xvf  MLNX_OFED_LINUX-5.2-2.2.4.0-ubuntu20.04-x86_64.tgz
@@ -310,7 +310,7 @@ echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 exit
 ```
 
-[DPDK](https://www.dpdk.org/) [v20.11.5 LTS](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that I have tested to work with Xilinx's `dma_ip_drivers 7859957`. DPDK needs to be installed from source as *dma_ip_drivers* require `librte`.
+[DPDK](https://www.dpdk.org/) [v20.11.5 LTS](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that works with Xilinx's `dma_ip_drivers 7859957`. DPDK needs to be installed from source as *dma_ip_drivers* require `librte`.
 ```Shell
 cd ~
 git clone --recursive -b v20.11.5 --single-branch http://dpdk.org/git/dpdk-stable
@@ -695,7 +695,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable](https://www.te.com/usa-en/product-2821224-7.html). Any DAC cable that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should also work.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should also work.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -750,9 +750,29 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 ![FPGA Configuration Memory Layout](img/FPGA_Configuration_Memory_Layout.png)
 
+
+#### Enable JTAG Access to the XCKU15P
+
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
+```Shell
+sudo mst start
+sudo mst status
+sudo mst status -v
+sudo flint -d /dev/mst/mt4119_pciconf0 q
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+lsmod | grep mlx
+cd ~
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+![Enable JTAG](img/Enable_JTAG_Access.png)
+
+
 #### Generate Configuration Images for the Full Memory Array
 
-Create configuration images that span the entire memory map as in the layout pictured above. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. Note that the configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8 during loading.
+Create configuration images that span the entire memory map as in the memory layout pictured earlier. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. Note that the configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8 during loading.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FPGA_image
 
@@ -790,7 +810,7 @@ echo bae7da6f6426445ca5a0f6eb8786a2e6c4c8b591599506b306ba109a634efedc
 sha256sum completeimage1.bin
 ```
 
-Confirm the memory images were generated correctly. These checksums are only valid for `Innova_2_Flex_Open_18_12.tar.gz`.
+Confirm the memory images were generated correctly. These checksums are only valid for files generated from `Innova_2_Flex_Open_18_12.tar.gz`.
 ```Shell
 sha256sum completeimage0.bin completeimage1.bin
 ```
@@ -798,28 +818,9 @@ sha256sum completeimage0.bin completeimage1.bin
 ![Complete Memory Image Checksums](img/Generate_Complete_Memory_Image.png)
 
 
-#### Enable JTAG Access to the XCKU15P
-
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images (notice the `FPGA image version: 0xc1` below) that work with `innova2_flex_app` then proceed to [Loading User a Image](#loading-a-user-image). Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
-```Shell
-sudo mst start
-sudo mst status
-sudo mst status -v
-sudo flint -d /dev/mst/mt4119_pciconf0 q
-cd ~/Innova_2_Flex_Open_18_12/driver/
-sudo ./make_device
-sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
-lsmod | grep mlx
-cd ~
-sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
-```
-
-![Enable JTAG](img/Enable_JTAG_Access.png)
-
-
 #### Programming the Factory and Flex Images
 
-Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power the Innova-2 from a second computer or using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and possibly crash Ubuntu.
+Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power the Innova-2 from a second computer or using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and crash Ubuntu.
 
 ![JTAG Connected](img/JTAG_Adapter_Connected.png)
 
@@ -871,7 +872,7 @@ sudo reboot
 
 ### Loading a User Image
 
-These instructions include a link to binaries for a working demo. Otherwise, after Vivado generates a programming Bitstream, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+These instructions include a link to binaries for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
@@ -944,12 +945,12 @@ sha256sum TEST RECV
 
 ![Test XDMA Communication](img/Test_XDMA_Communication.png)
 
-If the above works then great! Your Innova-2 has a working FPGA with PCIe. Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-gpio-control) project for further testing of the design, including DDR4.
+If the above works then great! Your Innova-2 has a working FPGA with PCIe. Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-gpio-control) project for further testing of the design, including its DDR4.
 
 
 ## Upgrading the ConnectX5 Firmware
 
-Once you have tested an Innova-2 using the current working firmware, consider upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). It has an `--online` option.
+Once you have tested an Innova-2 using the current working firmware, you may want to explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). It has an `--online` option.
 ```
 cd ~
 wget https://www.mellanox.com/downloads/firmware/mlxup/4.20.0/SFX/linux_x64/mlxup
@@ -1204,13 +1205,13 @@ If your DDR4-based design does not meet timing requirements:
 
 ![Design Does Not Meet Timing](img/DDR4_Design_Does_NOT_Meet_Timings.png)
 
-The slow down the DDR4:
+Then slow down the DDR4:
 
 ![Slow Down DDR4](img/DDR4_Slow_Down_to_Meet_Timings.png)
 
 If all goes well your design will meet timing requirements:
 
-![Design Meets Timing](DDR4_Design_Meets_Timings.png)
+![Design Meets Timing](img/DDR4_Design_Meets_Timings.png)
 
 
 ## Useful Commands
@@ -1247,6 +1248,7 @@ If all goes well your design will meet timing requirements:
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How? How do you set up the ConnectX-5 to communicate directly with the FPGA without the Host System as an intermediary?
+* [Example](https://github.com/acsl-technion/flexdriver-zuc/blob/688c44720cd7bc13e5e05dbf0695ef95a2e64afa/run_project.tcl#L164) for automating binary Memory  Configuration File generation
 * [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour full licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
