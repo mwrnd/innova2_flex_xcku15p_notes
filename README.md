@@ -92,6 +92,8 @@ Begin by updating and upgrading your [Ubuntu 20.04.4](https://releases.ubuntu.co
 sudo apt-get update  ;  sudo apt-get upgrade
 ```
 
+![apt update apt upgrade](img/apt_update_upgrade.png)
+
 Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work.
 ```Shell
 sudo apt-get install   linux-buildinfo-5.8.0-43-generic \
@@ -310,7 +312,7 @@ echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 exit
 ```
 
-[DPDK](https://www.dpdk.org/) [v20.11.5 LTS](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that works with Xilinx's `dma_ip_drivers 7859957`. DPDK needs to be installed from source as *dma_ip_drivers* require `librte`.
+[DPDK](https://www.dpdk.org/) [v20.11.5 LTS](https://doc.dpdk.org/guides-20.11/rel_notes/release_20_11.html) is the latest version that works with Xilinx's `dma_ip_drivers 7859957`. DPDK needs to be compiled and installed from source as *dma_ip_drivers* requires DPDK's `librte` to be built with QDMA support from *dma_ip_drivers* so that *dma_ip_drivers* can compile with a `librte` that supports QDMA so that XDMA drivers can build.
 ```Shell
 cd ~
 git clone --recursive -b v20.11.5 --single-branch http://dpdk.org/git/dpdk-stable
@@ -881,9 +883,11 @@ Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**
 sudo mst start
 cd ~/Innova_2_Flex_Open_18_12/driver/
 sudo ./make_device
-sudo insmod mlx5_fpga_tools
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+
+sudo reboot
 ```
 ![Set Flex Image Active](img/Activate_Flex_Image_for_Programming.png)
 
@@ -1142,7 +1146,7 @@ Connect to the JTAG Adapter (*Open Target* then *Auto Connect*) which will updat
 
 ![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
 
-*Close Target* and exit Vivado.
+Right-click on the JTAG Adapter, *xilinx_tcf*, then *Close Target* and exit Vivado.
 
 ![Vivado Close Target](img/Vivado_Hardware_Manager_Close_Target.png)
 
