@@ -4,7 +4,7 @@
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it likely means DDR4 did not initialize properly. Start by performing a cold reboot and checking communication again. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes to the design confirm in the *Address Editor* that it is still `0x0`. If [BRAM and GPIO communication](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-bram-communication) succeed but DDR4 fails then the issue is with DDR4.
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it likely means DDR4 did not initialize properly. Start by performing a cold reboot and checking communication again. The [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project has DDR4 at address `0x0` but if you made any changes to the design confirm in the *Vivado Block Design Address Editor* that it is still `0x0`. If [BRAM and GPIO communication](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-bram-communication) succeed but DDR4 fails then the issue is with DDR4.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -27,7 +27,7 @@ A *Write Leveling* failure is unfortunately a hardware issue. Refer to [Xilinx's
 
 ![CAL FAIL Write Leveling](img/DDR4_PG150_DDR_CAL_ERROR_1.png)
 
-Write Leveling calibrates clock and Data Strobe (DQS) signals. DDR4 uses a fly-by wiring topology for control and address signals but point-to-point for Data Strobe, Data Mask, and Data Byte Lanes. It is worthwhile to test individual byte lanes on a Write Leveling error as it is unlikely every memory IC is broken. Some of the memory address space may still be usable.
+Write Leveling calibrates clock to Data Strobe (DQS) signal timings. DDR4 uses a fly-by wiring topology for control and address signals but point-to-point for Data Strobe (DQS), Data Mask (DM), and Data Byte Lanes (DQ). It is worthwhile to test individual byte lanes on a Write Leveling error as it is unlikely every memory IC is broken. Some of the memory address space may still be usable.
 
 There are five [MT40A1G16KNR-075 ICs](https://www.micron.com/products/dram/ddr4-sdram/part-catalog/mt40a1g16knr-075) with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA) on the board which each have two x8 dies. The full memory interface is 72-Bit (64-Bit + ECC) so only 9 of the 10 dies are used.
 
@@ -59,7 +59,7 @@ I then tested 16-Bit wide versions of the DDR4 interface using different Byte La
 
 I then tested [3+7](innova2_constraints_ddr4_16bit_byte-lanes-3-7.xdc) and [3+8](innova2_constraints_ddr4_16bit_byte-lanes-3-8.xdc) and both worked. Only Byte Lane 1 is broken. Bank 68 otherwise works.
 
-I then tested 64-Bit versions of the DDR4 memory interface without Byte Lane 1 at two speeds, DDR4-1400 (**1428**ps) and DDR4-2400 (**833**ps). Both worked! Since I do not have access to a schematic I cannot further investigate this Byte Lane issue. However, I do not need ECC so having 8GB of working RAM is good enough.
+I then tested 64-Bit versions of the DDR4 memory interface without Byte Lane 1 at two speeds, DDR4-1400 (**1428**ps) and DDR4-2400 (**833**ps). Both worked! Since I do not have access to a schematic I cannot further investigate this Byte Lane issue. However, I do not need ECC so having the full 8GB of working RAM is good enough.
 
 ![DDR4-2400 64Bit No ECC No Byte Lane 1 DMA Throughput](img/DDR4-2400_64Bit_NoByteLane1_DMA_Throughput.png)
 
