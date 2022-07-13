@@ -546,7 +546,7 @@ Install [Xilinx Vivado ML 2021.2](https://www.xilinx.com/support/download/index.
 
 If you have decided to install full Vivado, select Vitis (which will include Vivado) and at least *Kintex Ultrascale+* and *Zynq Ultrascale+ MPSoC* under device support. *Zynq Ultrascale+ MPSoC* seems to pull in some files needed by Vitis.
 
-Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info.
+Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info. You will also need to obtain a Vivado License, such as an Evaluation License.
 
 ![Vivado Install Options](img/Vivado_Install_Options.png)
 
@@ -561,7 +561,7 @@ cd /tools/Xilinx/Vivado/2021.2/data/xicom/cable_drivers/lin64/install_script/ins
 sudo ./install_drivers
 ```
 
-Note that Vivado requires 4GB of system RAM per Job (Thread) plus a base of 10GB. An Ubuntu system with 16GB of RAM running just Vivado can reliably use only 1 core during synthesis and implementation.
+Note that Vivado requires 4GB of system RAM per Job (Thread) plus a base of 10GB. An Ubuntu system with 16GB of RAM running just Vivado can reliably use only 1 core during synthesis and implementation. Otherwise, it will overwhelm the [Kernel Swap Daemon](https://askubuntu.com/questions/259739/kswapd0-is-taking-a-lot-of-cpu).
 
 ![Vivado Requires 4GB of RAM per Job](img/Vivado_Requires_4GB_of_RAM_per_Job.png)
 
@@ -669,7 +669,7 @@ od -A x -t x1z -v W25Q128save.bin  |  head
 
 If `flashrom` successfully detected the `W25Q128.V` and reads are consistent, then the requirement for sensible reads is a judgement call on your part.
 
-Use `flashrom` to write the latest Innova-2 firmware to the W25Q128. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP *MNV303611A-EDLT* is nicknamed *MorseQ*. `cd` into the appropriate directory.
+Use `flashrom` to write the latest Innova-2 firmware to the `W25Q128`. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP *MNV303611A-EDLT* is nicknamed *MorseQ*. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flashrom --programmer ch341a_spi --write fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin
@@ -831,7 +831,7 @@ Connect your Xilinx-Compatible **1.8V** JTAG Adapter to your Innova-2 but power 
 
 ![JTAG Connected](img/JTAG_Adapter_Connected.png)
 
-If you do not have a second computer to power the Innova-2 while JTAG programming, use a Powered PCIe Riser/Extender:
+A Powered PCIe Riser/Extender is another option for powering the Innova-2 while JTAG programming.
 
 ![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.png)
 
@@ -879,7 +879,7 @@ sudo reboot
 
 ### Loading a User Image
 
-These instructions include a link to binaries for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
@@ -1012,11 +1012,11 @@ sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x0 --size 
 
 ### JTAG Programming Failure
 
-If Vivado finishes Configuration Memory Programming in under a minute with a *\[Labtools 27-3165\] End of startup status: Low* error, it has **not** programmed anything. This occurs when a JTAG Adapter is powered and connected to the Innova-2.
+If Vivado finishes Configuration Memory Programming in under a minute with a *\[Labtools 27-3165\] End of startup status: Low* error, it has **not** programmed anything. This occurs when the Innova-2 still has control over JTAG.
 
 ![JTAG Programming Failure](img/JTAG_Programming_Failure.png)
 
-
+**Enable JTAG Access** before attempting JTAG programming.
 ```Shell
 sudo mst start
 sudo mst status
@@ -1030,8 +1030,6 @@ lsmod | grep mlx
 cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
-
-**Enable JTAG Access** before attempting JTAG programming.
 
 ![Enable JTAG Access](img/Enable_JTAG_Access.png)
 
