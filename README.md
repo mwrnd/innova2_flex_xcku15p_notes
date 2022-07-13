@@ -30,7 +30,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
          * [Generate Configuration Images for the Full Memory Array](#generate-configuration-images-for-the-full-memory-array)
          * [Programming the Factory and Flex Images](#programming-the-factory-and-flex-images)
       * [Loading a User Image](#loading-a-user-image)
-      * [Testing a Loaded User Image](#testing-a-loaded-user-image)
+      * [Testing the Board using the Loaded Demo User Image](#testing-the-board-using-the-loaded-demo-user-image)
    * [Upgrading the ConnectX5 Firmware](#upgrading-the-connectx5-firmware)
    * [Troubleshooting](#troubleshooting)
       * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
@@ -285,6 +285,13 @@ sudo  apt-mark  hold     5.8.0-43-generic linux-image-generic \
     libdapl-dev dpcp srptools mlnx-ethtool mlnx-iproute2
 ```
 
+After reboot confirm Kernel Modules are Installed.
+```Shell
+sudo dkms status
+```
+
+![dkms status](img/dkms_status.png)
+
 Confirm the installed version of Mellanox OFED.
 ```Shell
 ofed_info -n
@@ -412,9 +419,12 @@ Build `igb_uio`.
 ```Shell
 cd ~/dpdk-stable/dpdk-kmods/linux/igb_uio
 make
+```
+
+Confirm `librte_net_qdma.a` was built and exists. 
+```
 ls -la ~/dpdk-stable/build/drivers/  |  grep librte_net_qdma.a
 ```
-Confirm `librte_net_qdma.a` was built and shows up above. 
 
 ![confirm librte exists](img/librte_exists.png)
 
@@ -487,13 +497,6 @@ make
 sudo reboot
 ```
 
-After reboot confirm Kernel Modules are Installed.
-```Shell
-sudo dkms status
-```
-
-![dkms status](img/dkms_status.png)
-
 
 ### Set up Innova-2 Flex Application
 
@@ -520,7 +523,7 @@ sudo reboot
 
 ### Install Vivado or Vivado Lab Edition
 
-Vivado is not strictly required on the system with the Innova-2. A seperate computer with Vivado can be used for development and JTAG. However, if you intend to use any of Xilinx's [Accelerator Projects](https://www.xilinx.com/products/design-tools/vitis/vitis-ai.html), they require the [Xilinx Runtime XRT](https://xilinx.github.io/XRT/2021.2/html/index.html) which requires Vitis, which requires Vivado.
+Vivado is not strictly required on the system with the Innova-2. A seperate computer with Vivado can be used for development and JTAG. However, if you intend to develop with any of Xilinx's [Accelerator Projects](https://www.xilinx.com/products/design-tools/vitis/vitis-ai.html), they require the [Xilinx Runtime XRT](https://xilinx.github.io/XRT/2021.2/html/index.html) which requires Vitis, which requires Vivado.
 
 Create a symbolic link for `gmake` which Vivado requires but Ubuntu already includes as `make`.
 ```Shell
@@ -541,7 +544,9 @@ rm -Rf tmppng12/
 
 Install [Xilinx Vivado ML 2021.2](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2021-2.html). Vivado **2021.2** is the latest version which has successfully synthesized and implemented a basic Innova-2 DDR4 design for me. 2018.3 and 2020.2 also worked. 2021.1 and 2017.2 fail. If download size is an issue, download only **Vivado Lab Edition** for now which is enough to test the Innova-2's FPGA. There are only modest savings in bandwidth and space requirements when using the Web Installer so you may as well download the complete 72GB [Xilinx Unified Installer 2021.2 SFD](https://www.xilinx.com/member/forms/download/xef.html?filename=Xilinx_Unified_2021.2_1021_0703.tar.gz) offline package.
 
-If installing full Vivado, select Vitis and at least *Kintex Ultrascale+* and *Zynq Ultrascale+ MPSoC* under device support. *Zynq Ultrascale+ MPSoC* seems to pull in some files needed by Vitis. Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info.
+If you have decided to install full Vivado, select Vitis (which will include Vivado) and at least *Kintex Ultrascale+* and *Zynq Ultrascale+ MPSoC* under device support. *Zynq Ultrascale+ MPSoC* seems to pull in some files needed by Vitis.
+
+Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info.
 
 ![Vivado Install Options](img/Vivado_Install_Options.png)
 
@@ -633,7 +638,7 @@ Abort if anything appears to be incorrect. If you are certain the programmer is 
 
 ![CH341A Programming](img/CH341A_USB_Connected.png)
 
-Use `flashrom` to test the Programmer-to-FLASH connection. The `W25Q128.V` should be found automatically by `flashrom`.
+Use `flashrom` to test the Programmer-to-FLASH connection. The `W25Q128.V` should be found automatically by `flashrom`. If it is not found then there is something wrong with the IC and/or flashrom and/or connections.
 ```Shell
 sudo flashrom --programmer ch341a_spi
 ```
@@ -648,21 +653,21 @@ sudo flashrom --programmer ch341a_spi --read W25Q128save2.bin
 
 ![flashrom read](img/flashrom_read.png)
 
-Confirm FLASH IC reads are identical, similar to below.
+Confirm FLASH IC reads are identical, similar to below. Inconsistent reads imply there is something wrong with the connection. If your programmer supports it, slow down the [SPI Speed](https://manpages.debian.org/testing/flashrom/flashrom.8.en.html#buspirate_spi_programmer) and try again.
 ```Shell
 sha256sum W25Q128save.bin W25Q128save2.bin
 ```
 
 ![confirm flashrom reads](img/Confirm_flashrom_Reads.png)
 
-Confirm FLASH IC reads are sensible. Notice the `ab cd ef 00 fa de 12 34 56 78 de ad` in the first line of the header.
+Confirm FLASH IC reads are sensible. Notice the `ab cd ef 00 fa de 12 34 56 78 de ad` in the first line of the header. An all-ones `ff` data read means the W25Q128 has been erased or was never programmed. An all-zeros `00` data read may be an inverted signal line.
 ```Shell
 od -A x -t x1z -v W25Q128save.bin  |  head
 ```
 
 ![confirm flashrom reads are sensible](img/Confirm_flashrom_Reads_are_Sensible.png)
 
-Abort this entire procedure if the FLASH contents are not consistent and/or the header is not sensible. Something might be wrong with your programmer or its connections.
+If `flashrom` successfully detected the `W25Q128.V` and reads are consistent, then the requirement for sensible reads is a judgement call on your part.
 
 Use `flashrom` to write the latest Innova-2 firmware to the W25Q128. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP *MNV303611A-EDLT* is nicknamed *MorseQ*. `cd` into the appropriate directory.
 ```Shell
@@ -697,7 +702,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should also work.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -911,7 +916,7 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 cd ~
 ```
 
-For board testing, clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
+For board testing, the following command will clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
 ```Shell
 git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
@@ -927,9 +932,9 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
 ![Program Innova-2 User Image](img/Program_User_Image.png)
 
 
-### Testing a Loaded User Image
+### Testing the Board using the Loaded Demo User Image
 
-After rebooting the User Image should be active. Check with `lspci`. It shows up at PCIe Bus Address `03:00` for me. Change the commands below appropriately.
+After rebooting the Innova-2 system, the `innova2_xcku15p_ddr4_bram_gpio` User Image should be active. Check with `lspci`. It shows up as `RAM memory: Xilinx Corporation Device 9038` at PCIe Bus Address `03:00` for me. Change the commands below appropriately.
 ```
 lspci | grep -i Xilinx
 sudo lspci  -s 03:00  -v
@@ -995,7 +1000,7 @@ Enable JTAG and [program the FPGA Configuration Memory to factory default](#prog
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the *Address Editor* that it is still `0x0`. See the [Advanced Troubleshooting Notes](https://github.com/mwrnd/innova2_flex_xcku15p_notes/tree/main/Troubleshooting) for DDR4 hardware debugging help.
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the *Address Editor* that it is still `0x0`. See the [Innova-2 DDR4 Troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) project for DDR4 hardware debugging help.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -1007,11 +1012,11 @@ sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x0 --size 
 
 ### JTAG Programming Failure
 
-If Vivado finishes Configuration Memory Programming in under a minute with a *\[Labtools 27-3165\] End of startup status: Low* error, it has **not** programmed anything.
+If Vivado finishes Configuration Memory Programming in under a minute with a *\[Labtools 27-3165\] End of startup status: Low* error, it has **not** programmed anything. This occurs when a JTAG Adapter is powered and connected to the Innova-2.
 
 ![JTAG Programming Failure](img/JTAG_Programming_Failure.png)
 
-**Enable JTAG Access** before attempting JTAG programming.
+
 ```Shell
 sudo mst start
 sudo mst status
@@ -1025,6 +1030,8 @@ lsmod | grep mlx
 cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
+
+**Enable JTAG Access** before attempting JTAG programming.
 
 ![Enable JTAG Access](img/Enable_JTAG_Access.png)
 
@@ -1084,7 +1091,7 @@ Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/dow
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
-From the directory containing [xcku15p_ffve1517.jtag](https://raw.githubusercontent.com/mwrnd/innova2_flex_xcku15p_notes/main/xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P. These commands assume UrJTAG installed support files to the default `/usr/local/share/` directory. Running the UrJTAG `detect` command reads the `Device Id` from the JTAG chain. First 4 bits (`0001`) are the *STEPPING*, next 16 bits (`0100101001010110`) are the *PART*, last 12 bits (`000010010011`) are the *MANUFACTURER*.
+From the directory containing [xcku15p_ffve1517.jtag](https://raw.githubusercontent.com/mwrnd/innova2_flex_xcku15p_notes/main/xcku15p_ffve1517.jtag) run the following commands which create *PART* and *STEPPINGS* files for the XCKU15P. These commands assume UrJTAG installed support files to the default `/usr/local/share/` directory. Values were found by running the UrJTAG `detect` command which reads the `Device Id` from the JTAG chain. First 4 bits (`0001`) are the *STEPPING*, next 16 bits (`0100101001010110`) are the *PART*, last 12 bits (`000010010011`) are the *MANUFACTURER*.
 ```Shell
 sudo su
 echo "# Kintex Ultrascale+ (XCKUxxP)" >>/usr/local/share/urjtag/xilinx/PARTS
@@ -1150,7 +1157,7 @@ Right-click on the JTAG Adapter, *xilinx_tcf*, then *Close Target* and exit Viva
 
 ![Vivado Close Target](img/Vivado_Hardware_Manager_Close_Target.png)
 
-`lsusb` will now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`. The JTAG adapter is now ready to be used by UrJTAG.
+`lsusb` should now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`. The JTAG adapter is now ready to be used by UrJTAG.
 
 ![03fd 0008 Xilinx Inc Platform Cable USB II](img/Xilinx_Platform_USB_Cable_II_lsusb_After_Update.png)
 
@@ -1220,11 +1227,11 @@ If all goes well your design will meet timing requirements:
 
 ## Useful Commands
 
-`dmesg | grep -i xdma` will show you whether the Xilinx XDMA driver from *dma_ip_drivers* successully loaded for a PCIe-based FPGA design
+`dmesg | grep -i xdma` will show you whether the Xilinx XDMA driver from *dma_ip_drivers* successully loaded for a PCIe-based FPGA design.
 
 ![dmesg grep xdma](img/dmesg_xdma.png)
 
-`dmesg | grep -i mlx` will show you whether the Mellanox OFED drivers successully loaded for the ConnectX-5
+`dmesg | grep -i mlx` will show you whether the Mellanox OFED drivers successully loaded for the ConnectX-5.
 
 ![dmesg grep mlx](img/dmesg_mlx.png)
 
@@ -1263,4 +1270,5 @@ If all goes well your design will meet timing requirements:
 ## Projects Tested to Work with the Innova2
 
 * [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
+* [innova2_ddr4_troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) - DDR4 Troubleshooting Bitstreams and Guide
 
