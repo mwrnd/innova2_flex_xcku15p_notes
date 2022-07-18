@@ -37,6 +37,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
       * [Factory Image Running with Flex Image Scheduled](#factory-image-running-with-flex-image-scheduled)
       * [DDR4 Communication Error](#ddr4-communication-error)
       * [JTAG Programming Failure](#jtag-programming-failure)
+      * [innova2_flex_app stuck on Erasing Flash](#innova2_flex_app-stuck-on-erasing-flash)
       * [Board Works But Not JTAG](#board-works-but-not-jtag)
       * [Nothing Seems to Work](#nothing-seems-to-work)
       * [Disable or Enable Resize BAR Support](#disable-or-enable-resize-bar-support)
@@ -101,6 +102,10 @@ sudo apt-get install   linux-buildinfo-5.8.0-43-generic \
        linux-image-5.8.0-43-generic linux-modules-5.8.0-43-generic \
        linux-modules-extra-5.8.0-43-generic linux-tools-5.8.0-43-generic
 ```
+
+Note that Mellanox/Nvidia [only officially support kernel](https://docs.nvidia.com/networking/display/MLNXOFEDv522240/General+Support+in+MLNX_OFED) `5.4.0-26-generic`. Xilinx appears to have only thoroughly tested Vivado **2021.2** against [5.8.0](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe).
+
+![Only Officially Supported Kernel is 5.4.0-26](img/Supported_Kernel_is_5.4.0-26-generic.png)
 
 #### GRUB Bootloader Configuration
 
@@ -1033,6 +1038,13 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 ![Enable JTAG Access](img/Enable_JTAG_Access.png)
 
+
+### innova2_flex_app stuck on Erasing Flash
+
+`innova2_flex_app` will get stuck on `Erasing flash ( 0%)` if a JTAG Adapter has not released control of JTAG signals. Disconnect the JTAG Adapter from USB and perform a cold reboot of the Innova-2 system.
+
+![innova2_flex_app stuck on Erasing Flash](img/innova2_flex_app_stuck_on_Erasing_flash_0.png)
+
 ### Board Works But Not JTAG
 
 Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf). Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
@@ -1243,6 +1255,8 @@ If all goes well your design will meet timing requirements:
 * [Lenovo Innova-2 Product Page](https://lenovopress.lenovo.com/lp1169-thinksystem-mellanox-innova-2-connectx-5-fpga-25gbe-2-port-adapter)
 * [Lenovo Version of User Guide](https://download.lenovo.com/servers/mig/2019/05/15/20295/mlnx-lnvgy_utl_nic_in2-18.12_manual_2.0.pdf)
 * [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
+* [Xilinx XDMA Support](https://support.xilinx.com/s/article/71435?language=en_US)
+* [Xilinx QDMA Support](https://support.xilinx.com/s/article/70928?language=en_US)
 * [OpenCAPI Open Source Projects](https://opencapi.github.io/)
 * [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf) mentions the Innova-2
 * [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki) has no Innova-2 support and I am unaware of anyone working on it
