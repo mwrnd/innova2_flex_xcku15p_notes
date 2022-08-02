@@ -35,6 +35,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
    * [Troubleshooting](#troubleshooting)
       * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
       * [Factory Image Running with Flex Image Scheduled](#factory-image-running-with-flex-image-scheduled)
+      * [Innova2 Flex App Will Not Program](#innova2-flex-app-will-not-program)
       * [DDR4 Communication Error](#ddr4-communication-error)
       * [JTAG Programming Failure](#jtag-programming-failure)
       * [innova2_flex_app stuck on Erasing Flash](#innova2_flex_app-stuck-on-erasing-flash)
@@ -765,7 +766,8 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image).
+
 ```Shell
 sudo mst start
 sudo mst status
@@ -779,7 +781,12 @@ cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
 
+![Flex Image Version](img/Flex_Image_Version.png)
+
+Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
+
 ![Enable JTAG](img/Enable_JTAG_Access.png)
+
 
 
 #### Generate Configuration Images for the Full Memory Array
@@ -885,6 +892,8 @@ sudo reboot
 ### Loading a User Image
 
 These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+
+![Vivado Tools Generate Memory Configuration File](img/Vivado_Tools_Generate_Memory_Configuration_File.png)
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
@@ -1001,6 +1010,28 @@ The *Factory Image* (FLASH IC Address `0x00000000`) is *Running* even though the
 Enable JTAG and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
 
 ![Factory Image Running](img/Factory_Image_Running_Enable_JTAG.png)
+
+
+### Innova2 Flex App Will Not Program
+
+Confirm the ConnectX and BOPE Devices are present when running `innova2_flex_app -v`.
+
+![ConnectX and BOPE Devices Present](innova2_flex_app_ConnectX_and_BOPE_Devices.png)
+
+The ConnectX device is created by running `insmod /usr/lib/modules/5.8.0-43-generic/updates/dkms/mlx5_fpga_tools.ko`
+
+The BOPE device is created by running `~/Innova_2_Flex_Open_18_12/driver/make_device`. BOPE will fail to load if the FPGA Image is not compatible with your `innova2_flex_app` version. [Programm the FPGA](#programming-the-fpga).
+
+```
+cd ~
+sudo mst start
+sudo mst status
+sudo mst status -v
+sudo flint -d /dev/mst/mt4119_pciconf0 q
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+```
 
 
 ### DDR4 Communication Error
@@ -1264,7 +1295,7 @@ If all goes well your design will meet timing requirements:
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/), [8ES8-1DF Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)
-* According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: 01PG974 SN37A28065 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
+* According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
 * MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** variants of the Innova-2 which may not work with any of my projects
 * DDR4 Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) x16 Twin Die with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
@@ -1272,7 +1303,6 @@ If all goes well your design will meet timing requirements:
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How? How do you set up the ConnectX-5 to communicate directly with the FPGA without the Host System as an intermediary?
-* [Example](https://github.com/acsl-technion/flexdriver-zuc/blob/688c44720cd7bc13e5e05dbf0695ef95a2e64afa/run_project.tcl#L164) for automating binary Memory  Configuration File generation
 * [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour full licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
