@@ -1024,7 +1024,7 @@ Confirm the ConnectX and BOPE Devices are present when running `innova2_flex_app
 
 The ConnectX device is created by running `insmod /usr/lib/modules/5.8.0-43-generic/updates/dkms/mlx5_fpga_tools.ko`
 
-The BOPE device is created by running `~/Innova_2_Flex_Open_18_12/driver/make_device`. BOPE will fail to load if the FPGA Image is not compatible with your `innova2_flex_app` version. [Programm the FPGA](#programming-the-fpga).
+The BOPE device is created by running `~/Innova_2_Flex_Open_18_12/driver/make_device`. BOPE will fail to load if the FPGA Image is not compatible with your `innova2_flex_app` version. [Program the FPGA](#programming-the-fpga).
 
 ```
 cd ~
