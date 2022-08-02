@@ -4,7 +4,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
-These notes include step-by-step instructions for setting up and Innova-2 system and preparing the Innova-2 for FPGA development.
+These notes include step-by-step instructions for setting up an Innova-2 system and preparing the Innova-2 for FPGA development.
 
 # Table of Contents
 
@@ -1020,7 +1020,7 @@ Enable JTAG and [program the FPGA Configuration Memory to factory default](#prog
 
 Confirm the ConnectX and BOPE Devices are present when running `innova2_flex_app -v`.
 
-![ConnectX and BOPE Devices Present](innova2_flex_app_ConnectX_and_BOPE_Devices.png)
+![ConnectX and BOPE Devices Present](img/innova2_flex_app_ConnectX_and_BOPE_Devices.png)
 
 The ConnectX device is created by running `insmod /usr/lib/modules/5.8.0-43-generic/updates/dkms/mlx5_fpga_tools.ko`
 
