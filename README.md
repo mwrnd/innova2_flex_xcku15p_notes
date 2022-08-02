@@ -4,6 +4,8 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 
 ![Innova-2 Overview](img/Innova-2_Overview.png)
 
+These notes include step-by-step instructions for setting up and Innova-2 system and preparing the Innova-2 for FPGA development.
+
 # Table of Contents
 
    * [Required Materials](#required-materials)
@@ -22,7 +24,7 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
       * [Install Vivado or Vivado Lab Edition](#install-vivado-or-vivado-lab-edition)
    * [Test the Innova-2](#test-the-innova-2)
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
-         * [Programming the ConnectX5 Firmware FLASH IC Directly](#programming-the-connectx5-firmware-flash-ic-directly)
+         * [Programming the ConnectX5 FLASH](#programming-the-connectx5-flash)
       * [Testing The Network Ports](#testing-the-network-ports)
    * [Programming the FPGA](#programming-the-fpga)
       * [Initial Loading of the Flex Image](#initial-loading-of-the-flex-image)
@@ -462,7 +464,7 @@ Above should produce output similar to:
 
 #### Generate Personal Signing Key
 
-Need a personal [signing key](https://github.com/andikleen/simple-pt/issues/8#issuecomment-813438385) for compiled kernel modules. Copy and paste the following into a command terminal and it should generate a key configuration.
+Need a personal [signing key](https://github.com/andikleen/simple-pt/issues/8#issuecomment-813438385) for compiled kernel modules. Run `sudo ls` to prime `sudo` then copy and paste the following into a command terminal and it should generate a key configuration.
 
 ```Shell
 cd /lib/modules/$(uname -r)/build/certs
@@ -552,7 +554,7 @@ Install [Xilinx Vivado ML 2021.2](https://www.xilinx.com/support/download/index.
 
 If you have decided to install full Vivado, select Vitis (which will include Vivado) and at least *Kintex Ultrascale+* and *Zynq Ultrascale+ MPSoC* under device support. *Zynq Ultrascale+ MPSoC* seems to pull in some files needed by Vitis.
 
-Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info. You will also need to obtain a Vivado License, such as an Evaluation License.
+Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info. You will also need to obtain a Vivado License, such as an [Evaluation License](https://www.xilinx.com/getlicense.html).
 
 ![Vivado Install Options](img/Vivado_Install_Options.png)
 
@@ -582,6 +584,8 @@ sudo lspci | grep -i mellanox
 ```
 
 ![lspci](img/lspci.png)
+
+If the Innova-2 does not show up, try a different PCIe slot. It should work in any x16 or x8 slot or even in an x1 with an [appropriate adapter](https://www.startech.com/en-ca/cards-adapters/pex1to162). If it does not, proceed to [Programming the ConnectX FLASH IC](#programming-the-connectx5-flash).
 
 Start Mellanox Software Tools (`mst`) to find the Innova-2's device address. Note the `/dev/mst/mt4119_pciconf0` or similar which will be needed later.
 ```Shell
@@ -618,7 +622,7 @@ sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020
 
 If the above works, proceed to [Testing The Network Ports](#testing-the-network-ports). If it fails as above due to a `-E- PSID mismatch` error, continue to programming the ConnectX5 Firmware FLASH IC directly.
 
-#### Programming the ConnectX5 Firmware FLASH IC Directly
+#### Programming the ConnectX5 FLASH
 
 If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH directly. The IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can destroy your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or purchase a W25Q128JVS IC to test with.
 
@@ -1303,7 +1307,7 @@ If all goes well your design will meet timing requirements:
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How? How do you set up the ConnectX-5 to communicate directly with the FPGA without the Host System as an intermediary?
-* [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour full licensed access to Vivado
+* [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour fully licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
 * [nextpnr-xilinx](https://github.com/gatecat/nextpnr-xilinx) project as well as [prjxray](https://github.com/f4pga/prjxray) and [prjxuray](https://github.com/f4pga/prjuray) - not aware of anyone working on this but it is [theoretically possible](https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=8746&context=etd) for an FPGA Soft Processor to partially reconfigure its own FPGA
