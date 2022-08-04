@@ -41,6 +41,7 @@ These notes include step-by-step instructions for setting up an Innova-2 system 
       * [DDR4 Communication Error](#ddr4-communication-error)
       * [JTAG Programming Failure](#jtag-programming-failure)
       * [innova2_flex_app stuck on Erasing Flash](#innova2_flex_app-stuck-on-erasing-flash)
+      * [xsdb Cannot Download Program](#xsdb-cannot-download-program)
       * [Board Works But Not JTAG](#board-works-but-not-jtag)
       * [Nothing Seems to Work](#nothing-seems-to-work)
       * [Disable or Enable Resize BAR Support](#disable-or-enable-resize-bar-support)
@@ -1079,6 +1080,28 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 `innova2_flex_app` will get stuck on `Erasing flash ( 0%)` if a JTAG Adapter has not released control of JTAG signals. Disconnect the JTAG Adapter from USB and perform a cold reboot of the Innova-2 system.
 
 ![innova2_flex_app stuck on Erasing Flash](img/innova2_flex_app_stuck_on_Erasing_flash_0.png)
+
+
+### xsdb Cannot Download Program
+
+If you are attempting to use `xsdb` to load a program into a Soft Processor Core (RISC-V, MicroBlaze) and encounter *Memory Write Errors*:
+```
+...
+ 83%    0MB   0.0MB/s  00:02 ETA
+Failed to download /home/user/vivado-risc-v/workspace/boot.elf
+Memory write error at 0x80226400. Debug Transport Module: data corruption (ID)
+xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger resync)
+...
+```
+
+*JTAG Access* must be enabled before attempting to download programs to a RISC-V core in the FPGA.
+
+![Enable Innova-2 JTAG Access](img/enable_innova2_JTAG_access.png)
+
+`xsdb` then works:
+
+![xsdb successful program download](img/xsdb_successful_program_download.png)
+
 
 ### Board Works But Not JTAG
 
