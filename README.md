@@ -771,7 +771,7 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG still works with the FPGA but access to the FPGA Configuration Memory is blocked by the ConnectX-5. The ConnectX-5 controls the Write-Protect pins of the MT25QU512 ICs. JTAG must be enabled in `innova2_flex_app` before continuing. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image).
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image).
 
 ```Shell
 sudo mst start
@@ -1012,7 +1012,7 @@ The *Factory Image* (FLASH IC Address `0x00000000`) is *Running* even though the
 
 ![Factory Image is Running](img/Factory_Image_Running.png)
 
-Enable JTAG and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
+[Enable JTAG Access](#enable-jtag-access-to-the-xcku15p) and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
 
 ![Factory Image Running](img/Factory_Image_Running_Enable_JTAG.png)
 
@@ -1174,7 +1174,7 @@ exit
 
 ### Connect JTAG Adapter
 
-JTAG Communication is controlled by the ConnectX-5 on the Innova-2. Enable JTAG using `innova2_flex_app`.
+JTAG Communication is controlled by the ConnectX-5 on the Innova-2. Enable JTAG Access to the FPGA using `innova2_flex_app`.
 ```Shell
 sudo mst start
 sudo mst status
