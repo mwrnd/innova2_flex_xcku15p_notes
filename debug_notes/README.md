@@ -2,7 +2,7 @@
 
 ## Debugging Vivado xsdb xsct JTAG Errors
 
-If commands in `xsdb` lead to a Memory Write Errors or Debug Transport Module errors:
+If commands in `xsdb` lead to Memory Write Errors or Debug Transport Module errors:
 ```Shell
 Failed to download /home/user/boot.elf
 Memory write error at 0x8022D500. FPGA reprogrammed, wait for debugger resync
@@ -57,3 +57,4 @@ Edit `hw_server_log_xsdb` and look for the `Memory write` error:
 
 ![Edit hw_server_log_xsdb](img/vi_hw_server_log_xsdb.png)
 
+The above notes are a result of working on [`eugene-tarassov/vivado-risc-v` Issue 97](https://github.com/eugene-tarassov/vivado-risc-v/issues/97).
