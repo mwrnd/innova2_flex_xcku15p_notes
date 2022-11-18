@@ -16,6 +16,7 @@ These notes include step-by-step instructions for setting up an Innova-2 system 
          * [Remove all Kernels other than 5.8.0-43](#remove-all-kernels-other-than-580-43)
       * [Install All Prerequisites](#install-all-prerequisites)
       * [Install Mellanox OFED](#install-mellanox-ofed)
+         * [Confirm Mellanox OFED Installed Successfully](#confirm-mellanox-ofed-installed-successfully)
       * [Install Xilinx PCIe DMA IP Drivers](#install-xilinx-pcie-dma-ip-drivers)
          * [Install and Set Up DPDK](#install-and-set-up-dpdk)
          * [Generate Personal Signing Key](#generate-personal-signing-key)
@@ -87,7 +88,7 @@ The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
 The Innova-2 requires a specific system setup. [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is the most recent combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
 
-I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full *Vivado 2021.2*. 50GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
+I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full **Vivado 2021.2**. 50GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
 
 
 ### Linux Kernel
@@ -293,6 +294,8 @@ sudo  apt-mark  hold     5.8.0-43-generic linux-image-generic \
     knem-dkms knem openmpi mpitests libdapl2 dapl2-utils \
     libdapl-dev dpcp srptools mlnx-ethtool mlnx-iproute2
 ```
+
+#### Confirm Mellanox OFED Installed Successfully
 
 After reboot confirm Kernel Modules are Installed.
 ```Shell
@@ -625,7 +628,7 @@ If the above works, proceed to [Testing The Network Ports](#testing-the-network-
 
 #### Programming the ConnectX5 FLASH
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH directly. The IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can destroy your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or purchase a W25Q128JVS IC to test with.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH directly. The IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can destroy your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
 
 ![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.png)
 
@@ -896,7 +899,7 @@ sudo reboot
 
 ### Loading a User Image
 
-These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Write Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Generate Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
 ![Vivado Tools Generate Memory Configuration File](img/Vivado_Tools_Generate_Memory_Configuration_File.png)
 
@@ -1005,6 +1008,8 @@ sudo lspci | grep -i mellanox
 
 ![lspci for failed FLASH IC](img/lspci_results_when_FLASH_IC_fails.png)
 
+Shut down your Innova2 system and unplug power, wait a minute, then power the system back up. If that fails, [Confirm Mellanox OFED Installed Successfully](#confirm-mellanox-ofed-installed-successfully). If all else fails, try [re-programming the W25Q128JVS](#programming-the-connectx5-flash).
+
 
 ### Factory Image Running with Flex Image Scheduled
 
@@ -1084,7 +1089,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 ### xsdb Cannot Download Program
 
-If you are attempting to use `xsdb` to load a program into a Soft Processor Core (RISC-V, MicroBlaze) and encounter *Memory Write Errors*:
+If you are attempting to use `xsdb` to load a program into a Soft Processor Core (RISC-V, MicroBlaze) using [JTAG](https://docs.xilinx.com/v/u/en-US/pg245-debug-bridge) and encounter *Memory Write Errors*:
 ```
 ...
  83%    0MB   0.0MB/s  00:02 ETA
@@ -1094,7 +1099,7 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 ...
 ```
 
-*JTAG Access* must be enabled before attempting to download programs to a RISC-V core in the FPGA.
+*JTAG Access* must be enabled before attempting to download programs to a Soft Processor Core in the FPGA using JTAG.
 
 ![Enable Innova-2 JTAG Access](img/enable_innova2_JTAG_access.png)
 
