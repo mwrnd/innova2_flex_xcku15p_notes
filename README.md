@@ -1147,7 +1147,7 @@ It should have no effect when running a 64-Bit OS but sometimes it does. Flip th
 
 ```Shell
 cd ~
-wget https://downloads.sourceforge.net/project/urjtag/urjtag/2021.03/urjtag-2021.03.tar.xz
+wget https://versaweb.dl.sourceforge.net/project/urjtag/urjtag/2021.03/urjtag-2021.03.tar.xz
 sha256sum urjtag-2021.03.tar.xz
 echo b0a2eaa245513af096dc4d770109832335c694c6c12aa5e92fefae8685416f1c should be the SHA256 Checksum
 tar -xvf urjtag-2021.03.tar.xz
