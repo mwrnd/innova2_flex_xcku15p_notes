@@ -177,56 +177,55 @@ uname -s -r -m
 
 Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers will install custom versions of some of the libraries that get pulled into this install. By installing everything first you can avoid library incompatibility issues and `MLNX_OFED` reinstallations. `libibverbs` is one package that gets updated and pulled in by almost every piece of networking software but `MLNX_OFED` requires a custom version.
 ```Shell
+
 sudo apt install    alien apt autoconf automake binfmt-support \
-    binutils-riscv64-unknown-elf binwalk bison bpfcc-tools \
-    build-essential bzip2 chrpath clang clinfo cmake coreutils \
-    curl cycfx2prog dapl2-utils debhelper dh-autoreconf dh-python \
-    dkms dos2unix doxygen dpatch dpdk elfutils flashrom flex fxload \
-    gcc gcc-multilib gcc-riscv64-unknown-elf gdb gfortran \
-    gfortran-multilib ghex git graphviz gtkterm gtkwave hwdata \
-    ibacm ibutils ibverbs-providers ibverbs-utils intel-opencl-icd \
-    iperf3 ixo-usb-jtag kcachegrind libaio1 libaio-dev libasm1 \
-    libbpfcc libbpfcc-dev libbsd0 libc6 libc6-dev libcap-dev \
-    libc-dev libcharon-extauth-plugins libclang-dev libcunit1 \
-    libcunit1-dev libdapl2 libdrm-dev libdw1 libdwarf++0 \
-    libedit-dev libegl1-mesa-dev libelf++0 libelf1 libelf-dev \
-    libelfin-dev libfdt1 libfdt-dev libfontconfig1-dev \
-    libfreetype6-dev libftdi1 libftdi1-dev libftdi1-doc libftdi-dev \
-    libgfortran4 libglib2.0-0 libglib2.0-bin libglib2.0-data \
-    libglib2.0-dev libhugetlbfs-bin libibdm1 libibmad5 libibmad-dev \
-    libibnetdisc5 libibnetdisc-dev libibumad-dev libibverbs1 \
+    binutils-riscv64-unknown-elf binwalk bison bpfcc-tools build-essential \
+    bzip2 chrpath clang clinfo cmake coreutils curl cycfx2prog dapl2-utils \
+    debhelper debootstrap dh-autoreconf dh-python dkms dos2unix doxygen \
+    dpatch dpdk elfutils fio flashrom flex fxload gcc gcc-multilib \
+    gcc-riscv64-unknown-elf gdb gfortran gfortran-multilib ghex git \
+    graphviz gtkterm gtkwave hwdata ibacm ibutils ibverbs-providers \
+    ibverbs-utils intel-opencl-icd iperf3 ixo-usb-jtag kcachegrind libaio1 \
+    libaio-dev libasm1 libbpfcc libbpfcc-dev libbsd0 libc6 libc6-dev \
+    libcap-dev libc-dev libcharon-extauth-plugins libclang-dev libcunit1 \
+    libcunit1-dev libdapl2 libdrm-dev libdw1 libdwarf++0 libedit-dev \
+    libegl1-mesa-dev libelf++0 libelf1 libelf-dev libelfin-dev libfdt1 \
+    libfdt-dev libfontconfig1-dev libfreetype6-dev libftdi1 libftdi1-dev \
+    libftdi1-doc libftdi-dev libgfortran4 libglib2.0-0 libglib2.0-bin \
+    libglib2.0-data libglib2.0-dev libhugetlbfs-bin libibdm1 libibmad5 \
+    libibmad-dev libibnetdisc5 libibnetdisc-dev libibumad-dev libibverbs1 \
     libibverbs-dev libipsec-mb0 libipsec-mb-dev libisal2 libisal-dev \
-    libjansson4 libjpeg-dev liblzma-dev libmfx1 libmfx-dev \
-    libmfx-tools libmnl0 libmnl-dev libmount-dev libncurses5 \
-    libncurses-dev libnl-3-200 libnl-3-dev libnl-route-3-200 \
-    libnl-route-3-dev libnuma-dev libopencl-clang10 libpcap-dev \
-    libprocps-dev librdmacm1 librdmacm-dev libreadline-dev \
-    librte-pmd-qat20.0 libselinux1 libselinux1-dev libsgutils2-dev \
-    libssl-dev libstdc++-9-dev-riscv64-cross \
+    libjansson4 libjpeg-dev liblzma-dev libmfx1 libmfx-dev libmfx-tools \
+    libmnl0 libmnl-dev libmount-dev libncurses5 libncurses-dev libnl-3-200 \
+    libnl-3-dev libnl-route-3-200 libnl-route-3-dev libnuma-dev \
+    libopencl-clang10 libpcap-dev libprocps-dev librdmacm1 librdmacm-dev \
+    libreadline-dev librte-pmd-qat20.0 libselinux1 libselinux1-dev \
+    libsgutils2-dev libssl-dev libstdc++-9-dev-riscv64-cross \
     libstdc++-9-pic-riscv64-cross libstrongswan \
-    libstrongswan-standard-plugins libsystemd0 libsystemd-dev \
-    libtiff5 libtiff-dev libtinfo5 libtinfo-dev libtool libudev-dev \
-    libunbound8 libunbound-dev libunwind8 libunwind-dev \
-    libusb-1.0-0-dev libusb-dev libvma libvma-dev libxext-dev \
-    libxfixes-dev libxft-dev llvm-dev logrotate lsb-base make \
-    mdevctl meld mesa-opencl-icd meson module-assistant ninja-build \
-    ntpdate nvme-cli ocl-icd-dev ocl-icd-libopencl1 \
-    ocl-icd-opencl-dev opencl-headers openjdk-17-jdk openjdk-17-jre \
-    openocd opensm openssl openvswitch-switch pandoc pciutils \
-    perftest perl pkg-config procps python python3-all python3-attr \
-    python3-automat python3-binwalk python3-bpfcc python3-constantly \
-    python3-docutils python3-ftdi1 python3-hamcrest \
-    python3-hyperlink python3-incremental python3-openssl python3-pip \
-    python3-pkgconfig python3-pyasn1 python3-pyasn1-modules \
-    python3-pyelftools python3-pyverbs python3-service-identity \
-    python3-setuptools python3-six python3-sphinx python3-twisted \
-    python3-twisted-bin python3-zope.interface python-six \
-    python-zope.interface quilt rdmacm-utils sg3-utils sockperf \
-    squashfs-tools squashfs-tools-ng squashfuse strongswan \
-    strongswan-charon strongswan-libcharon strongswan-starter swig \
-    tcl-dev tcptraceroute tk-dev udev v4l2loopback-dkms \
-    v4l2loopback-utils valgrind valgrind-mpi vbindiff xc3sprog xxd \
-    zlib1g zlib1g-dev dpkg-dev:i386 libgtk2.0-0:i386 libstdc++6:i386
+    libstrongswan-standard-plugins libsystemd0 libsystemd-dev libtiff5 \
+    libtiff-dev libtinfo5 libtinfo-dev libtool libudev-dev libunbound8 \
+    libunbound-dev libunwind8 libunwind-dev libusb-1.0-0-dev libusb-dev \
+    libvma libvma-dev libxext-dev libxfixes-dev libxft-dev llvm-dev \
+    logrotate lsb-base make mdevctl meld mesa-opencl-icd meson \
+    module-assistant ninja-build nmap ntpdate nvme-cli ocl-icd-dev \
+    ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers openjdk-17-jdk \
+    openjdk-17-jre openocd opensbi opensm openssl openvswitch-switch pandoc \
+    pciutils perftest perl pkg-config procps python python3-all \
+    python3-attr python3-automat python3-binwalk python3-bpfcc \
+    python3-constantly python3-docutils python3-ftdi1 python3-hamcrest \
+    python3-hyperlink python3-incremental python3-openpyxl python3-openssl \
+    python3-pip python3-pkgconfig python3-pyasn1 python3-pyasn1-modules \
+    python3-pyelftools python3-pyverbs python3-scapy \
+    python3-service-identity python3-setuptools python3-six python3-sphinx \
+    python3-twisted python3-twisted-bin python3-zope.interface python-six \
+    python-zope.interface qemu-system-misc qemu-system-x86 qemu-utils quilt \
+    rdmacm-utils sg3-utils sockperf squashfs-tools squashfs-tools-ng \
+    squashfuse strongswan strongswan-charon strongswan-libcharon \
+    strongswan-starter swig tcl-dev tcptraceroute tk-dev u-boot-qemu udev \
+    v4l2loopback-dkms v4l2loopback-utils valgrind valgrind-mpi vbindiff \
+    vtun xc3sprog xxd zlib1g zlib1g-dev
+
+sudo apt install    dpkg-dev:i386 libgtk2.0-0:i386 libstdc++6:i386
 ```
 
 Need to remove some extra packages that conflict with Mellanox OFED.
@@ -394,7 +393,6 @@ network_devices = [network_class, cavium_pkx, avp_vnic, ifpga_class, xilinx_qdma
 ![edit dpdk-devbind.py](img/editing_dpdk-devbind_py.png)
 
 
-
 Build DPDK:
 ```Shell
 cd ~/dpdk-stable
@@ -439,6 +437,11 @@ ls -la ~/dpdk-stable/build/drivers/  |  grep librte_net_qdma.a
 ```
 
 ![confirm librte exists](img/librte_exists.png)
+
+
+Edit `dma_ip_drivers`'s QDMA to enable [Xilinx Virtual Cable (XVC)](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/Vivado-Debug-Bridge-IP-and-Xilinx-Virtual-Cable-XVC-Flow). Uncomment `export enable_xvc` in `dma_ip_drivers/QDMA/linux-kernel/driver/Makefile`:
+
+![Enable XVC in QDMA Makefile](img/QDMA_Makefile-Enable_XVC.png)
 
 Continue to build QDMA test application:
 ```Shell
@@ -1336,7 +1339,7 @@ If all goes well your design will meet timing requirements:
 * FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
-* A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA Bump-In-The-Wire processing. How? How do you set up the ConnectX-5 to communicate directly with the FPGA without the Host System as an intermediary?
+* A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA data processing via PCIe Peer-to-Peer. Unfortunately, this is a [Proprietary Feature](https://github.com/acsl-technion/flexdriver-iot-auth/issues/1). Refer to [Issue #1](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/1) for any progress with this functionality.
 * [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour fully licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
