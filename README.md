@@ -1311,6 +1311,12 @@ If all goes well your design will meet timing requirements:
 
 ![dmesg grep mlx](img/dmesg_mlx.png)
 
+`sudo lspci -tv | grep "Mellanox\|Xilinx"` displays a tree view of the PCIe bus.
+
+![lspci tree view](img/lspci_tree_view_Mellanox_and_Xilinx.png)
+
+
+
 
 ## Useful Links
 
