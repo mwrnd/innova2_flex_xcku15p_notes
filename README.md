@@ -6,6 +6,8 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 
 These notes include step-by-step instructions for setting up an Innova-2 system and preparing the Innova-2 for FPGA development.
 
+If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https://forums.developer.nvidia.com/c/infrastructure/software-and-drivers/soc-and-smartnic/530) and this project's [Issues](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues?q=is%3Aissue+is%3Aopen+is%3Aclosed).
+
 # Table of Contents
 
    * [Required Materials](#required-materials)
@@ -502,13 +504,20 @@ sudo reboot
 #### Build and Install Xilinx XDMA Drivers
 
 ```Shell
-cd ~/dma_ip_drivers/XDMA/linux-kernel/xdma
+cd ~/dma_ip_drivers/QDMA/linux-kernel/
 make
 sudo make install
+
+cd ~/dma_ip_drivers/XDMA/linux-kernel/xdma/
+make
+sudo make install
+
 sudo depmod -a
 sudo ldconfig
+
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools
 make
+
 sudo reboot
 ```
 
@@ -777,7 +786,7 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image).
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exist `innova2_flex_app`.
 
 ```Shell
 sudo mst start
@@ -794,7 +803,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 ![Flex Image Version](img/Flex_Image_Version.png)
 
-Otherwise, run `innova2_flex_app` and choose option `10`-enter to enable JTAG then `99`-enter to exit.
+If the FPGA Image is *NOT* Version `0xc1`, choose option `10`-enter to enable JTAG then `99`-enter to exit.
 
 ![Enable JTAG](img/Enable_JTAG_Access.png)
 
@@ -908,7 +917,7 @@ These instructions include a link to a bitstream for a working demo. Otherwise, 
 
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
-Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**. The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect.
+Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**. The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect. This is the start of a programming cycle which is: disable JTAG and schedule the Flex image, reboot, program with `innova2_flex_app`, reboot, and then test your loaded bitstream.
 ```
 sudo mst start
 cd ~/Innova_2_Flex_Open_18_12/driver/
@@ -1049,11 +1058,13 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the Vivado Block Design *Address Editor* that it is still `0x0`. See the [Innova-2 DDR4 Troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) project for DDR4 hardware debugging help.
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the Vivado Block Design *Address Editor* that it is still `0x0`. Note the [DDR4 IP Block](https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/ultrascale_memory_ip/v1_4/pg150-ultrascale-memory-ip.pdf) does not allow reading from memory that has not yet been written to. Test with a write then a read. See the [Innova-2 DDR4 Troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) project for DDR4 hardware debugging help.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
 sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x0 --size 8192  -f    TEST
+sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x0 --size 8192 --file RECV
+md5sum TEST RECV
 ```
 
 ![Error 512](img/XDMA_DDR4_Communication_Failure_Error_512.png)
@@ -1065,7 +1076,7 @@ If Vivado finishes Configuration Memory Programming in under a minute with a *\[
 
 ![JTAG Programming Failure](img/JTAG_Programming_Failure.png)
 
-**Enable JTAG Access** before attempting JTAG programming.
+**Enable JTAG Access** before attempting JTAG programming. `10`-Enter then `99`-Enter in `innova2_flex_app`.
 ```Shell
 sudo mst start
 sudo mst status
@@ -1102,7 +1113,7 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 ...
 ```
 
-*JTAG Access* must be enabled before attempting to download programs to a Soft Processor Core in the FPGA using JTAG.
+*JTAG Access* must be enabled before attempting to download programs to a Soft Processor Core in the FPGA using JTAG. `3`-Enter then `99`-Enter in `innova2_flex_app`.
 
 ![Enable Innova-2 JTAG Access](img/enable_innova2_JTAG_access.png)
 
