@@ -734,7 +734,7 @@ sudo flint --device /dev/mst/mt525_pciconf0 query
 
 ![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
 
-Program the ConnectX-5 firmare using `mstflint`.
+Program the ConnectX-5 firmare using `mstflint`. Note the device name is the PCI address from `lspci -vnn`
 ```
 sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
 ```
