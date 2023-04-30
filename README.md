@@ -717,7 +717,7 @@ Power down your system. Wait a moment, then power back up.
 
 ##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
 
-Thanks to @yangl1996 for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode. Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful.
+Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode. Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful.
 
 ![Force Recovery Mode by Shorting FLASH IC Pins 2 and 4 During Boot](img/Reset_ConnectX-5_Firmware_25Q128_FLASH_by_Shorting_Pins_2-4.jpg)
 
