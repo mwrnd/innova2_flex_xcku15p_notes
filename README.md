@@ -644,7 +644,7 @@ If the above works, proceed to [Testing The Network Ports](#testing-the-network-
 
 #### Programming the ConnectX5 FLASH
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board but the Recoery Mode method does not require an SPI programmer.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board but the Recovery Mode method does not require an SPI programmer.
 
 
 ##### Programming the ConnectX5 FLASH Using a CH341A Programmer
