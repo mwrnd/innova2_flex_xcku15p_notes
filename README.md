@@ -644,7 +644,7 @@ If the above works, proceed to [Testing The Network Ports](#testing-the-network-
 
 #### Programming the ConnectX5 FLASH
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board but the Recoery Mode method does not require an SPI programmer.
 
 
 ##### Programming the ConnectX5 FLASH Using a CH341A Programmer
@@ -723,8 +723,6 @@ Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://gith
 
 If all goes well the Innova-2 should show up as `Memory controller [0580]: Mellanox Technologies MT28800 Family [ConnectX-5 Flash Recovery] [15b3:020d]` under `lspci -vnn`. It should show up as `/dev/mst/mt525_pciconf0` under `mst status`. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
 
-![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
-
 ```
 sudo lspci -vnn
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
@@ -733,6 +731,8 @@ sudo mst start
 sudo mst status
 sudo flint --device /dev/mst/mt525_pciconf0 query
 ```
+
+![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
 
 Program the ConnectX-5 firmare using `mstflint`.
 ```
