@@ -30,7 +30,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
          * [Programming the ConnectX5 FLASH](#programming-the-connectx5-flash)
             * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
             * [Programming the ConnectX5 FLASH By Forcing Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode)
-         * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
+            * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
       * [Testing The Network Ports](#testing-the-network-ports)
    * [Programming the FPGA](#programming-the-fpga)
       * [Initial Loading of the Flex Image](#initial-loading-of-the-flex-image)
@@ -649,7 +649,7 @@ If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to u
 
 ##### Programming the ConnectX5 FLASH Using a CH341A Programmer
 
-The ConnectX-5's FLASH IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can damage your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
+The ConnectX-5's FLASH IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store/tree/5b4fda3add3d492f14f73a8376c580644f6c8195). **This is a dangerous procedure that can damage your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
 
 ![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.png)
 
@@ -717,7 +717,7 @@ Power down your system. Wait a moment, then power back up.
 
 ##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
 
-The ConnectX-5 can be forced into Flash Recovery Mode by shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot. **This is a dangerous procedure that can damage your Innova-2**. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. This prevents the firmware from loading and should put the ConnectX-5 into recovery mode.
+Thanks to @yangl1996 for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode. Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful.
 
 ![Force Recovery Mode by Shorting FLASH IC Pins 2 and 4 During Boot](img/Reset_ConnectX-5_Firmware_25Q128_FLASH_by_Shorting_Pins_2-4.jpg)
 
@@ -728,6 +728,7 @@ If all goes well the Innova-2 should show up as `Memory controller [0580]: Mella
 ```
 sudo lspci -vnn
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
+ls
 sudo mst start
 sudo mst status
 sudo flint --device /dev/mst/mt525_pciconf0 query
@@ -1397,7 +1398,7 @@ If all goes well your design will meet timing requirements:
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA data processing via PCIe Peer-to-Peer. Unfortunately, this is a [Proprietary Feature](https://github.com/acsl-technion/flexdriver-iot-auth/issues/1). Refer to [Issue #1](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/1) for any progress with this functionality.
-* [Awesome SmartNIC](https://github.com/mashemat/awesome-smartnic) project has many SmartNIC-related research links
+* [Awesome SmartNIC](https://github.com/mashemat/awesome-smartnic/tree/074e2513b1daa3e8fed38ff8ec35ff574cf2dd8f) project has many SmartNIC-related research links
 * [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour fully licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
