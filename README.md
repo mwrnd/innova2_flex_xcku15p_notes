@@ -28,6 +28,9 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
    * [Test the Innova-2](#test-the-innova-2)
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
          * [Programming the ConnectX5 FLASH](#programming-the-connectx5-flash)
+            * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
+            * [Programming the ConnectX5 FLASH By Forcing Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode)
+         * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
       * [Testing The Network Ports](#testing-the-network-ports)
    * [Programming the FPGA](#programming-the-fpga)
       * [Initial Loading of the Flex Image](#initial-loading-of-the-flex-image)
@@ -47,7 +50,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
       * [xsdb Cannot Download Program](#xsdb-cannot-download-program)
       * [Board Works But Not JTAG](#board-works-but-not-jtag)
       * [Nothing Seems to Work](#nothing-seems-to-work)
-      * [Disable or Enable Resize BAR Support](#disable-or-enable-resize-bar-support)
+      * [Disable or Enable Resizable BAR Support](#disable-or-enable-resizable-bar-support)
       * [Disable or Enable Above-4G Memory Decoding](#disable-or-enable-above-4g-memory-decoding)
    * [JTAG Using UrJTAG](#jtag-using-urjtag)
       * [Compile and Install UrJTAG](#compile-and-install-urjtag)
@@ -70,7 +73,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
 * Innova-2 Flex
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
-* **3.3V** SPI FLASH IC Programmer compatible with [flashrom](https://flashrom.org)
+* **3.3V** SPI FLASH IC Programmer compatible with [flashrom](https://flashrom.org) (*Optional*)
 * [Xilinx-Compatible](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
 * Second Computer or *External Powered PCIe Adapter* to program Flex and Factory Images via JTAG
 * SFP28/SFP+/SFP Modules and Cable or [Direct-Attach Cable](https://www.fs.com/products/65841.html) to test network ports
@@ -638,9 +641,15 @@ sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020
 
 If the above works, proceed to [Testing The Network Ports](#testing-the-network-ports). If it fails as above due to a `-E- PSID mismatch` error, continue to programming the ConnectX5 Firmware FLASH IC directly.
 
+
 #### Programming the ConnectX5 FLASH
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH directly. The IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can destroy your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board.
+
+
+##### Programming the ConnectX5 FLASH Using a CH341A Programmer
+
+The ConnectX-5's FLASH IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store). **This is a dangerous procedure that can damage your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
 
 ![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.png)
 
@@ -686,7 +695,7 @@ sha256sum W25Q128save.bin W25Q128save2.bin
 
 ![confirm flashrom reads](img/Confirm_flashrom_Reads.png)
 
-Confirm FLASH IC reads are sensible. Notice the `ab cd ef 00 fa de 12 34 56 78 de ad` in the first line of the header. An all-ones `ff` data read means the W25Q128 has been erased or was never programmed. An all-zeros `00` data read may be an inverted signal line.
+Confirm FLASH IC reads are sensible. Notice the `ab cd ef 00 fa de 12 34 56 78 de ad` in the first line of the header. An all-ones `ff` data read means the W25Q128 has been erased or was never programmed.
 ```Shell
 od -A x -t x1z -v W25Q128save.bin  |  head
 ```
@@ -695,7 +704,7 @@ od -A x -t x1z -v W25Q128save.bin  |  head
 
 If `flashrom` successfully detected the `W25Q128.V` and reads are consistent, then the requirement for sensible reads is a judgement call on your part.
 
-Use `flashrom` to write the latest Innova-2 firmware to the `W25Q128`. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* without DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
+Use `flashrom` to write the latest Innova-2 firmware to the `W25Q128`. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flashrom --programmer ch341a_spi --write fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin
@@ -704,6 +713,36 @@ sudo flashrom --programmer ch341a_spi --write fw-ConnectX5-rel-16_24_4020-MNV303
 ![flashrom write](img/flashrom_write.png)
 
 Power down your system. Wait a moment, then power back up.
+
+
+##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
+
+The ConnectX-5 can be forced into Flash Recovery Mode by shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot. **This is a dangerous procedure that can damage your Innova-2**. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. This prevents the firmware from loading and should put the ConnectX-5 into recovery mode.
+
+![Force Recovery Mode by Shorting FLASH IC Pins 2 and 4 During Boot](img/Reset_ConnectX-5_Firmware_25Q128_FLASH_by_Shorting_Pins_2-4.jpg)
+
+If all goes well the Innova-2 should show up as `Memory controller [0580]: Mellanox Technologies MT28800 Family [ConnectX-5 Flash Recovery] [15b3:020d]` under `lspci -vnn`. It should show up as `/dev/mst/mt525_pciconf0` under `mst status`. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
+
+![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
+
+```
+sudo lspci -vnn
+cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
+sudo mst start
+sudo mst status
+sudo flint --device /dev/mst/mt525_pciconf0 query
+```
+
+Program the ConnectX-5 firmare using `mstflint`.
+```
+sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
+```
+
+![Program ConnectX-5 Firmware Using mstflint](img/Program_ConnectX-5_Firmware_Using_mstflint.png)
+
+Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then power back on.
+
+##### Update GUID and MAC IDs
 
 Start Mellanox Software Tools (MST) and query the new firmware with `flint`.
 ```Shell
@@ -786,7 +825,7 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exist `innova2_flex_app`.
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exit `innova2_flex_app`.
 
 ```Shell
 sudo mst start
@@ -1140,11 +1179,11 @@ The board is well designed with all voltage rails exposed on test points. Carefu
 ![Voltage Test Points](img/Voltage_Test_Points.png)
 
 
-### Disable or Enable Resize BAR Support
+### Disable or Enable Resizable BAR Support
 
 If you are experiencing PCIe communication problems, flip this setting in your BIOS.
 
-![Enable Resize BAR Support](img/Enable_Re-Size_BAR_Support.png)
+![Enable Resizable BAR Support](img/Enable_Re-Size_BAR_Support.png)
 
 ### Disable or Enable Above-4G Memory Decoding
 
@@ -1174,7 +1213,7 @@ sudo ldconfig
 
 ### Create UrJTAG-Compatible JTAG Definition Files from BSDL Files
 
-Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) include `STD_1149_6_2003.all` definitions that UrJTAG's `bsdl2jtag` cannot process and must therefore be removed. The included [xcku15p_ffve1517_bsd.patch](xcku15p_ffve1517_bsd.patch) is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included [xcku15p_ffve1517.jtag](xcku15p_ffve1517.jtag) file.
+Xilinx's [Kintex Ultrascale+ BSDL Files](https://www.xilinx.com/member/forms/download/sim-model-eval-license-xef.html?filename=bsdl_kintexuplus_2021_2.zip) include [`STD_1149_6_2003.all`](https://ieeexplore.ieee.org/document/1196298/) Advanced I/O Testing definitions that UrJTAG's `bsdl2jtag` [cannot process](https://sourceforge.net/p/urjtag/enhancements/126/). They must therefore be removed. The included [xcku15p_ffve1517_bsd.patch](xcku15p_ffve1517_bsd.patch) is a patch to Xilinx's BSDL file for the 1517-pin XCKU15P that removes incompatible definitions. The resulting file is then processed with `bsdl2jtag` to produce the included [xcku15p_ffve1517.jtag](https://raw.githubusercontent.com/mwrnd/innova2_flex_xcku15p_notes/main/xcku15p_ffve1517.jtag) file.
 
 ### Add XCKU15P FFVE1517 JTAG Bit Definitions to UrJTAG
 
@@ -1349,6 +1388,7 @@ If all goes well your design will meet timing requirements:
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter)([Archived](https://web.archive.org/web/20210121175017/https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter)) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf))
 * [SocketDirect](https://support.mellanox.com/s/article/How-to-Work-with-Socket-Direct) is an example of OpenCAPI use.
 * According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
+* The [XCKU15P is a XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
 * MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [may not work with any of my projects](https://github.com/mwrnd/innova2_ddr4_troubleshooting/issues/1)
 * MNV303611A-EDLT variant of the Innova-2 has 40GbE/100GbE QSFP connectors but **no DDR4**
