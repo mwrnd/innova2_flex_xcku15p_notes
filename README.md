@@ -28,8 +28,8 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
    * [Test the Innova-2](#test-the-innova-2)
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
          * [Programming the ConnectX5 FLASH IC](#programming-the-connectx5-flash-ic)
-            * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
             * [Programming the ConnectX5 FLASH By Forcing Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode)
+            * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
          * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
       * [Testing The Network Ports](#testing-the-network-ports)
    * [Programming the FPGA](#programming-the-fpga)
@@ -757,7 +757,7 @@ sudo flint --device /dev/mst/mt4119_pciconf0 query
 
 ![flint query](img/flint_query_fresh_write.png)
 
-Notice above that the GUID and MAC IDs are blank. Use `flint` to set the values back to those from earlier. Note the `0x` hex designator prepended to the values.
+If the GUID and MAC IDs are blank, you can use `flint` to set the values back to those from earlier. Note the `0x` hex designator prepended to the values.
 ```Shell
 sudo flint --device /dev/mst/mt4119_pciconf0 -guid 0xc0dec0dec0dec0de -mac 0xc0dec0dec0de sg
 sudo mlxfwreset --device /dev/mst/mt4119_pciconf0 reset
@@ -1390,7 +1390,7 @@ If all goes well your design will meet timing requirements:
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
 * [SlimSAS Cable SFF-8654 8i 85-Ohm](https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter)([Archived](https://web.archive.org/web/20210121175017/https://www.sfpcables.com/24g-internal-slimsas-sff-8654-to-sff-8654-8i-cable-straight-to-90-degree-left-angle-8x-12-sas-4-0-85-ohm-0-5-1-meter)) or [RSL74-0540](http://www.amphenol-ast.com/v3/en/product_view.aspx?id=235) or [8ES8-1DF21-0.50](https://www.3m.com/3M/en_US/p/d/b5000000278/)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf))
 * [SocketDirect](https://support.mellanox.com/s/article/How-to-Work-with-Socket-Direct) is an example of OpenCAPI use.
-* The [XCKU15P is a XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
+* The [XCKU15P is an XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
 * According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
 * MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [may not work with any of my projects](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/4)
