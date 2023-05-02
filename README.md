@@ -1412,4 +1412,9 @@ If all goes well your design will meet timing requirements:
 
 * [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
 * [innova2_ddr4_troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) - DDR4 Troubleshooting Bitstreams and Guide
+* [xdma_uart-to-uart](https://github.com/mwrnd/innova2_experiments/tree/main/xdma_uart-to-uart) - UART-over-XDMA Testing
+
+
+
+
 
