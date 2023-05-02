@@ -1035,18 +1035,24 @@ If the above works then great! Your Innova-2 has a working FPGA with PCIe. Conti
 
 ## Upgrading the ConnectX5 Firmware
 
-Once you have tested an Innova-2 using the current working firmware, you may want to explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). It has an `--online` option.
+If you are experiencing issues with your Innova-2 or require PXE Boot capability, explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). The latest version to support the Innova-2 is `4.15.2` and will upgrade your ConnectX-5 firmware to **16.28.2006** and PXE Boot `3.6.0102`.
+
+![mlxup 4.15.2](img/mlxup-mft_Download.png)
+
 ```
 cd ~
-wget https://www.mellanox.com/downloads/firmware/mlxup/4.20.0/SFX/linux_x64/mlxup
-echo e9ce226ee43fb0ad0b84ecee44cf64989bdf5f1f6a99c459aae29f3a4e1ae32c should be the SHA256 checksum
+wget https://www.mellanox.com/downloads/firmware/mlxup/4.15.2/SFX/linux_x64/mlxup
+echo b3c1c1e6b5c3f37c46bc6ceb319d4b888379a7c813a7e08d931f962572eb7ac4 should be the SHA256 checksum
 sha256sum mlxup
+sudo mst start
+sudo chmod +x mlxup
+sudo ./mlxup --version
 sudo ./mlxup
 ```
 
 ![mlxup](img/mlxup.png)
 
-The latest firmware [directy downloadable](http://www.mellanox.com/downloads/firmware/fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip) from Nvidia/Mellanox is **16.26.4012**.
+The latest firmware [directy downloadable](http://www.mellanox.com/downloads/firmware/fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip) from Nvidia/Mellanox is **16.26.4012** which is older than the version included with `mlxup 4.15.2`
 
 ![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
 
