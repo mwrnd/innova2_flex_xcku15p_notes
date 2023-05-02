@@ -58,3 +58,34 @@ Edit `hw_server_log_xsdb` and look for the `Memory write` error:
 ![Edit hw_server_log_xsdb](img/vi_hw_server_log_xsdb.png)
 
 The above notes are a result of working on [`eugene-tarassov/vivado-risc-v` Issue 97](https://github.com/eugene-tarassov/vivado-risc-v/issues/97).
+
+
+
+
+## Debugging PCIe Using Xilinx IBERT
+
+**Work-In-Progress**
+
+![SlimSAS to PCIe Testing](img/SlimSAS_to_PCIe_Testing.jpg)
+
+Create an `xdma_0_ex` example design with all debugging options enabled. Connect a JTAG debugger to the board and run `source test_rd.tcl` in the [**Tcl Console**](https://docs.xilinx.com/r/2021.1-English/ug893-vivado-ide/Using-the-Tcl-Console). It will be in the `xdma_0_ex/xdma_0_ex.gen/sources_1/ip/xdma_0/ip_0/xdma_0_pcie4_ip/pcie_debugger` directory. Refer to the [IBERT Product Guide](https://docs.xilinx.com/v/u/en-US/pg246-in-system-ibert).
+
+![source test_rd.tcl](img/Innova2_PCIe_xdma_0_ex_source_test_rd_tcl.png)
+
+In your OS's terminal, `cd` into the `xdma_0_ex/xdma_0_ex.gen/sources_1/ip/xdma_0/ip_0/xdma_0_pcie4_ip/pcie_debugger` directory and run the various state diagrams.
+```
+tclsh draw_ltssm.tcl
+tclsh draw_reset.tcl
+```
+
+![Draw LTSSM](img/Innova2_PCIe_xdma_0_ex_tclsh_draw_ltssm.jpg)
+
+![Draw Reset](img/Innova2_PCIe_xdma_0_ex_tclsh_draw_reset.png)
+
+Run a Sweep in Vivado to see an [Eye Diagram](https://en.wikipedia.org/wiki/Eye_pattern).
+
+![Run a Sweep to see an Eye Diagram](img/Innova2_PCIe_SlimSAS_Eye_Diagram.png)
+
+
+
+
