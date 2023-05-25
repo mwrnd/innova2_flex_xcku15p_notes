@@ -44,6 +44,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
       * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
       * [Factory Image Running with Flex Image Scheduled](#factory-image-running-with-flex-image-scheduled)
       * [Innova2 Flex App Will Not Program](#innova2-flex-app-will-not-program)
+      * [Innova2 Flex App No BOPE or ConnectX Devices](#innova2-flex-app-no-bope-or-connectx-devices)
       * [DDR4 Communication Error](#ddr4-communication-error)
       * [JTAG Programming Failure](#jtag-programming-failure)
       * [innova2_flex_app stuck on Erasing Flash](#innova2_flex_app-stuck-on-erasing-flash)
@@ -998,7 +999,7 @@ git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
 ```
 
-Run `innova2_flex_app` with appropriate `-b` commands to program a design. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
+Run `innova2_flex_app` with appropriate `-b` commands to program a design into the FPGA. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
 ```Shell
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
   -b innova2_xcku15p_ddr4_bram_gpio_primary.bin,0       \
@@ -1101,6 +1102,114 @@ sudo flint -d /dev/mst/mt4119_pciconf0 q
 cd ~/Innova_2_Flex_Open_18_12/driver/
 sudo ./make_device
 sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+```
+
+
+
+### Innova2 Flex App No BOPE or ConnectX Devices
+
+If you run `sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v` and do not see a BOPE and ConnectX device:
+
+```
+===============================================
+ Verbosity:        1
+ BOPE device:      None
+ ConnectX device:  None
+Cannot find appropriate ConnectX device
+```
+
+![innova2_flex_app No BOPE or ConnectX Device](img/innova2_flex_app_No_BOPE_No_ConnectX_Device.png)
+
+The following commands must be run after each reboot to reinstall the BOPE and ConnectX devices if you intend to program the FPGA.
+
+```
+sudo mst start
+sudo mst status
+sudo mst status -v
+sudo flint -d /dev/mst/mt4119_pciconf0 q
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+lsmod | grep mlx
+cd ~
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+The `mlx5_fpga_tools` module creates the ConnectX device:
+
+```
+sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+```
+===============================================
+ Verbosity:        1
+ BOPE device:      None
+ ConnectX device:  None
+ ConnectX device: /dev/0000:04:00.0_mlx5_fpga_tools
+ BOPE device:     None
+ Scheduled image:  Innova2 Flex Image
+ Running image:    User Image(Success)
+ Type of board: Morse
+
+Jump-to-Innova2-User menu
+------------------
+[ 1 ] Set Innova2_Flex image active (reboot required)
+[ 2 ] Set User image active
+[ 3 ] Enable JTAG Access - no thermal status
+[ 4 ] Read FPGA thermal status
+[ 5 ] Reload User image
+[99 ] Exit
+Your choice: 99
+```
+
+![insmod mlx5_fpga_tools](img/innova2_insmod_mlx5_fpga_tools_adds_ConnectX_Device.png)
+
+The `make_device` utility creates the BOPE device:
+
+```
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
+```
+
+```
+===============================================
+ Verbosity:        1
+ BOPE device:      None
+ ConnectX device:  None
+ ConnectX device: /dev/0000:04:00.0_mlx5_fpga_tools
+ BOPE device:     /dev/0000:03:00.0_mlx_fpga_bope
+ Scheduled image:  Innova2 Flex Image
+ Running image:    Innova2 Flex Image(Success)
+ Type of board: Morse
+	***   FPGA image version: 0xc1   ***
+	***   Mailbox Done counter   0   ***
+
+Burn-Diagnostics menu
+------------------
+[ 1 ] Query Innova2_Flex FPGA version
+[ 2 ] DDR stress test
+[ 3 ] PCI test
+[ 4 ] Read FPGA thermal status
+[ 5 ] Read Fan speed
+[ 6 ] Burn of customer User image
+[ 7 ] Set User image active (reboot required)
+[ 8 ] Set Innova2_Flex image active
+[ 9 ] Increase FPGA power consumption
+[10 ] Enable JTAG Access - no thermal status
+[99 ] Exit
+Your choice: 99
+```
+
+![innova2 make_device adds BOPE Device](img/innova2_make_device_adds_BOPE_Device.png)
+
+Once both BOPE and ConnectX devices exist and the `Flex Image` is the Active Image, you can run `innova2_flex_app` with appropriate `-b` commands to [program a design into the FPGA](#loading-a-user-image). Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
+```Shell
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
+  -b innova2_xcku15p_ddr4_bram_gpio_primary.bin,0       \
+  -b innova2_xcku15p_ddr4_bram_gpio_secondary.bin,1
 ```
 
 
@@ -1390,7 +1499,7 @@ If all goes well your design will meet timing requirements:
 * [Xilinx QDMA Support](https://support.xilinx.com/s/article/70928?language=en_US)
 * [OpenCAPI Open Source Projects](https://opencapi.github.io/)
 * [OpenCAPI Presentation](https://opencapi.org/wp-content/uploads/2018/12/OpenCAPI-Tech-SC18-Exhibitor-Forum.pdf) mentions the Innova-2
-* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki) has no Innova-2 support and I am unaware of anyone working on it
+* [OpenCAPI3.0 Reference Design](https://github.com/OpenCAPI/OpenCAPI3.0_Client_RefDesign/wiki) has no Innova-2 support
 * [OpenCAPI Pinout](https://docs.nvidia.com/networking/download/attachments/11995849/Innova-2%20Flex%20Open%20Interface%20Pinouts.xlsx?version=2&modificationDate=1554362542493&api=v2)
 * OpenCAPI [OpenPower Advanced Accelerator Adapter Electro-Mechanical Specification](https://files.openpower.foundation/s/xSQPe6ypoakKQdq/download/25Gbps-spec-20171108.pdf)
 * OpenCAPI [SlimSAS Connector U10-J074-24 or U10-K274-26](https://www.amphenol-cs.com/media/wysiwyg/files/documentation/datasheet/inputoutput/hsio_cn_slimsas_u10.pdf)
