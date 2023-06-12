@@ -680,6 +680,8 @@ Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then pow
 
 ##### Programming the ConnectX5 FLASH Using a CH341A Programmer
 
+If the above method of forcing Recovery Mode worked, you may skip this section. I have only needed an exact copy of the initial firmware that came with the board when preparing these notes. However, if you have the ability to read FLASH ICs then it is safer to have a copy.
+
 The ConnectX-5's FLASH IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store/tree/5b4fda3add3d492f14f73a8376c580644f6c8195). **This is a dangerous procedure that can damage your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
 
 ![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.png)
@@ -993,7 +995,8 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 cd ~
 ```
 
-For board testing, the following command will clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
+For board testing, the following command will clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory. If you have the 
+MNV303611A-EDLT variant of the Innova-2 which **does not** have DDR4, check out the [innova2_mnv303611a_xcku15p_xdma](https://github.com/mwrnd/innova2_mnv303611a_xcku15p_xdma) project instead.
 ```Shell
 git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
 cd innova2_xcku15p_ddr4_bram_gpio
