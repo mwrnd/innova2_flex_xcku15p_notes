@@ -63,6 +63,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
          * [Begin a UrJTAG Session](#begin-a-urjtag-session)
    * [FPGA Design Notes](#fpga-design-notes)
       * [Design Does Not Meet Timing Requirements](#design-does-not-meet-timing-requirements)
+      * [PCIe and OpenCAPI Pinout](#pcie-and-opencapi-pinout)
    * [Useful Commands](#useful-commands)
    * [Useful Links](#useful-links)
    * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
@@ -1470,6 +1471,17 @@ Then slow down the DDR4:
 If all goes well your design will meet timing requirements:
 
 ![Design Meets Timing](img/DDR4_Design_Meets_Timings.png)
+
+
+### PCIe and OpenCAPI Pinout
+
+Taken from [ug575 UltraScale+ Device Packaging Pinouts](https://docs.xilinx.com/r/en-US/ug575-ultrascale-pkg-pinout).
+
+![XCKU15P FFVE1517 Banks](img/XCKU15P_FFVE1517_Banks.png)
+
+PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y0`-to-`X0Y7`. OpenCAPI connections are on Quads 131 and 132 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y16`-to-`X0Y23`.
+
+![XCKU15P FFVE1517 PCIe and OpenCAPI Pins](img/XCKU15P_FFVE1517_Innova2_PCIe_OpenCAPI_Pins.png)
 
 
 ## Useful Commands
