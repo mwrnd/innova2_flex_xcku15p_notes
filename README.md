@@ -1458,6 +1458,7 @@ Right-click on the JTAG Adapter, *xilinx_tcf*, then *Close Target* and exit Viva
 
 
 
+
 ## FPGA Design Notes
 
 ### Design Does Not Meet Timing Requirements
@@ -1475,6 +1476,8 @@ If all goes well your design will meet timing requirements:
 ![Design Meets Timing](img/DDR4_Design_Meets_Timings.png)
 
 
+
+
 ### PCIe and OpenCAPI Pinout
 
 Taken from [ug575 UltraScale+ Device Packaging Pinouts](https://docs.xilinx.com/r/en-US/ug575-ultrascale-pkg-pinout).
@@ -1484,6 +1487,8 @@ Taken from [ug575 UltraScale+ Device Packaging Pinouts](https://docs.xilinx.com/
 PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y0`-to-`X0Y7`. OpenCAPI connections are on Quads 131 and 132 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y16`-to-`X0Y23`.
 
 ![XCKU15P FFVE1517 PCIe and OpenCAPI Pins](img/XCKU15P_FFVE1517_Innova2_PCIe_OpenCAPI_Pins.png)
+
+
 
 
 ## Useful Commands
@@ -1540,10 +1545,14 @@ PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://w
 
 
 
+
 ## Projects Tested to Work with the Innova2
 
 * [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) - Simple PCIe XDMA to DDR4 and GPIO Demo
 * [innova2_ddr4_troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) - DDR4 Troubleshooting Bitstreams and Guide
 * [xdma_uart-to-uart](https://github.com/mwrnd/innova2_experiments/tree/main/xdma_uart-to-uart) - UART-over-XDMA Testing
 * [innova2_mnv303611a_xcku15p_xdma](https://github.com/mwrnd/innova2_mnv303611a_xcku15p_xdma) - Simple PCIe XDMA Demo without DDR4 that should work on all Innova-2 variants
-* 
+
+
+
+
