@@ -957,6 +957,8 @@ sudo reboot
 
 ### Loading a User Image
 
+Note the process of enabling the Flex Image, rebooting, programming, enabling the User Image, then rebooting takes approximately 10 minutes each time you update your User Image.
+
 These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Generate Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
 ![Vivado Tools Generate Memory Configuration File](img/Vivado_Tools_Generate_Memory_Configuration_File.png)
