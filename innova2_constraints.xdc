@@ -19,7 +19,7 @@ set_property OFFCHIP_TERM NONE [get_ports {Dout_0[0]}]
 
 
 
-# PCIe - Location: X0Y2 - GTY Quads 127, 129
+# PCIe - Location: X0Y2 - GTY Quads 127, 128
 
 set_property PACKAGE_PIN AA38 [get_ports {pcie_7x_mgt_rtl_0_rxp[7]}]
 set_property PACKAGE_PIN AB36 [get_ports {pcie_7x_mgt_rtl_0_rxp[6]}]
