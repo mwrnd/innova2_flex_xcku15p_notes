@@ -1287,9 +1287,13 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 
 ### Board Works But Not JTAG
 
-Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! I believe it is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf). Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
+Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
 
 ![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.png)
+
+It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Channel MOSFET.
+
+![SC70 MOSFET with MXX Marking](img/DMN63D8LW-7_MXX-Marking.jpg)
 
 
 ### Nothing Seems to Work
