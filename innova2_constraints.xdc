@@ -6,7 +6,7 @@
 
 
 
-# LEDs - A6=D19, B6=D18
+# LEDs - A6=D19, B6=D18 - A6 and B6 are in Bank 90
 
 set_property PACKAGE_PIN A6 [get_ports {GPIO_0_tri_o[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_0_tri_o[0]}]
@@ -30,10 +30,11 @@ set_property PACKAGE_PIN AF36 [get_ports {pcie_7x_mgt_rtl_0_rxp[2]}]
 set_property PACKAGE_PIN AG38 [get_ports {pcie_7x_mgt_rtl_0_rxp[1]}]
 set_property PACKAGE_PIN AH36 [get_ports {pcie_7x_mgt_rtl_0_rxp[0]}]
 
+# PCIe Clock - AB27 is MGTREFCLK0 in GTY Quad/Bank 128
 set_property PACKAGE_PIN AB27 [get_ports {diff_clock_rtl_0_clk_p[0]}]
 create_clock -name sys_clk -period 10.000 [get_ports diff_clock_rtl_0_clk_p]
 
-# PCIe Reset
+# PCIe Reset - F2 is in Bank 90
 set_property PACKAGE_PIN F2 [get_ports reset_rtl_0]
 set_property IOSTANDARD LVCMOS33 [get_ports reset_rtl_0]
 set_property PULLUP true [get_ports reset_rtl_0]

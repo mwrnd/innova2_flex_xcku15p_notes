@@ -28,6 +28,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
    * [Test the Innova-2](#test-the-innova-2)
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
          * [Programming the ConnectX5 FLASH IC](#programming-the-connectx5-flash-ic)
+            * [Programming the ConnectX5 FLASH By Corrupting its Firmware](#programming-the-connectx5-flash-by-corrupting-its-firmware)
             * [Programming the ConnectX5 FLASH By Forcing Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode)
             * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
          * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
@@ -626,13 +627,13 @@ sudo flint --device /dev/mst/mt4119_pciconf0 query
 
 ![flint query](img/flint_query_IBM0000000018.png)
 
-If the result is `PSID: MT_0000000158` then you can attempt to program the firmware using `flint`. Otherwise, the next step requires physical access to the board. My device presented as `PSID: IBM0000000018` and needed to be programmed. Note that `sudo mst start` must be run to enable `flint`.
+If the result is `PSID: MT_0000000158` then you can attempt to program the firmware using `flint`. Otherwise, the next step may require physical access to the board. My device presented as `PSID: IBM0000000018` and needed to be programmed. Note that `sudo mst start` must be run to enable `flint`.
 
 Make sure to **write down the GUID and MAC values**.
 
 If the FW Version is `16.24.4020` or newer then proceed to [Testing The Network Ports](#testing-the-network-ports) as firmware is already up-to-date.
 
-Attempt to program the firmware using `flint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+Attempt to program the firmware using `flint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin --allow_rom_change burn
@@ -645,12 +646,59 @@ If the above works, proceed to [Testing The Network Ports](#testing-the-network-
 
 #### Programming the ConnectX5 FLASH IC
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to program the FLASH IC [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option risks damage to the board but the Recovery Mode method does not require an SPI programmer.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to update it so that it works with `innova2_flex_app`. There are three methods: [Corrupting the firmware and using `mstflint`](#programming-the-connectx5-flash-by-corrupting-its-firmware), [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer), or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option has associated risks.
+
+
+##### Programming the ConnectX5 FLASH By Corrupting its Firmware
+
+`mstflint` does not allow you to overwrite ConnectX-5 firmware if there is a `PSID` mismatch but it _will_ allow you to write arbitrary data to the flash IC. By corrupting the firmware and causing a CRC error you can enable `mstflint` to program new firmware.
+
+First, save a couple copies of the current firmware. Note this will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have complete copy of the FLASH IC. The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
+```
+sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read1.bin
+sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read2.bin
+```
+
+![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
+
+Attempt to program the firmware using `mstflint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+
+```
+cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
+sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 04:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
+```
+
+![mstflint programming fails](img/mstflint_programming_fails.jpg)
+
+If programming succeeds, proceed to [update the GUID and MAC IDs](#update-guid-and-mac-ids). Otherwise, write some data to corrupt the ConnectX-5 firmware. The exact memory locations and data are not critical but I found the following to work when I tried to modify the `PSID`.
+
+```
+sudo mstflint --device 04:00.0 ww 0x00357734 0x30303135
+sudo mstflint --device 04:00.0 ww 0x00357738 0x38000000
+```
+
+![mstflint write to firmware](img/mstflint_corrupt_ConnectX-5_firmware.jpg)
+
+Confirm there is now a CRC error with the ConnectX-5 firmware.
+```
+sudo mstflint --device 04:00.0 query
+```
+
+![mstflint firmware CRC error](img/mstflint_CRC_checksum_error.jpg)
+
+Program the ConnectX-5 firmware. The `Current FW` should show up as `N/A` due to the CRC error.
+```
+sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 04:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
+```
+
+![mstflint programming succeeds](img/mstflint_program_over_corrupt_ConnectX-5_firmware.jpg)
+
+If the above worked, proceed to [update the GUID and MAC IDs](#update-guid-and-mac-ids). If it fails, try the following method of Forcing Recovery Mode.
 
 
 ##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
 
-Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode and [its FLASH read with `mstflint`](https://github.com/Tualua/labnotes/wiki/Mellanox-ConnectX-4-Lx-Firmware-recovery). Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful. Release the short after boot to allow the IC to be programmed. Note that `mstflint` will only read and write the firmware sections of the Flash. Checksums will not match as empty sections will be different.
+Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode and [its FLASH read and written with `mstflint`](https://github.com/Tualua/labnotes/wiki/Mellanox-ConnectX-4-Lx-Firmware-recovery). Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful. Release the short after boot to allow the IC to be programmed. Note that `mstflint` will only read and write the firmware sections of the Flash. Checksums will not match as empty sections will be different.
 
 ![Force Recovery Mode by Shorting FLASH IC Pins 2 and 4 During Boot](img/ConnectX-5_Flash_Recovery_Mode_by_Shorting_DO-to-GND.jpg)
 
@@ -676,7 +724,15 @@ sudo mstflint --device 01:00.0  ri  innova2_CX5_FW_read2_after_write.bin
 
 ![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
 
-Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then power back on.
+Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then power back on. Confirm the ConnectX-5 firmware has been updated.
+
+```
+sudo mst start
+sudo mst status
+sudo flint --device /dev/mst/mt525_pciconf0 query
+```
+
+If the above worked, proceed to [update the GUID and MAC IDs](#update-guid-and-mac-ids).
 
 
 ##### Programming the ConnectX5 FLASH Using a CH341A Programmer
@@ -1495,6 +1551,15 @@ PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://w
 
 
 
+### LEDs
+
+LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of the XCKU15P.
+
+![LEDs D18 D19](img/Innova2_LEDs_D18_D19.jpg)
+
+
+
+
 ## Useful Commands
 
 `dmesg | grep -i xdma` will show you whether the Xilinx XDMA driver from *dma_ip_drivers* successully loaded for a PCIe-based FPGA design.
@@ -1534,7 +1599,7 @@ PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://w
 * The [XCKU15P is an XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
 * According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
-* MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [may not work with any of my projects](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/4)
+* MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [have some caveats to their use](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/4)
 * MNV303611A-EDLT variant of the Innova-2 has 40GbE/100GbE QSFP connectors but **no DDR4**
 * DDR4 Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) x16 Twin Die with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
 * FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
