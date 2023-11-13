@@ -46,7 +46,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
    * [Loading Updated Designs Using JTAG](#loading-updated-designs-using-jtag)
       * [Confirm Motherboard BIOS and Linux Support Hotplug](#confirm-motherboard-bios-and-linux-support-hotplug)
       * [Attempt PCIe Remove and Rescan](#attempt-pcie-remove-and-rescan)
-      * [Enable JTAG Access to the Innova2](#enablejtag-access-to-the-innova2)
+      * [Enable JTAG Access to the Innova2](#enable-jtag-access-to-the-innova2)
       * [Disconnect Innova2 from the PCIe Bridge](#disconnect-innova2-from-the-pcie-bridge)
       * [Program the FPGA Using JTAG](#program-the-fpga-using-jtag)
       * [Reconnect Innova2 FPGA to the PCIe Bridge and Rescan PCIe Bus](#reconnect-innova2-fpga-to-the-pcie-bridge-and-rescan-pcie-bus)
