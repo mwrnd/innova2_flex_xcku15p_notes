@@ -15,16 +15,24 @@ I found out about this technique [here](https://hackaday.com/2018/02/17/catching
 ![Boot Delay Technique Source](img/Delay_Boot_with_Capacitor_Across_PC_RESET.png)
 
 
+
+
 ## Discerning ADLT vs ADAT and ADIT Variants
 
-[Innova2 8GB MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf) boards have [`MT40A1G16KNR-075`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) DDR4 ICs with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA). [Innova2 4GB MNV303212A-ADAT/MNV303212A-ADIT](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) boards have [`MT40A512M16JY-083E`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/8gb_ddr4_sdram.pdf) DDR4 ICs with ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)).
+[Innova2 8GB MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf) boards have [`MT40A1G16KNR-075`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) DDR4 ICs with [**D9WFR** FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA). [Innova2 4GB MNV303212A-ADAT/MNV303212A-ADIT](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) boards have [`MT40A512M16JY-083E`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/8gb_ddr4_sdram.pdf) DDR4 ICs with [**D9TBK** FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)).
 
 ![DDR4 IC Comparison](img/Innova2_Variant_DDR4_Comparison.jpg)
+
+
 
 
 ## Tracing OpenCAPI Connector Signals
 
 ![Partial Tracing of OpenCAPI Signals](img/Innova2_ADLT_OpenCAPI_Partial_Pinout.jpg)
+
+![Back of Board](img/Innova2_ADLT_OpenCAPI_Back_of_Board.jpg)
+
+
 
 
 ## Debugging Vivado xsdb xsct JTAG Errors
@@ -112,6 +120,19 @@ tclsh draw_reset.tcl
 Run a Sweep in Vivado to see an [Eye Diagram](https://en.wikipedia.org/wiki/Eye_pattern).
 
 ![Run a Sweep to see an Eye Diagram](img/Innova2_PCIe_SlimSAS_Eye_Diagram.png)
+
+
+
+
+## Useful Hardware for Debug
+
+A PCIe x16-to-x1 Adapter forces x1 lane width.
+
+![PCIe x16 to x1 Adapter](img/PCIe_x16-to-x1_Adapter.jpg)
+
+A PCIe Extender can be used to solder directly to individual lanes.
+
+![PCIe x1 Extender for Direct Lane Soldering](img/PCIe_x1_Extender_Solder_Direct_to_Specific_Lane.jpg)
 
 
 

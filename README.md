@@ -126,7 +126,7 @@ sudo apt-get install   linux-buildinfo-5.8.0-43-generic \
        linux-modules-extra-5.8.0-43-generic linux-tools-5.8.0-43-generic
 ```
 
-Note that Nvidia/Mellanox [only officially support kernel](https://docs.nvidia.com/networking/display/MLNXOFEDv522240/General+Support+in+MLNX_OFED) `5.4.0-26-generic`. Xilinx appears to have only thoroughly tested Vivado **2021.2** against [5.8.0](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe).
+Nvidia/Mellanox [only officially support kernel](https://docs.nvidia.com/networking/display/MLNXOFEDv522240/General+Support+in+MLNX_OFED) `5.4.0-26-generic`. Xilinx appears to have only thoroughly tested Vivado **2021.2** against [5.8.0](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe).
 
 ![Only Officially Supported Kernel is 5.4.0-26](img/Supported_Kernel_is_5.4.0-26-generic.png)
 
@@ -601,7 +601,7 @@ cd /tools/Xilinx/Vivado/2021.2/data/xicom/cable_drivers/lin64/install_script/ins
 sudo ./install_drivers
 ```
 
-Note that Vivado requires 4GB of system RAM per Job (Thread) plus a base of 10GB. An Ubuntu system with 16GB of RAM running just Vivado can reliably use only 1 core during synthesis and implementation. Otherwise, it will overwhelm the [Kernel Swap Daemon](https://askubuntu.com/questions/259739/kswapd0-is-taking-a-lot-of-cpu).
+Vivado requires 4GB of system RAM per Job (Thread) plus a base of 10GB. An Ubuntu system with 16GB of RAM running just Vivado can reliably use only 1 core during synthesis and implementation. Otherwise, it will overwhelm the [Kernel Swap Daemon](https://askubuntu.com/questions/259739/kswapd0-is-taking-a-lot-of-cpu).
 
 ![Vivado Requires 4GB of RAM per Job](img/Vivado_Requires_4GB_of_RAM_per_Job.png)
 
@@ -638,13 +638,13 @@ sudo flint --device /dev/mst/mt4119_pciconf0 query
 
 ![flint query](img/flint_query_IBM0000000018.png)
 
-If the result is `PSID: MT_0000000158` then you can attempt to program the firmware using `flint`. Otherwise, the next step may require physical access to the board. My device presented as `PSID: IBM0000000018` and needed to be programmed. Note that `sudo mst start` must be run to enable `flint`.
+If the result is `PSID: MT_0000000158` then you can attempt to program the firmware using `flint`. Otherwise, the next step may require physical access to the board. My device presented as `PSID: IBM0000000018` and needed to be programmed. `sudo mst start` must be run to enable `flint`.
 
 Make sure to **write down the GUID and MAC values**.
 
 If the FW Version is `16.24.4020` or newer then proceed to [Testing The Network Ports](#testing-the-network-ports) as firmware is already up-to-date.
 
-Attempt to program the firmware using `flint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+Attempt to program the firmware using `flint`. The 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin --allow_rom_change burn
@@ -664,7 +664,7 @@ If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to u
 
 `mstflint` does not allow you to overwrite ConnectX-5 firmware if there is a `PSID` mismatch but it _will_ allow you to write arbitrary data to the flash IC. By corrupting the firmware and causing a CRC error you can enable `mstflint` to program new firmware.
 
-First, save a couple copies of the current firmware. Note this will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have complete copy of the FLASH IC. The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
+First, save a couple copies of the current firmware. This will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have complete copy of the FLASH IC. The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
 ```
 sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read1.bin
 sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read2.bin
@@ -672,7 +672,7 @@ sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read2.bin
 
 ![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
 
-Attempt to program the firmware using `mstflint`. Note that the 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+Attempt to program the firmware using `mstflint`. The 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
 
 ```
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
@@ -709,11 +709,11 @@ If the above worked, proceed to [update the GUID and MAC IDs](#update-guid-and-m
 
 ##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
 
-Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode and [its FLASH read and written with `mstflint`](https://github.com/Tualua/labnotes/wiki/Mellanox-ConnectX-4-Lx-Firmware-recovery). Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful. Release the short after boot to allow the IC to be programmed. Note that `mstflint` will only read and write the firmware sections of the Flash. Checksums will not match as empty sections will be different.
+Thanks [yangl1996](https://github.com/yangl1996) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/2) the ConnectX-5 can be forced into Flash Recovery Mode and [its FLASH read and written with `mstflint`](https://github.com/Tualua/labnotes/wiki/Mellanox-ConnectX-4-Lx-Firmware-recovery). Shorting the [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf) FLASH IC's pins 2 (DO=Data Output) and 4 (GND) during boot prevents the firmware from loading and should put the ConnectX-5 into Recovery Mode. Use precision metal tweezers or fine pitch [SMD Grabber Test Clips](https://www.trustedparts.com/en/part/danaher/5243-0) to short the pins. **This is a dangerous procedure that can damage your Innova-2** so please be careful. Release the short after boot to allow the IC to be programmed. `mstflint` will only read and write the firmware sections of the Flash. Checksums will not match as empty sections will be different.
 
 ![Force Recovery Mode by Shorting FLASH IC Pins 2 and 4 During Boot](img/ConnectX-5_Flash_Recovery_Mode_by_Shorting_DO-to-GND.jpg)
 
-If all goes well the Innova-2 should show up as `Memory controller [0580]: Mellanox Technologies MT28800 Family [ConnectX-5 Flash Recovery] [15b3:020d]` under `lspci -vnn`. It should show up as `/dev/mst/mt525_pciconf0` under `mst status`. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
+If all goes well the Innova-2 should show up as `Memory controller [0580]: Mellanox Technologies MT28800 Family [ConnectX-5 Flash Recovery] [15b3:020d]` under `lspci -vnn`. It should show up as `/dev/mst/mt525_pciconf0` under `mst status`. The 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
 
 ```
 sudo lspci -vnn
@@ -726,7 +726,7 @@ sudo flint --device /dev/mst/mt525_pciconf0 query
 
 ![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
 
-Save a copy of the current FLASH IC firmware then program the ConnectX-5 firmare using `mstflint`. Note the device name is the PCI address from `lspci -vnn`
+Save a copy of the current FLASH IC firmware then program the ConnectX-5 firmare using `mstflint`. The device name is the PCI address from `lspci -vnn`
 ```
 sudo mstflint --device 01:00.0  ri  innova2_CX5_FW_read1.bin
 sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
@@ -762,7 +762,7 @@ Please take [ESD precautions](https://www.dell.com/support/kbdoc/en-ca/000137973
 
 ![CH341A Connection](img/CH341A_Programmer_Connection.png)
 
-Confirm pin connections are independent. Note Pins 8, 7, and 3 (Vcc, Hold, and Write-Protect) are shorted together but all other pins are independent with respect to each other. Check every combination.
+Confirm pin connections are independent. Pins 8, 7, and 3 (Vcc, Hold, and Write-Protect) are shorted together but all other pins are independent with respect to each other. Check every combination.
 
 ![Check for Improper Short Connections](img/CH341A_Confirm_Independent_Pins.png)
 
@@ -805,7 +805,7 @@ od -A x -t x1z -v W25Q128save.bin  |  head
 
 If `flashrom` successfully detected the `W25Q128.V` and reads are consistent, then the requirement for sensible reads is a judgement call on your part.
 
-Use `flashrom` to write the latest Innova-2 firmware to the `W25Q128`. This takes several minutes. Note that the 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
+Use `flashrom` to write the latest Innova-2 firmware to the `W25Q128`. This takes several minutes. The 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo flashrom --programmer ch341a_spi --write fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin
@@ -841,7 +841,7 @@ Power down and restart your system.
 
 ### Testing The Network Ports
 
-The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. Note that if you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
+The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. If you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
 
 ![Direct-Attach Cable](img/Direct-Attach-Cable.png)
 
@@ -899,7 +899,7 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. Note that if your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exit `innova2_flex_app`.
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. If your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exit `innova2_flex_app`.
 
 ```Shell
 sudo mst start
@@ -924,7 +924,7 @@ If the FPGA Image is *NOT* Version `0xc1`, choose option `10`-enter to enable JT
 
 #### Generate Configuration Images for the Full Memory Array
 
-Create configuration images that span the entire memory map as in the memory layout pictured earlier. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. Note that the configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8 during loading.
+Create configuration images that span the entire memory map as in the memory layout pictured earlier. The `Innova_2_Flex_Open_18_12` package does not include configuration files with the binary images so everything gets written to address `0x00000000` which is incorrect. Create correct full memory images by copying data from the individual images into blank 64MB files. This should be done on the system running JTAG and requires a copy of [Innova_2_Flex_Open_18_12](http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz) from earlier. The configuration data is split into primary and secondary parts between the two x4 FLASH ICs to double throughput to x8 during loading.
 ```Shell
 cd ~/Innova_2_Flex_Open_18_12/FPGA_image
 
@@ -1024,15 +1024,19 @@ sudo reboot
 
 ### Loading a User Image
 
-Note the process of enabling the Flex Image, rebooting, programming, enabling the User Image, then rebooting takes approximately 10 minutes each time you update your User Image.
+The process of enabling the Flex Image, rebooting, programming, enabling the User Image, then rebooting takes approximately 10 minutes each time you update your User Image.
 
-These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Generate Memory Configuration File*, select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+These instructions include a link to a bitstream for a working demo. Otherwise, after Vivado generates a programming Bitstream for your design, run *Generate Memory Configuration File*:
 
 ![Vivado Tools Generate Memory Configuration File](img/Vivado_Tools_Generate_Memory_Configuration_File.png)
 
+Select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
+
 ![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
 
-Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter**. The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect. This is the start of a programming cycle which is: disable JTAG and schedule the Flex image, reboot, program with `innova2_flex_app`, reboot, and then test your loaded bitstream.
+Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter** (unplug its USB cable).
+
+The Innova-2 Flex Image must be activated to allow `innova2_flex_app` to program the FPGA's Configuration Memory. Run the `innova2_flex_app` and choose option `1`-enter then `99`-enter to enable the Flex Image. Reboot your system for the change to take effect. This is the start of a programming cycle which is: disable JTAG and schedule the Flex image, reboot, program with `innova2_flex_app`, reboot, and then test your loaded bitstream.
 ```
 sudo mst start
 cd ~/Innova_2_Flex_Open_18_12/driver/
@@ -1045,7 +1049,7 @@ sudo reboot
 ```
 ![Set Flex Image Active](img/Activate_Flex_Image_for_Programming.png)
 
-After rebooting, the Flex Image should be active, check with `lspci`.
+After rebooting the Flex Image should be active. Look for `Class 2000: Mellanox Technologies Innova-2 Flex Burn image` or similar.
 ```
 lspci | grep -i Mellanox
 ```
@@ -1080,6 +1084,11 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
 
 ![Program Innova-2 User Image](img/Program_User_Image.png)
 
+Reboot your system.
+```
+sudo reboot
+```
+
 
 ### Testing the Board using the Loaded Demo User Image
 
@@ -1096,8 +1105,6 @@ lspci -nn | grep "Mellanox\|Xilinx"
 lspci -tv | grep "0000\|Mellanox\|Xilinx"
 ```
 
-![lspci Xilinx and Mellanox Devices](img/lspci_view_of_innova2_FPGA.jpg)
-
 The FPGA is attached to a PCIe Bridge (`02:08.0`), as are the two Ethernet Controllers (`02:10.0`).
 ```
 01:00.0 PCI bridge [0604]: Mellanox Technologies MT28800 Family [ConnectX-5 PCIe Bridge] [15b3:1974]
@@ -1113,7 +1120,9 @@ The FPGA is attached to a PCIe Bridge (`02:08.0`), as are the two Ethernet Contr
            |                                            \-00.1  Mellanox Technologies MT27800 Family [ConnectX-5]
 ```
 
-The current PCIe Link status is useful. Note this is the FPGA to ConnectX-5 PCIe Bridge link.
+![lspci Xilinx and Mellanox Devices](img/lspci_view_of_innova2.jpg)
+
+The current PCIe Link status is useful. This is the FPGA to ConnectX-5 PCIe Bridge link.
 ```
 sudo lspci -nnvd 10ee:  ;  sudo lspci -nnvvd 10ee: | grep Lnk
 ```
@@ -1127,9 +1136,11 @@ sudo lspci -nnvd 10ee:  ;  sudo lspci -nnvvd 10ee: | grep Lnk
 
 #### AXI BRAM Communication
 
-The XDMA Driver [(`dma_ip_drivers`)](https://github.com/xilinx/dma_ip_drivers) creates [character device files](https://en.wikipedia.org/wiki/Device_file#Character_devices) that are [write-only and read-only](https://manpages.debian.org/bookworm/manpages-dev/open.2.en.html#File_access_mode), `/dev/xdma0_h2c_0` and `/dev/xdma0_c2h_0` respectively. They allow direct access to the FPGA design's AXI Bus. To read from an AXI Block at address `0x80000000` you would read from address `0x80000000` of the `/dev/xdma0_c2h_0` (Card-to-Host) file. To write you would write to the appropriate address of `/dev/xdma0_h2c_0` (Host-to-Card).
+The XDMA Driver ([`dma_ip_drivers`](https://github.com/xilinx/dma_ip_drivers)) creates [character device files](https://en.wikipedia.org/wiki/Device_file#Character_devices) that are [write-only and read-only](https://manpages.debian.org/bookworm/manpages-dev/open.2.en.html#File_access_mode), `/dev/xdma0_h2c_0` and `/dev/xdma0_c2h_0` respectively. They allow direct access to the FPGA design's AXI Bus. To read from an AXI Block at address `0x80000000` you would read from address `0x80000000` of the `/dev/xdma0_c2h_0` (Card-to-Host) file. To write you would write to the appropriate address of `/dev/xdma0_h2c_0` (Host-to-Card).
 
-The commands below use the utilities from `dma_ip_drivers` to generate 8kb of random data, then send it to the `M_AXI` [BRAM Controller Block](https://docs.xilinx.com/v/u/en-US/pg078-axi-bram-ctrl) in the XCKU15P, then read it back and confirm the data is identical. The [address of the BRAM](https://github.com/mwrnd/innova2_xdma_demo/tree/56b1e6eb09055167956287890aeceb23fff3e8f5#axi-addresses) Controller is `0x80000000` in the `innova2_xdma_demo` project.
+![XDMA Driver dev Files](img/XDMA_Driver_dev_Files.png)
+
+The commands below generate 8kb of random data then use the utilities from `dma_ip_drivers` to send the data to the `M_AXI` [BRAM Controller Block](https://docs.xilinx.com/v/u/en-US/pg078-axi-bram-ctrl) in the XCKU15P, then read it back and confirm the data is identical. The [address of the BRAM](https://github.com/mwrnd/innova2_xdma_demo/tree/56b1e6eb09055167956287890aeceb23fff3e8f5#axi-addresses) Controller is `0x80000000` in the `innova2_xdma_demo` project.
 ```Shell
 cd dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom of=TEST bs=8192 count=1
@@ -1143,7 +1154,7 @@ md5sum TEST RECV
 
 #### AXI BRAM and Files
 
-The AXI Blocks can also be accessed using [`dd`](https://manpages.debian.org/testing/coreutils/dd.1.en.html). Note `dd` requires numbers in Base-10 so you can use [`printf`](https://manpages.debian.org/testing/coreutils/printf.1.en.html) to convert from the hex address, `0x80000000=2147483648`. Note `count=1` as this is a single transfer to address `0x80000000` so the [lseek](https://manpages.ubuntu.com/manpages/focal/en/man2/write.2.html#description) address should not be reset.
+The AXI Blocks can also be accessed using [`dd`](https://manpages.debian.org/testing/coreutils/dd.1.en.html). `dd` requires numbers in Base-10 so you can use [`printf`](https://manpages.debian.org/testing/coreutils/printf.1.en.html) to convert from the hex address, `0x80000000=2147483648`. `count=1` as this is a single transfer to address `0x80000000` so the [lseek](https://manpages.ubuntu.com/manpages/focal/en/man2/write.2.html#description) address should not be reset.
 
 ```
 dd if=/dev/urandom of=TEST bs=8192 count=256
@@ -1165,7 +1176,7 @@ gcc -Wall innova2_xdma_test.c -o innova2_xdma_test -lm
 sudo ./innova2_xdma_test
 ```
 
-![innova2_xdma_test.c Run](img/innova2_xdma_test_Run.png)
+![innova2_xdma_test.c Run](img/innova2_xdma_test_Run.jpg)
 
 The design allows for measuring the frequency of various connected clocks by [comparing](https://github.com/mwrnd/innova2_xdma_demo/blob/f1dba215a96e209c0a278857c47d4f3ddf8e8f3f/innova2_xdma_test.c#L173) them to the 250MHz XDMA *axi_aclk*.
 
@@ -1247,7 +1258,7 @@ md5sum xdma_wrapper_208MHz.bit
 echo b7feb55f6d84bbf4ed96b7f9c791c5c8 should be the MD5 checksum of xdma_wrapper_208MHz.bit
 ```
 
-Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen after every time the adapter is powered.
+Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen every time the adapter is powered.
 ```
 source /tools/Xilinx/Vivado_Lab/2023.1/settings64.sh
 xsdb
@@ -1284,6 +1295,10 @@ sudo lspci -nnvd 10ee:  ;  sudo lspci -nnvvd 10ee: | grep Lnk
 ```
 
 ![lspci Link Status](img/lspci_lnk_status.jpg)
+
+`dmesg | grep -i xdma` will inform you if the XDMA driver has loaded correctly.
+
+![dmesg for XDMA Driver](img/dmesg_xdma.jpg)
 
 
 ### Test the Updated Design
@@ -1477,7 +1492,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
 
 ### DDR4 Communication Error
 
-If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the Vivado Block Design *Address Editor* that it is still `0x0`. Note the [DDR4 IP Block](https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/ultrascale_memory_ip/v1_4/pg150-ultrascale-memory-ip.pdf) does not allow reading from memory that has not yet been written to. Test with a write then a read. See the [Innova-2 DDR4 Troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) project for DDR4 hardware debugging help.
+If you attempt to send data to the DDR4 address but get `write file: Unknown error 512` it means DDR4 did not initialize properly or you are attempting to communicate with the wrong address. The *innova2_xcku15p_ddr4_bram_gpio* project has DDR4 at address `0x0` but if you made any changes confirm in the Vivado Block Design *Address Editor* that it is still `0x0`. The [DDR4 IP Block](https://www.xilinx.com/content/dam/xilinx/support/documents/ip_documentation/ultrascale_memory_ip/v1_4/pg150-ultrascale-memory-ip.pdf) does not allow reading from memory that has not yet been written to. Test with a write then a read. See the [Innova-2 DDR4 Troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) project for DDR4 hardware debugging help.
 ```Shell
 cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
 dd if=/dev/urandom bs=1 count=8192 of=TEST
@@ -1655,7 +1670,7 @@ Connect your JTAG Adapter to the Innova-2. If you are using a Platform Cable USB
 
 ![03fd 0013 Xilinx Inc](img/Xilinx_Platform_USB_Cable_II_lsusb_Initial.png)
 
-Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen after every time the adapter is powered.
+Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen every time the adapter is powered.
 ```
 source /tools/Xilinx/Vivado_Lab/2023.1/settings64.sh
 xsdb
