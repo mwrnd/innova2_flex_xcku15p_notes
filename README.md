@@ -1313,7 +1313,7 @@ sudo ./innova2_xdma_test
 
 ## Upgrading the ConnectX5 Firmware
 
-If you are experiencing issues with your Innova-2 or require PXE Boot capability, explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). The latest version to support the Innova-2 is `4.15.2` and will upgrade your ConnectX-5 firmware to **16.28.2006** and PXE Boot `3.6.0102`.
+If you are experiencing issues with your Innova-2 or require PXE Boot capability, explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). The latest version to support the Innova-2 is [`4.15.2`](http://www.mellanox.com/downloads/firmware/mlxup/4.15.2/SFX/linux_x64/mlxup) and will upgrade your ConnectX-5 firmware to **16.28.2006** and PXE Boot `3.6.0102`.
 
 ![mlxup 4.15.2](img/mlxup-mft_Download.png)
 
