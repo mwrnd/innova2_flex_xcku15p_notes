@@ -40,6 +40,17 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
          * [Programming the Factory and Flex Images](#programming-the-factory-and-flex-images)
       * [Loading a User Image](#loading-a-user-image)
       * [Testing the Board using the Loaded Demo User Image](#testing-the-board-using-the-loaded-demo-user-image)
+         * [AXI BRAM Communication](#axi-bram-communication)
+         * [AXI BRAM and Files](#axi-bram-and-files)
+         * [Custom Software for Accessing AXI Blocks](#custom-software-for-accessing-axi-blocks)
+   * [Loading Updated Designs Using JTAG](#loading-updated-designs-using-jtag)
+      * [Confirm Motherboard BIOS and Linux Support Hotplug](#confirm-motherboard-bios-and-linux-support-hotplug)
+      * [Attempt PCIe Remove and Rescan](#attempt-pcie-remove-and-rescan)
+      * [Enable JTAG Access to the Innova2](#enablejtag-access-to-the-innova2)
+      * [Disconnect Innova2 from the PCIe Bridge](#disconnect-innova2-from-the-pcie-bridge)
+      * [Program the FPGA Using JTAG](#program-the-fpga-using-jtag)
+      * [Reconnect Innova2 FPGA to the PCIe Bridge and Rescan PCIe Bus](#reconnect-innova2-fpga-to-the-pcie-bridge-and-rescan-pcie-bus)
+      * [Test the Updated Design](#test-the-updated-design)
    * [Upgrading the ConnectX5 Firmware](#upgrading-the-connectx5-firmware)
    * [Troubleshooting](#troubleshooting)
       * [W25Q128JVS FLASH Failure](#w25q128jvs-flash-failure)
@@ -188,8 +199,8 @@ Install all necessary prerequisite libraries and software. `MLNX_OFED` drivers w
 sudo apt install    alien apt autoconf automake binfmt-support \
     binutils-riscv64-unknown-elf binwalk bison bpfcc-tools build-essential \
     bzip2 chrpath clang clinfo cmake coreutils curl cycfx2prog dapl2-utils \
-    debhelper debootstrap dh-autoreconf dh-python dkms dos2unix doxygen \
-    dpatch dpdk elfutils fio flashrom flex fxload gcc gcc-multilib \
+    debhelper debootstrap devmem2 dh-autoreconf dh-python dkms dos2unix \
+    doxygen dpatch dpdk elfutils fio flashrom flex fxload gcc gcc-multilib \
     gcc-riscv64-unknown-elf gdb gfortran gfortran-multilib ghex git \
     graphviz gtkterm gtkwave hwdata ibacm ibutils ibverbs-providers \
     ibverbs-utils intel-opencl-icd iperf3 ixo-usb-jtag kcachegrind libaio1 \
@@ -1054,18 +1065,17 @@ sudo insmod /usr/lib/modules/`uname -r`/updates/dkms/mlx5_fpga_tools.ko
 cd ~
 ```
 
-For board testing, the following command will clone the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) demo which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory. If you have the 
-MNV303611A-EDLT variant of the Innova-2 which **does not** have DDR4, check out the [innova2_mnv303611a_xcku15p_xdma](https://github.com/mwrnd/innova2_mnv303611a_xcku15p_xdma) project instead.
+For board testing, the following command will clone the [innova2_xdma_demo](https://github.com/mwrnd/innova2_xdma_demo) project which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
 ```Shell
-git clone https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio
-cd innova2_xcku15p_ddr4_bram_gpio
+git clone https://github.com/mwrnd/innova2_xdma_demo.git
+cd innova2_xdma_demo
 ```
 
 Run `innova2_flex_app` with appropriate `-b` commands to program a design into the FPGA. Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
 ```Shell
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
-  -b innova2_xcku15p_ddr4_bram_gpio_primary.bin,0       \
-  -b innova2_xcku15p_ddr4_bram_gpio_secondary.bin,1
+  -b innova2_xdma_demo_primary.bin,0                    \
+  -b innova2_xdma_demo_secondary.bin,1
 ```
 
 ![Program Innova-2 User Image](img/Program_User_Image.png)
@@ -1073,27 +1083,217 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
 
 ### Testing the Board using the Loaded Demo User Image
 
-After rebooting the Innova-2 system, the `innova2_xcku15p_ddr4_bram_gpio` User Image should be active. Check with `lspci`. It shows up as `RAM memory: Xilinx Corporation Device 9038` at PCIe Bus Address `03:00` for me. Change the commands below appropriately.
+After programming the bitstream and rebooting, the design should show up as `Memory controller: Xilinx Corporation Device 9038`. It shows up at PCIe Bus Address `03:00` for me.
 ```
-lspci | grep -i Xilinx
-sudo lspci  -s 03:00  -v
-sudo lspci  -s 03:00  -vvv | grep "LnkCap\|LnkSta"
+lspci -d 10ee:
 ```
 
-![lspci Xilinx RAM Device](img/lspci_Xilinx_RAM_Device.png)
+![lspci Xilinx Devices](img/lspci_d_10ee_Xilinx_Devices.png)
 
-Run the Xilinx XDMA Test programs. The commands below generate 8kb of random data, then send it to a BRAM in the XCKU15P, then read it back and confirm the data is identical. The address used is specific to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio) project. Note `h2c` is *Host-to-Card* and `c2h` is *Card-to-Host*.
+The following [lspci](https://manpages.ubuntu.com/manpages/jammy/man8/lspci.8.html) commands list all Mellanox and Xilinx devices and show their relation.
+```
+lspci -nn | grep "Mellanox\|Xilinx"
+lspci -tv | grep "0000\|Mellanox\|Xilinx"
+```
+
+![lspci Xilinx and Mellanox Devices](img/lspci_view_of_innova2_FPGA.jpg)
+
+The FPGA is attached to a PCIe Bridge (`02:08.0`), as are the two Ethernet Controllers (`02:10.0`).
+```
+01:00.0 PCI bridge [0604]: Mellanox Technologies MT28800 Family [ConnectX-5 PCIe Bridge] [15b3:1974]
+02:08.0 PCI bridge [0604]: Mellanox Technologies MT28800 Family [ConnectX-5 PCIe Bridge] [15b3:1974]
+02:10.0 PCI bridge [0604]: Mellanox Technologies MT28800 Family [ConnectX-5 PCIe Bridge] [15b3:1974]
+03:00.0 Memory controller [0580]: Xilinx Corporation Device [10ee:9038]
+04:00.0 Ethernet controller [0200]: Mellanox Technologies MT27800 Family [ConnectX-5] [15b3:1017]
+04:00.1 Ethernet controller [0200]: Mellanox Technologies MT27800 Family [ConnectX-5] [15b3:1017]
+
+-[0000:00]-+-00.0  Intel Corporation Device 3e0f
+           +-1d.0-[01-04]----00.0-[02-04]--+-08.0-[03]----00.0  Xilinx Corporation Device 9038
+           |                               \-10.0-[04]--+-00.0  Mellanox Technologies MT27800 Family [ConnectX-5]
+           |                                            \-00.1  Mellanox Technologies MT27800 Family [ConnectX-5]
+```
+
+The current PCIe Link status is useful. Note this is the FPGA to ConnectX-5 PCIe Bridge link.
+```
+sudo lspci -nnvd 10ee:  ;  sudo lspci -nnvvd 10ee: | grep Lnk
+```
+
+![lspci Link Status](img/lspci_lnk_status.jpg)
+
+`dmesg | grep -i xdma` provides details on how Xilinx's PCIe XDMA driver has loaded.
+
+![dmesg xdma](img/dmesg_xdma.jpg)
+
+
+#### AXI BRAM Communication
+
+The XDMA Driver [(`dma_ip_drivers`)](https://github.com/xilinx/dma_ip_drivers) creates [character device files](https://en.wikipedia.org/wiki/Device_file#Character_devices) that are [write-only and read-only](https://manpages.debian.org/bookworm/manpages-dev/open.2.en.html#File_access_mode), `/dev/xdma0_h2c_0` and `/dev/xdma0_c2h_0` respectively. They allow direct access to the FPGA design's AXI Bus. To read from an AXI Block at address `0x80000000` you would read from address `0x80000000` of the `/dev/xdma0_c2h_0` (Card-to-Host) file. To write you would write to the appropriate address of `/dev/xdma0_h2c_0` (Host-to-Card).
+
+The commands below use the utilities from `dma_ip_drivers` to generate 8kb of random data, then send it to the `M_AXI` [BRAM Controller Block](https://docs.xilinx.com/v/u/en-US/pg078-axi-bram-ctrl) in the XCKU15P, then read it back and confirm the data is identical. The [address of the BRAM](https://github.com/mwrnd/innova2_xdma_demo/tree/56b1e6eb09055167956287890aeceb23fff3e8f5#axi-addresses) Controller is `0x80000000` in the `innova2_xdma_demo` project.
 ```Shell
-cd ~/dma_ip_drivers/XDMA/linux-kernel/tools/
-dd if=/dev/urandom bs=1 count=8192 of=TEST
-sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x200100000 --size 8192  -f    TEST
-sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x200100000 --size 8192 --file RECV
-sha256sum TEST RECV
+cd dma_ip_drivers/XDMA/linux-kernel/tools/
+dd if=/dev/urandom of=TEST bs=8192 count=1
+sudo ./dma_to_device   --verbose --device /dev/xdma0_h2c_0 --address 0x80000000 --size 8192  -f    TEST
+sudo ./dma_from_device --verbose --device /dev/xdma0_c2h_0 --address 0x80000000 --size 8192 --file RECV
+md5sum TEST RECV
 ```
 
-![Test XDMA Communication](img/Test_XDMA_Communication.png)
+![XDMA BRAM Test](img/XDMA_BRAM_Test_using_dma_ip_drivers_software.jpg)
 
-If the above works then great! Your Innova-2 has a working FPGA with PCIe. Continue to the [innova2_xcku15p_ddr4_bram_gpio](https://github.com/mwrnd/innova2_xcku15p_ddr4_bram_gpio#axi-gpio-control) project for further testing of the design, including its DDR4.
+
+#### AXI BRAM and Files
+
+The AXI Blocks can also be accessed using [`dd`](https://manpages.debian.org/testing/coreutils/dd.1.en.html). Note `dd` requires numbers in Base-10 so you can use [`printf`](https://manpages.debian.org/testing/coreutils/printf.1.en.html) to convert from the hex address, `0x80000000=2147483648`. Note `count=1` as this is a single transfer to address `0x80000000` so the [lseek](https://manpages.ubuntu.com/manpages/focal/en/man2/write.2.html#description) address should not be reset.
+
+```
+dd if=/dev/urandom of=TEST bs=8192 count=256
+printf "%d\n" 0x80000000
+sudo dd if=TEST of=/dev/xdma0_h2c_0 bs=2097152 count=1 seek=2147483648 oflag=seek_bytes
+sudo dd if=/dev/xdma0_c2h_0 of=RECV bs=2097152 count=1 skip=2147483648 iflag=skip_bytes
+md5sum TEST RECV
+```
+
+![XDMA BRAM Testing Using dd](img/XDMA_BRAM_Test_using_dd.jpg)
+
+
+#### Custom Software for Accessing AXI Blocks
+
+[innova2_xdma_test.c](https://github.com/mwrnd/innova2_xdma_demo/blob/56b1e6eb09055167956287890aeceb23fff3e8f5/innova2_xdma_test.c) is a simple program that demonstrates XDMA communication in [C](https://en.wikipedia.org/wiki/C_(programming_language)). It uses [`pread` and `pwrite`](https://manpages.ubuntu.com/manpages/jammy/en/man2/pread.2.html) to communicate with AXI Blocks. [`read` and `write`](https://manpages.ubuntu.com/manpages/jammy/en/man2/read.2.html) plus [`lseek`](https://manpages.ubuntu.com/manpages/jammy/en/man2/lseek.2.html) can also be used.
+
+```
+gcc -Wall innova2_xdma_test.c -o innova2_xdma_test -lm
+sudo ./innova2_xdma_test
+```
+
+![innova2_xdma_test.c Run](img/innova2_xdma_test_Run.png)
+
+The design allows for measuring the frequency of various connected clocks by [comparing](https://github.com/mwrnd/innova2_xdma_demo/blob/f1dba215a96e209c0a278857c47d4f3ddf8e8f3f/innova2_xdma_test.c#L173) them to the 250MHz XDMA *axi_aclk*.
+
+If the above works then great! Your Innova-2 has a working FPGA with PCIe. The [innova2_xdma_demo](https://github.com/mwrnd/innova2_xdma_demo/tree/56b1e6eb09055167956287890aeceb23fff3e8f5#memory-functionality-tests) project page has more testing.
+
+
+## Loading Updated Designs Using JTAG
+
+Designs with [identical](https://stackoverflow.com/questions/32334870/how-to-do-a-true-rescan-of-pcie-bus) XDMA Block configurations can be updated using JTAG. Bitstream update over JTAG is only retained for as long as the board is powered but takes under 1 minute which is less than the approximately 10 required when updating the configuration Flash memory. Very useful when iterating designs.
+
+### Confirm Motherboard BIOS and Linux Support Hotplug
+
+The host system for the Innova-2 needs to support PCIe Hotplug for Bitstream update to work with PCIe. Confirm your computer's motherboard chipset and BIOS support PCIe hotplug. Check your [Linux](https://lwn.net/Articles/767885/) kernel by looking for `CONFIG_HOTPLUG_PCI_PCIE=y` in its `/boot/config-???` configuration file.
+```
+cat /boot/config-5.8.0-43-generic | grep -i pci | grep -i hotplug
+```
+
+![linux kernel config pci hotplug](img/linux_kernel_config_pci_hotplug.jpg)
+
+
+### Attempt PCIe Remove and Rescan
+
+Find your design on the PCIe bus address, the `03` below, and remove it. Then rescan the PCIe bus.
+```
+lspci -nn -d 15b3:
+sudo lspci -tv -nn -d 15b3:
+
+sudo su
+echo 1 > /sys/bus/pci/devices/0000\:03\:00.0/remove
+lspci -nn -d 15b3:
+echo 1 > /sys/bus/pci/rescan 
+lspci -nn -d 15b3:
+exit
+```
+
+![Remove and Rescan the Flex Burn Image](img/innova2_burn_image_remove_and_rescan.jpg)
+
+
+### Enable JTAG Access to the Innova2
+
+If remove and rescan works, run `innova2_flex_app` and choose option `3`-Enter to enable JTAG Access then `99`-Enter to exit.
+```
+sudo mst start
+cd ~/Innova_2_Flex_Open_18_12/driver/
+sudo ./make_device
+cd ~
+sudo insmod /usr/lib/modules/5.8.0-43-generic/updates/dkms/mlx5_fpga_tools.ko
+sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app
+```
+
+![Enable JTAG Access Using innova2_flex_app](img/innova2_Enable_JTAG_Access.jpg)
+
+
+### Disconnect Innova2 from the PCIe Bridge
+
+Confirm the XDMA device is present then remove it from the PCIe bus and disconnect it from its PCIe Bridge. The ConnectX-5 PCIe Bridge for the FPGA on the Innova-2 is sub-device `08`, function `0`, `:08.0`.
+```
+lspci  |  grep -i "Xilinx\|Mellanox"
+
+sudo su
+lspci -nn -d 10ee:
+echo 1 > /sys/bus/pci/devices/0000\:03\:00.0/remove
+lspci -nn -d 10ee:
+
+setpci  -s 02:08.0  0x70.w=0x50
+```
+
+![Disconnect Innova2 from PCIe Bridge](img/innova2_JTAG_Bitstream_update-Disconnect_from_PCIe_Bridge.jpg)
+
+
+### Program the FPGA Using JTAG
+
+Confirm checksum of the Bitstream.
+
+![Confirm Checksum of Bitstream](img/md5sum_xdma_wrapper_208MHz_bitstream.png)
+
+```
+md5sum xdma_wrapper_208MHz.bit
+echo b7feb55f6d84bbf4ed96b7f9c791c5c8 should be the MD5 checksum of xdma_wrapper_208MHz.bit
+```
+
+Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen after every time the adapter is powered.
+```
+source /tools/Xilinx/Vivado_Lab/2023.1/settings64.sh
+xsdb
+```
+```
+connect
+after 7000
+targets
+target 1
+fpga -state
+fpga xdma_wrapper_208MHz.bit
+fpga -state
+disconnect
+exit
+```
+
+![Load FPGA Bitstream Using xsdb](img/xsdb_load_fpga_bitstream.jpg)
+
+
+### Reconnect Innova2 FPGA to the PCIe Bridge and Rescan PCIe Bus
+
+Reconnect the FPGA to the PCIe Bridge and rescan the PCIe bus.
+```
+setpci  -s 02:08.0  0x70.w=0x40
+echo 1 > /sys/bus/pci/rescan 
+exit
+```
+
+![Reconnect Innova2 to PCIe Bridge](img/innova2_JTAG_Bitstream_update-Reconnect_to_PCIe_Bridge.jpg)
+
+The PCIe device should return with the same settings as before.
+```
+sudo lspci -nnvd 10ee:  ;  sudo lspci -nnvvd 10ee: | grep Lnk
+```
+
+![lspci Link Status](img/lspci_lnk_status.jpg)
+
+
+### Test the Updated Design
+
+Run the test program. It should now show 208.333333MHz as an estimate for *uram_clk*.
+```
+sudo ./innova2_xdma_test
+```
+
+![Test Updated Design](img/innova2_xdma_test_Run_208MHz.jpg)
 
 
 ## Upgrading the ConnectX5 Firmware
@@ -1455,17 +1655,21 @@ Connect your JTAG Adapter to the Innova-2. If you are using a Platform Cable USB
 
 ![03fd 0013 Xilinx Inc](img/Xilinx_Platform_USB_Cable_II_lsusb_Initial.png)
 
-Start Vivado or Vivado Lab Hardware Manager:
+Load your Vivado or Vivado Lab `settings64.sh` and start `xsdb`. The `after 7000` command waits 7 seconds for [Xilinx-Compatible JTAG adapters](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) based on the [FX2](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) to update their firmware and needs to happen after every time the adapter is powered.
+```
+source /tools/Xilinx/Vivado_Lab/2023.1/settings64.sh
+xsdb
+```
+```
+connect
+after 7000
+targets
+fpga -state
+disconnect
+exit
+```
 
-![Vivado Hardware Manager](img/Vivado_Hardware_Manager.png)
-
-Connect to the JTAG Adapter (*Open Target* then *Auto Connect*) which will update the adapter's SRAM firmware. This change disappears if the JTAG adapter is powered off or unplugged from USB.
-
-![Hardware Manager AutoConnect](img/Hardware_Manager_AutoConnect.png)
-
-Right-click on the JTAG Adapter, *xilinx_tcf*, then *Close Target* and exit Vivado.
-
-![Vivado Close Target](img/Vivado_Hardware_Manager_Close_Target.png)
+![xsdb updates JTAG Adapter Firmware](img/xsdb_updates_JTAG_Adapter_Firmware.jpg)
 
 `lsusb` should now show `03fd:0008 Xilinx, Inc. Platform Cable USB II`. The JTAG adapter is now ready to be used by UrJTAG.
 
@@ -1621,7 +1825,7 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 * [innova2_ddr4_troubleshooting](https://github.com/mwrnd/innova2_ddr4_troubleshooting) - DDR4 Troubleshooting Bitstreams and Guide
 * [xdma_uart-to-uart](https://github.com/mwrnd/innova2_experiments/tree/main/xdma_uart-to-uart) - UART-over-XDMA Testing
 * [innova2_mnv303611a_xcku15p_xdma](https://github.com/mwrnd/innova2_mnv303611a_xcku15p_xdma) - Simple PCIe XDMA Demo without DDR4 that should work on all Innova-2 variants
-
+* [innova2_xdma_demo](https://github.com/mwrnd/innova2_xdma_demo) - Simple PCIe XDMA Demo without DDR4 that should work on all Innova-2 variants
 
 
 

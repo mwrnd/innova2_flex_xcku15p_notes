@@ -1,5 +1,32 @@
 # Debug Notes
 
+## Delay Motherboard Boot Using RESET Capacitor
+
+Slowing down BIOS boot is a simple trick that solves many PCIe issues. You can do this by pressing the POWER button, then pressing and holding the RESET button for a second before releasing it. Or, connect a capacitor across the reset pins of your motherboard's [Front Panel Header](https://www.intel.com/content/www/us/en/support/articles/000007309/intel-nuc.html). This prevents you from using the RESET button as that would short the capacitor. Try values between 100uF and 1000uF. Optimal value depends on required delay and motherboard design.
+
+![Delay Motherboard Boot Using RESET Capacitor](img/Delay_Boot_Using_Capacitor.jpg)
+
+The capacitor across RESET works thanks to an [RC Delay](https://en.wikipedia.org/wiki/RC_time_constant) on the reset signal buffer. The [OpenCompute](https://en.wikipedia.org/wiki/Open_Compute_Project) project has a public schematic and the RESET Button is on Pg#151 in *Project_Olympus_Intel_XSP_Schematics_20171016.pdf* found in [`Project_Olympus_Intel_XSP_Collateral.zip`](http://files.opencompute.org/oc/public.php?service=files&t=e969672c57d6e17647adea54f2c3e5a7&download).
+
+![RESET Button Schematic](img/Server_Motherboard_RESET_Button_Schematic.png)
+
+I found out about this technique [here](https://hackaday.com/2018/02/17/catching-the-pcie-bus/):
+
+![Boot Delay Technique Source](img/Delay_Boot_with_Capacitor_Across_PC_RESET.png)
+
+
+## Discerning ADLT vs ADAT and ADIT Variants
+
+[Innova2 8GB MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf) boards have [`MT40A1G16KNR-075`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) DDR4 ICs with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA). [Innova2 4GB MNV303212A-ADAT/MNV303212A-ADIT](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) boards have [`MT40A512M16JY-083E`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/8gb_ddr4_sdram.pdf) DDR4 ICs with ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)).
+
+![DDR4 IC Comparison](img/Innova2_Variant_DDR4_Comparison.jpg)
+
+
+## Tracing OpenCAPI Connector Signals
+
+![Partial Tracing of OpenCAPI Signals](img/Innova2_ADLT_OpenCAPI_Partial_Pinout.jpg)
+
+
 ## Debugging Vivado xsdb xsct JTAG Errors
 
 If commands in `xsdb` lead to Memory Write Errors or Debug Transport Module errors:
