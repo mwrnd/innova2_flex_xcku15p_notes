@@ -10,7 +10,7 @@ The capacitor across RESET works thanks to an [RC Delay](https://en.wikipedia.or
 
 ![RESET Button Schematic](img/Server_Motherboard_RESET_Button_Schematic.png)
 
-A standard Schmitt-Trigger inverter such as the [SN74LVC1G14](https://www.ti.com/lit/gpn/SN74LVC1G14) has a positive-going threshold voltage of about 1.5V with a 3.3V supply. I have measured 1k-Ohm between the RESET+ pin and the 3.3V ATX Power supply rail. A 330uF capacitor delays boot by about 200ms.
+A standard Schmitt-Trigger inverter such as the [SN74LVC1G14](https://www.ti.com/lit/gpn/SN74LVC1G14) has a positive-going threshold voltage of about 1.5V with a 3.3V supply. I have measured 1k-Ohm between the RESET+ pin and the 3.3V ATX Power supply rail. A 330uF capacitor [delays](http://ladyada.net/library/rccalc.html) boot by about 200ms.
 
 ![RC Delay Calculator](img/RC_Delay_Calculator.png)
 
