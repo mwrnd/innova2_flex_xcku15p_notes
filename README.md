@@ -664,7 +664,9 @@ If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to u
 
 `mstflint` does not allow you to overwrite ConnectX-5 firmware if there is a `PSID` mismatch but it _will_ allow you to write arbitrary data to the flash IC. By corrupting the firmware and causing a CRC error you can enable `mstflint` to program new firmware.
 
-First, save a couple copies of the current firmware. This will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have complete copy of the FLASH IC. The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
+First, save a couple copies of the current firmware. This will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [reading the Flash using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have a complete copy of the FLASH IC.
+
+The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
 ```
 sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read1.bin
 sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read2.bin
