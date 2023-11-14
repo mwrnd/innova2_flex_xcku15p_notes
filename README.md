@@ -1071,7 +1071,7 @@ cd ~
 
 For board testing, the following command will clone the [innova2_xdma_demo](https://github.com/mwrnd/innova2_xdma_demo) project which includes bitstream binaries for programming to the FPGA. Otherwise, `cd` into your own project directory.
 ```Shell
-git clone https://github.com/mwrnd/innova2_xdma_demo.git
+git clone --depth=1 https://github.com/mwrnd/innova2_xdma_demo.git
 cd innova2_xdma_demo
 ```
 
