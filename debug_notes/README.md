@@ -143,6 +143,8 @@ A PCIe Extender can be used to solder directly to individual lanes.
 
 ### Xilinx DLC10 Platform Cable USB II
 
+The [Xilinx Platform Cable USB II](https://docs.xilinx.com/v/u/en-US/ds593) is based on an [FX2 USB MCU](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) and [Spartan-3 FPGA](https://www.xilinx.com/products/silicon-devices/fpga/spartan-3.html).
+
 ![Xilinx DLC10 Platform Cable USB II PCB Top](img/Xilinx_DLC10_Platform_Cable_USB_II_PCB.jpg)
 
 
