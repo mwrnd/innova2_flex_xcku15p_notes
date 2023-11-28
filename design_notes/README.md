@@ -40,6 +40,15 @@ Each channel will have its own set of `h2c` and `c2h` files.
 
 
 
+## Processor System Reset Block
+
+A [Processor System Reset](https://www.xilinx.com/products/intellectual-property/proc_sys_reset.html) IP Block ([pg164](https://docs.xilinx.com/v/u/en-US/pg164-proc-sys-reset)) includes reset sequencing:
+
+![Processor System Reset Module Sequences Resets](img/Processor_System_Reset_Module_Sequences_Resets.png)
+
+
+
+
 ## Alternate Bitstream Programming Methods
 
 Refer to [Post-Configuration Access of SPI Flash Memory (XAPP1280)](https://docs.xilinx.com/r/en-US/xapp1280-us-post-cnfg-flash-startupe3).
