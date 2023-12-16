@@ -666,13 +666,13 @@ If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to u
 
 First, save a couple copies of the current firmware. This will **NOT** be an exact copy of the firmware IC as only the executable sections are saved. Consider [reading the Flash using an SPI programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer) if you want to be certain you have a complete copy of the FLASH IC.
 
-The device name is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
+The device ID is the PCI address of the first Mellanox Ethernet Controller found using `lspci -vnn -d 15b3:`. Be careful if your system has other Mellanox devices installed.
 ```
-sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read1.bin
-sudo mstflint --device 04:00.0  ri  innova2_CX5_FW_read2.bin
+sudo mstflint --device 04:00.0  rb  FW_SAVE1.bin
+sudo mstflint --device 04:00.0  rb  FW_SAVE2.bin
 ```
 
-![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
+![Program ConnectX-5 Firmware Using mstflint](img/mstflint_read_firmware.png)
 
 Attempt to program the firmware using `mstflint`. The 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
 
