@@ -753,6 +753,8 @@ sudo mstflint --device 01:00.0 wb BLANK.bin 0
 
 ![mstflint write BLANK Image to FLASH IC](img/mstflint_Burn_BLANK_FLASH_Image.png)
 
+Attempt to program the firmware using `mstflint`'s Write Block (`wb`) command. The 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+
 ```
 cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
 sudo mstflint --device 01:00.0 wb fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  0
@@ -760,7 +762,7 @@ sudo mstflint --device 01:00.0 wb fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.
 
 ![mstflint Burn Firmware with Block Write](img/mstflint_Burn_Firmware.png)
 
-Program the ConnectX-5 firmare a second time using `mstflint`.
+Program the ConnectX-5 firmare a second time using `mstflint`'s Write Image command:
 ```
 sudo mstflint --allow_rom_change  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
 ```
