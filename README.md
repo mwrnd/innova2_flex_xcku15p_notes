@@ -737,6 +737,32 @@ sudo mstflint --device 01:00.0  ri  innova2_CX5_FW_read2_after_write.bin
 
 ![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
 
+
+###### Try Overwriting with Empty Image
+
+If the above fails, try overwriting the complete FLASH IC with a blank image:
+```
+sudo lspci -v -d 15b3:
+dd if=/dev/zero of=BLANK.bin bs=4096 count=4096
+sudo mstflint --device 01:00.0 wb BLANK.bin 0
+```
+
+![mstflint write BLANK Image to FLASH IC](img/mstflint_Burn_BLANK_FLASH_Image.png)
+
+```
+cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
+sudo mstflint --device 01:00.0 wb fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  0
+```
+
+![mstflint Burn Firmware with Block Write](img/mstflint_Burn_Firmware.png)
+
+Program the ConnectX-5 firmare a second time using `mstflint`.
+```
+sudo mstflint --allow_rom_change  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
+```
+
+![Update ConnectX-5 Firmware Using mstflint](img/mstflint_Update_Firmware.png)
+
 Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then power back on. Confirm the ConnectX-5 firmware has been updated.
 
 ```
