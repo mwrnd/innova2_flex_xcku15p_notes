@@ -20,12 +20,15 @@ set_property OFFCHIP_TERM NONE [get_ports {Dout_0[0]}]
 
 
 # PCIe - PCIE4 Location: X0Y2 - GTY Quads 127, 128
+#
 # GTY Quad 127 == Quad_X0Y0
 # AH36=MGTYRXP0=CHANNEL_X0Y0, AG38=MGTYRXP1=CHANNEL_X0Y1,
 # AF36=MGTYRXP2=CHANNEL_X0Y2, AE38=MGTYRXP3=CHANNEL_X0Y3
+#
 # GTY Quad 128 == Quad_X0Y1
 # AD36=MGTYRXP0=CHANNEL_X0Y4, AC38=MGTYRXP1=CHANNEL_X0Y5,
 # AB36=MGTYRXP2=CHANNEL_X0Y6, AA38=MGTYRXP3=CHANNEL_X0Y7
+
 set_property PACKAGE_PIN AA38 [get_ports {pcie_7x_mgt_rtl_0_rxp[7]}]
 set_property PACKAGE_PIN AB36 [get_ports {pcie_7x_mgt_rtl_0_rxp[6]}]
 set_property PACKAGE_PIN AC38 [get_ports {pcie_7x_mgt_rtl_0_rxp[5]}]
@@ -49,12 +52,17 @@ set_false_path -from [get_ports reset_rtl_0]
 
 
 # OpenCAPI - PCIE4 Location: X0Y3 - GTY Quads 131, 132
+#
 # GTY Quad 131 == Quad_X0Y4
 # M36=MGTYRXP0=CHANNEL_X0Y16, L38=MGTYRXP1=CHANNEL_X0Y17,
 # K36=MGTYRXP2=CHANNEL_X0Y18, J38=MGTYRXP3=CHANNEL_X0Y19
+# T27=MGTREFCLK0_P, R29=MGTREFCLK1_P
+#
 # GTY Quad 132 == Quad_X0Y5
 # H36=MGTYRXP0=CHANNEL_X0Y20, G38=MGTYRXP1=CHANNEL_X0Y21,
 # E38=MGTYRXP2=CHANNEL_X0Y22, C38=MGTYRXP3=CHANNEL_X0Y23
+# P27=MGTREFCLK0_P, N29=MGTREFCLK1_P
+
 #set_property PACKAGE_PIN M36 [get_ports {pcie_7x_mgt_rtl_0_rxp[0]}]
 #set_property PACKAGE_PIN L38 [get_ports {pcie_7x_mgt_rtl_0_rxp[1]}]
 #set_property PACKAGE_PIN K36 [get_ports {pcie_7x_mgt_rtl_0_rxp[2]}]
@@ -100,10 +108,12 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets emc_clk_150MHz_IBUF[0]_inst/O
 
 # MNV303212A-ADAT and MNV303212A-ADIT Only:
 # SFP - CMAC X0Y0 and X0Y1
+#
 # GTY Quad 129 == Quad_X0Y2
 # AD36=MGTYRXP0=CHANNEL_X0Y8, AC38=MGTYRXP1=CHANNEL_X0Y9,
 # AB36=MGTYRXP2=CHANNEL_X0Y10, AA38=MGTYRXP3=CHANNEL_X0Y11
 # Y27=MGTREFCLK0_P, W29=MGTREFCLK1_P
+#
 # GTY Quad 130 == Quad_X0Y3
 # AD36=MGTYRXP0=CHANNEL_X0Y12, AC38=MGTYRXP1=CHANNEL_X0Y13,
 # AB36=MGTYRXP2=CHANNEL_X0Y14, AA38=MGTYRXP3=CHANNEL_X0Y15
@@ -111,11 +121,11 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets emc_clk_150MHz_IBUF[0]_inst/O
 
 # Transceiver Pins Currently Unknown, only Clock Pins work
 
-#set_property PACKAGE_PIN V27 [get_ports diff_clock_rtl_2_clk_p]
-#create_clock -period 6.206 -name sys_clk [get_ports diff_clock_rtl_2_clk_p]
+#set_property PACKAGE_PIN Y27 [get_ports diff_clock_rtl_2_clk_p]
+#create_clock -period 6.206 -name gty_clk2 [get_ports diff_clock_rtl_2_clk_p]
 
-#set_property PACKAGE_PIN Y27 [get_ports diff_clock_rtl_3_clk_p]
-#create_clock -period 6.206 -name sys_clk [get_ports diff_clock_rtl_3_clk_p]
+#set_property PACKAGE_PIN V27 [get_ports diff_clock_rtl_3_clk_p]
+#create_clock -period 6.206 -name gty_clk3 [get_ports diff_clock_rtl_3_clk_p]
 
 
 
