@@ -74,12 +74,12 @@ set_false_path -from [get_ports reset_rtl_0]
 
 # OpenCAPI Clock Pins T27 and P27 are connected together
 # OpenCAPI - Clock - T27 is MGTREFCLK0 in GTY_Quad/Bank 131 - X0Y4
-#set_property PACKAGE_PIN T27 [get_ports diff_clock_rtl_0_clk_p]
-#create_clock -name sys_clk -period 10.000 [get_ports diff_clock_rtl_0_clk_p]
+#set_property PACKAGE_PIN T27 [get_ports diff_clock_rtl_1_clk_p]
+#create_clock -name gty_clk1 -period 10.000 [get_ports diff_clock_rtl_1_clk_p]
 
 # OpenCAPI - Clock - P27 is MGTREFCLK0 in GTY_Quad/Bank 132 - X0Y5
-#set_property PACKAGE_PIN P27 [get_ports {diff_clock_rtl_0_clk_p[0]}]
-#create_clock -name sys_clk -period 10.000 [get_ports diff_clock_rtl_0_clk_p]
+#set_property PACKAGE_PIN P27 [get_ports diff_clock_rtl_1_clk_p]
+#create_clock -name gty_clk1 -period 10.000 [get_ports diff_clock_rtl_1_clk_p]
 
 # OpenCAPI - Reset - C4 is in Bank 90
 #set_property PACKAGE_PIN C4 [get_ports reset_rtl_0]
