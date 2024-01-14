@@ -110,22 +110,22 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets emc_clk_150MHz_IBUF[0]_inst/O
 # SFP - CMAC X0Y0 and X0Y1
 #
 # GTY Quad 129 == Quad_X0Y2
-# AD36=MGTYRXP0=CHANNEL_X0Y8, AC38=MGTYRXP1=CHANNEL_X0Y9,
-# AB36=MGTYRXP2=CHANNEL_X0Y10, AA38=MGTYRXP3=CHANNEL_X0Y11
+# Y36=MGTYRXP0=CHANNEL_X0Y8,  W38=MGTYRXP1=CHANNEL_X0Y9,
+# V36=MGTYRXP2=CHANNEL_X0Y10, U38=MGTYRXP3=CHANNEL_X0Y11
 # Y27=MGTREFCLK0_P, W29=MGTREFCLK1_P
 #
 # GTY Quad 130 == Quad_X0Y3
-# AD36=MGTYRXP0=CHANNEL_X0Y12, AC38=MGTYRXP1=CHANNEL_X0Y13,
-# AB36=MGTYRXP2=CHANNEL_X0Y14, AA38=MGTYRXP3=CHANNEL_X0Y15
+# T36=MGTYRXP0=CHANNEL_X0Y12, R38=MGTYRXP1=CHANNEL_X0Y13,
+# P36=MGTYRXP2=CHANNEL_X0Y14, N38=MGTYRXP3=CHANNEL_X0Y15
 # V27=MGTREFCLK0_P, U29=MGTREFCLK1_P
 
-# Transceiver Pins Currently Unknown, only Clock Pins work
+# Transceiver Pins Currently Unknown, only Clock Pins known
 
 #set_property PACKAGE_PIN Y27 [get_ports diff_clock_rtl_2_clk_p]
-#create_clock -period 6.206 -name gty_clk2 [get_ports diff_clock_rtl_2_clk_p]
+#create_clock -period 6.206 -name gt_clk2 [get_ports diff_clock_rtl_2_clk_p]
 
 #set_property PACKAGE_PIN V27 [get_ports diff_clock_rtl_3_clk_p]
-#create_clock -period 6.206 -name gty_clk3 [get_ports diff_clock_rtl_3_clk_p]
+#create_clock -period 6.206 -name gt_clk3 [get_ports diff_clock_rtl_3_clk_p]
 
 
 
@@ -326,7 +326,5 @@ set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
 set_property BITSTREAM.CONFIG.UNUSEDPIN PULLUP [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 set_property BITSTREAM.GENERAL.CRC ENABLE [current_design]
-
-#set_property BITSTREAM.GENERAL.JTAG_SYSMON ENABLE [current_design]
-#set_property BITSTREAM.GENERAL.JTAG_XADC [current_design]
+set_property BITSTREAM.GENERAL.JTAG_SYSMON ENABLE [current_design]
 
