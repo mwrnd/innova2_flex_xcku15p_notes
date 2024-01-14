@@ -933,7 +933,7 @@ In order for `innova2_flex_app` to program a User Image into the FPGA's configur
 
 #### Enable JTAG Access to the XCKU15P
 
-The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. If your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exit `innova2_flex_app`.
+The Innova-2's ConnectX-5 firmware and FPGA Factory/Flex Image communicate to prevent JTAG access to the FPGA Configuration Memory outside of `innova2_flex_app`. JTAG must be enabled in `innova2_flex_app` before using JTAG. The Enable JTAG feature will reset to disabled after a system reboot. If your Innova-2 already has up-to-date Factory and Flex images that work with `innova2_flex_app` (notice the `FPGA image version: 0xc1` below) then proceed to [Loading User a Image](#loading-a-user-image). Press `99`-Enter to exit `innova2_flex_app`.
 
 ```Shell
 sudo mst start
@@ -1251,7 +1251,7 @@ exit
 
 ### Enable JTAG Access to the Innova2
 
-If remove and rescan works, run `innova2_flex_app` and choose option `3`-Enter to enable JTAG Access then `99`-Enter to exit.
+If remove and rescan works, run `innova2_flex_app` and choose option `3`-Enter to enable JTAG Access then `99`-Enter to exit. The Enable JTAG feature will reset to disabled after a system reboot.
 ```
 sudo mst start
 cd ~/Innova_2_Flex_Open_18_12/driver/
@@ -1544,7 +1544,7 @@ If Vivado finishes Configuration Memory Programming in under a minute with a *\[
 
 ![JTAG Programming Failure](img/JTAG_Programming_Failure.png)
 
-**Enable JTAG Access** before attempting JTAG programming. `10`-Enter then `99`-Enter in `innova2_flex_app`.
+**Enable JTAG Access** before attempting JTAG programming. `10`-Enter then `99`-Enter in `innova2_flex_app`. The Enable JTAG feature will reset to disabled after a system reboot.
 ```Shell
 sudo mst start
 sudo mst status
@@ -1665,7 +1665,7 @@ exit
 
 ### Connect JTAG Adapter
 
-JTAG Communication is controlled by the ConnectX-5 on the Innova-2. Enable JTAG Access to the FPGA using `innova2_flex_app`.
+JTAG Communication is controlled by the ConnectX-5 on the Innova-2. Enable JTAG Access to the FPGA using `innova2_flex_app`. The Enable JTAG feature will reset to disabled after a system reboot.
 ```Shell
 sudo mst start
 sudo mst status
