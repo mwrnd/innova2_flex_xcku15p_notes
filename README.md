@@ -1838,7 +1838,7 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 * Lenovo sells the Innova-2 as the [Lenovo 4XC7A16683](http://lenovopress.com/lp1169.pdf).
 * [Lenovo Innova-2 Product Page](https://lenovopress.lenovo.com/lp1169-thinksystem-mellanox-innova-2-connectx-5-fpga-25gbe-2-port-adapter)
 * [Lenovo Version of User Guide](https://download.lenovo.com/servers/mig/2019/05/15/20295/mlnx-lnvgy_utl_nic_in2-18.12_manual_2.0.pdf)
-* [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)
+* [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?version=3&modificationDate=1554374888353&api=v2)([Archive](https://web.archive.org/web/20220706190318/https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?api=v2&modificationDate=1554374888353&version=3))
 * [Xilinx XDMA Support](https://support.xilinx.com/s/article/71435?language=en_US)
 * [Xilinx QDMA Support](https://support.xilinx.com/s/article/70928?language=en_US)
 * [OpenCAPI Open Source Projects](https://opencapi.github.io/)
