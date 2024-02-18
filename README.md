@@ -1233,7 +1233,7 @@ cat /boot/config-5.8.0-43-generic | grep -i pci | grep -i hotplug
 
 ### Attempt PCIe Remove and Rescan
 
-Find your design on the PCIe bus address, the `03` below, and remove it. Then rescan the PCIe bus.
+Find your design on the PCIe bus address, the `03` below, and remove it. Then rescan the PCIe bus to confirm it shows up again.
 ```
 lspci -nn -d 15b3:
 sudo lspci -tv -nn -d 15b3:
@@ -1266,7 +1266,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app
 
 ### Disconnect Innova2 from the PCIe Bridge
 
-Confirm the XDMA device is present then remove it from the PCIe bus and disconnect it from its PCIe Bridge. The ConnectX-5 PCIe Bridge for the FPGA on the Innova-2 is sub-device `08`, function `0`, `:08.0`.
+Confirm the XDMA device is present then remove it from the PCIe bus and disconnect it from its PCIe Bridge. The ConnectX-5 PCIe Bridge for the FPGA on the Innova-2 is sub-device `08`, function `0`, `:08.0`. It shows up as PCIe device `02` for me.
 ```
 lspci  |  grep -i "Xilinx\|Mellanox"
 
