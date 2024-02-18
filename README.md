@@ -104,7 +104,7 @@ The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
 ## System Setup
 
-The Innova-2 requires a specific system setup. [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is the most recent combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
+The Innova-2 requires a specific system setup. [Ubuntu 20.04.4](https://releases.ubuntu.com/20.04.4/) with Linux Kernel 5.8.0-43 and `MLNX_OFED 5.2-2.2.4.0` drivers is a fully tested combination that works for me. I am running the card in the second PCIe slot of a system with 16GB of memory and a CPU with Integrated Graphics. Using the second PCIe slot prevents issues with the motherboard assuming the Innova-2 is a video card. A CPU with Integrated Graphics prevents conflicts between the Innova-2 and a Video Card and is useful when debugging PCIe designs.
 
 I recommend starting with a fresh Ubuntu install on a blank SSD. An approximately 250GB SSD is enough for a working system that includes full **Vivado 2021.2**. 50GB drive space is enough for a working system with *Vivado Lab Edition* for basic functionality testing of the Innova-2.
 
@@ -276,7 +276,7 @@ uname -s -r -m
 
 ![Kernel 5.8.0-43-generic](img/Kernel_Version.png)
 
-[MLNX_OFED-5.2-2.2.4.0](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) is the latest version that works for me.
+[MLNX_OFED-5.2-2.2.4.0](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) is the latest version that includes the `mlx5_fpga_tools` kernel module required to program the FPGA's Configuration Memory using `innova2_flex_app`.
 
 ![Mellanox OFED Download](img/Mellanox_OFED_Download.png)
 
@@ -1859,7 +1859,7 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA data processing via PCIe Peer-to-Peer. Unfortunately, this is a [Proprietary Feature](https://github.com/acsl-technion/flexdriver-iot-auth/issues/1). Refer to [Issue #1](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/1) for any progress with this functionality.
-* [Awesome SmartNIC](https://github.com/mashemat/awesome-smartnic/tree/074e2513b1daa3e8fed38ff8ec35ff574cf2dd8f) project has many SmartNIC-related research links
+* [Awesome SmartNIC](https://github.com/opensmartnic/awesome-smartnic) project has many SmartNIC-related research links
 * [AWS Vivado 2021.2 Developer AMI](https://aws.amazon.com/marketplace/pp/prodview-53u3edtjtp2fe) provides by-the-hour fully licensed access to Vivado
 * [ServeTheHome Forum](https://forums.servethehome.com/index.php?threads/mellanox-innova2-connect-x-5-25gbps-sfp28-and-xilinx-kintex-ultrascale-dpu-250-bestoffer.31993/) post regarding the Innova-2
 * [EEVblog Forum](https://www.eevblog.com/forum/repair/how-to-test-salvageable-xilinx-ultrascale-board-from-ebay/?all) post regarding the Innova-2
