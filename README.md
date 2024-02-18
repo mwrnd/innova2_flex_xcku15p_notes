@@ -1235,14 +1235,14 @@ cat /boot/config-5.8.0-43-generic | grep -i pci | grep -i hotplug
 
 Find your design on the PCIe bus address, the `03` below, and remove it. Then rescan the PCIe bus to confirm it shows up again.
 ```
-lspci -nn -d 15b3:
-sudo lspci -tv -nn -d 15b3:
+lspci -nn
+sudo lspci -tv -nn
 
 sudo su
 echo 1 > /sys/bus/pci/devices/0000\:03\:00.0/remove
-lspci -nn -d 15b3:
+lspci -nn
 echo 1 > /sys/bus/pci/rescan 
-lspci -nn -d 15b3:
+lspci -nn
 exit
 ```
 
