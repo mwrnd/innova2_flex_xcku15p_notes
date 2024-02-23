@@ -8,7 +8,7 @@
 
 ### Testing MNV303212A-ADIT OpenCAPI Connections
 
-A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board and the [IBERT for GTY](https://docs.xilinx.com/v/u/en-US/pg196-ibert-ultrascale-gty) can be used to test OpenCAPI port connections. Testing works well using a [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)).
+A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board and the [IBERT for GTY Demo Project](https://github.com/mwrnd/innova2_experiments/tree/main/xcku15p_ffve1517_GTY_IBERT) can be used to test OpenCAPI port connections. Testing works well using a [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)).
 
 ![Testing Innova2 OpenCAPI GTY Connections](img/Innova2_4GB_MNV303212A-ADIT_Testing_OpenCAPI_GTY.jpg)
 
@@ -22,7 +22,7 @@ I manually searched for working connections.
 
 After finding working connections I connected both N and P signals.
 
-![Connect both N and P Signals](img/Innova2_4GB_ADIT_Testing_OpenCAPI_RX1p-TX3p_RX1n-TX3n.jpg)
+![Connect both N and P Signals](img/Testing_OpenCAPI_RX1p-TX3p_RX1n-TX3n.jpg)
 
 I discovered that the Innova2 4GB MNV303212A-AD**I**T has a significantly different OpenCAPI pinout than the Innova2 8GB MNV303212A-AD**L**T.
 ```
@@ -83,7 +83,7 @@ The following are Eye Diagram Scans for all the OpenCAPI GTY Channels:
 
 ### Testing MNV303212A-ADLT OpenCAPI Connections
 
-A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout) board and the [IBERT for GTY project](LINKMISSING) can be used to confirm OpenCAPI port pinout and connections. Testing works well using a [3M Cable](LINKMISSING).
+A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board and the [IBERT for GTY Demo Project](https://github.com/mwrnd/innova2_experiments/tree/main/xcku15p_ffve1517_GTY_IBERT) can be used to test OpenCAPI port connections. Testing works well using a [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)).
 
 ![Testing Innova2 OpenCAPI GTY Connections](img/Innova2_4GB_MNV303212A-ADIT_Testing_OpenCAPI_GTY.jpg)
 
@@ -97,7 +97,7 @@ I manually searched for working connections.
 
 After finding working connections I connected both N and P signals.
 
-![Connect both N and P Signals](img/Innova2_4GB_ADIT_Testing_OpenCAPI_RX1p-TX3p_RX1n-TX3n.jpg)
+![Connect both N and P Signals](img/Testing_OpenCAPI_RX1p-TX3p_RX1n-TX3n.jpg)
 
 I discovered channels 0, 3, and 4 have swapped transceiver differential pairs (N,P):
 ```
@@ -145,7 +145,7 @@ The following are Eye Diagram Scans for all the OpenCAPI GTY Channels:
 
 ![IBERT Results for X0Y23 RX7p-TX7p RX7n-TX7n](img/ADLT_OpenCAPI_X0Y23_RX7p-TX7p_RX7n-TX7n.png)
 
-After about 15 minutes Channel X0Y19 began failing:
+After about 15 minutes Channel X0Y19 began failing due to overheating:
 
 ![X0Y19 begins failing after 15min](img/ADLT_OpenCAPI_X0Y19_RX3_TX3_after_15min.png)
 

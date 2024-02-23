@@ -2,7 +2,7 @@
 
 The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) accelerator card, model [MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf), can be used as an FPGA development platform. It is based on the Mellanox [ConnectX-5 MT27808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) and Xilinx [Ultrascale+ XCKU15P](https://www.xilinx.com/products/silicon-devices/fpga/kintex-ultrascale-plus.html). It is a high capacity FPGA with 8GB DDR4, connected through a PCIe x8 switch in the ConnectX-5.
 
-![Innova-2 Overview](img/Innova-2_Overview.png)
+![Innova-2 Overview](img/Innova-2_Overview.jpg)
 
 These notes include step-by-step instructions for setting up an Innova-2 system and preparing the Innova-2 for FPGA development.
 
@@ -96,11 +96,11 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
 
 The card is designed for use in servers and requires active cooling with up to [800 LFM of air flow](https://docs.nvidia.com/networking/display/Innova2Flex/Specifications#Specifications-MNV303212A-ADLTSpecifications). My Innova-2 came without a cooling solution so I attached a hard drive heat sink to it and placed a 12V 1.3A blower fan from a server in line with the card. I have the board in an open air setup with no enclosure. I run the blower fan from a 5V power rail and get acceptable noise and performance when using only the FPGA. I need to run the fan at 12V when testing the network interfaces. The board otherwise overheats and the interfaces shut down.
 
-![Cooling Setup](img/Cooling_Setup.png)
+![Cooling Setup](img/Cooling_Setup.jpg)
 
 The two main ICs are different heights so I needed 2mm and 0.5mm thermal pads.
 
-![ICs are Different Heights](img/Cooling_Solution_Thermal_Pads.png)
+![ICs are Different Heights](img/Cooling_Solution_Thermal_Pads.jpg)
 
 ## System Setup
 
@@ -181,7 +181,7 @@ sudo reboot
 
 After reboot run Ubuntu *Software Updater*.
 
-![Ubuntu Software Updater](img/Ubuntu_Software_Updater.png)
+![Ubuntu Software Updater](img/Ubuntu_Software_Updater.jpg)
 
 
 ### Install All Prerequisites
@@ -542,7 +542,7 @@ sudo reboot
 
 The `innova2_flex_app`, part of the [Innova-2 Flex Firmware Release](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/), allows software update of the XCKU15P FPGA User Image as well as basic diagnostics of the Innova-2.
 
-![Innova-2 Flex Firmware 18.12](img/Innova-2_Flex_Release_18_12.png)
+![Innova-2 Flex Firmware 18.12](img/Innova-2_Flex_Release_18_12.jpg)
 
 
 The following commands download and install *Innova_2_Flex_Open_18_12*.
@@ -786,27 +786,27 @@ If the above method of forcing Recovery Mode worked, you may skip this section. 
 
 The ConnectX-5's FLASH IC is a 3V 128Mbit=16Mbyte [W25Q128JVS](https://www.winbond.com/resource-files/W25Q128JV%20RevI%2008232021%20Plus.pdf). I was able to successfully program it using a [CH341A Programmer](https://github.com/stahir/CH341-Store/tree/5b4fda3add3d492f14f73a8376c580644f6c8195). **This is a dangerous procedure that can damage your Innova-2**. Please do not make this your first attempt at FLASH IC programming. Consider a practice run on some other less important device or [purchase a W25Q128JVS](https://www.trustedparts.com/en/search/W25Q128JVS) IC to test with.
 
-![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.png)
+![U45 W25Q128JVS IC](img/FLASH_IC_U45_W25Q128JVSQ.jpg)
 
 If you are using a CH341A Programmer, set the configuration jumper to default/SPI mode, `1-2`.
 
-![CH341A Setup](img/CH341A_Programmer_Setup.png)
+![CH341A Setup](img/CH341A_Programmer_Setup.jpg)
 
 Please take [ESD precautions](https://www.dell.com/support/kbdoc/en-ca/000137973/safety-precautions-when-working-with-electrical-equipment) seriously. Connect your 3.3V programmer to the W25Q128JVS. The Innova-2 **should not** be powered or plugged in.
 
-![CH341A Connection](img/CH341A_Programmer_Connection.png)
+![CH341A Connection](img/CH341A_Programmer_Connection.jpg)
 
 Confirm pin connections are independent. Pins 8, 7, and 3 (Vcc, Hold, and Write-Protect) are shorted together but all other pins are independent with respect to each other. Check every combination.
 
-![Check for Improper Short Connections](img/CH341A_Confirm_Independent_Pins.png)
+![Check for Improper Short Connections](img/CH341A_Confirm_Independent_Pins.jpg)
 
 Confirm Programmer-to-FLASH IC connections. 1-to-1, 2-to-2, etc.
 
-![Confirm CH341A-to-FLASH Connections](img/CH341A_Confirm_Connections_Correct.png)
+![Confirm CH341A-to-FLASH Connections](img/CH341A_Confirm_Connections_Correct.jpg)
 
 Abort if anything appears to be incorrect. If you are certain the programmer is connected properly and you accept the risks, plug the programmer into your system. The Innova-2 **should not** be powered or plugged in.
 
-![CH341A Programming](img/CH341A_USB_Connected.png)
+![CH341A Programming](img/CH341A_USB_Connected.jpg)
 
 Use `flashrom` to test the Programmer-to-FLASH connection. The `W25Q128.V` should be found automatically by `flashrom`. If it is not found then there is something wrong with the IC and/or flashrom and/or connections.
 ```Shell
@@ -877,7 +877,7 @@ Power down and restart your system.
 
 The network interfaces can be tested using 1G, 10G, or 25G SFP/SFP+/SFP28 modules and cables. The [ConnectX-5 MT2x808](https://web.archive.org/web/20220412010542/https://network.nvidia.com/files/doc-2020/pb-connectx-5-en-ic.pdf) supports all three speeds. If you have the 100GbE QSFP *MNV303611A-EDL* variant of the Innova-2 it requires 40GbE or 100GbE QSFP equipment. I used a [Direct-Attach Cable (DAC)](https://www.te.com/usa-en/product-2821224-7.html). Any DAC that is [Mellanox or Cisco compatible](https://www.fs.com/products/65841.html) should work.
 
-![Direct-Attach Cable](img/Direct-Attach-Cable.png)
+![Direct-Attach Cable](img/Direct-Attach-Cable.jpg)
 
 Check that the cable is recognized.
 ```Shell
@@ -919,7 +919,7 @@ ip netns exec clnt iperf3 -t 1 -c 10.10.10.1 -B 10.10.10.7
 
 Results should approach about 23Gbits/sec as there is some overhead. Change the `-t 1` option to `-t 10` for longer throughput testing.
 
-![client server namespaces](img/Dual_Namespace_Loopback_Throughput_Test.png)
+![client server namespaces](img/Dual_Namespace_Loopback_Throughput_Test.jpg)
 
 
 ## Programming the FPGA
@@ -1008,11 +1008,11 @@ sha256sum completeimage0.bin completeimage1.bin
 
 Connect your [Xilinx-Compatible](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) **1.8V** JTAG Adapter to your Innova-2 but power the Innova-2 from a second computer or using a *Powered External PCIe Extender*. Running JTAG from the system with the Innova-2 may cause undefined behaviour. If JTAG halts the FPGA it will disappear off the PCIe bus and crash Ubuntu.
 
-![JTAG Connected](img/JTAG_Adapter_Connected.png)
+![JTAG Connected](img/JTAG_Adapter_Connected.jpg)
 
 A Powered PCIe Riser/Extender is another option for powering the Innova-2 while JTAG programming.
 
-![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.png)
+![Powered External PCIe Extender](img/Powered_PCIe_Extender_for_JTAG.jpg)
 
 Start Vivado Hardware Manager. Any recent version of [Vivado Lab Edition](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2021-2.html) or full Vivado is enough for this task.
 
@@ -1024,7 +1024,7 @@ Start a Connection, `Open Target -> Auto Connect`
 
 Right-click on `xcku15p_0` and select `Add Configuration Memory Device ...`
 
-![Add Configuration Memory Device](img/Add_Configuration_Memory_Device.png)
+![Add Configuration Memory Device](img/Add_Configuration_Memory_Device.jpg)
 
 Select `mt25qu512-spi-x1_x2_x4_x8`.
 
@@ -1081,7 +1081,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 
 sudo reboot
 ```
-![Set Flex Image Active](img/Activate_Flex_Image_for_Programming.png)
+![Set Flex Image Active](img/Activate_Flex_Image_for_Programming.jpg)
 
 After rebooting the Flex Image should be active. Look for `Class 2000: Mellanox Technologies Innova-2 Flex Burn image` or similar.
 ```
@@ -1594,7 +1594,7 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 
 Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
 
-![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.png)
+![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.jpg)
 
 It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Channel MOSFET.
 
@@ -1605,11 +1605,11 @@ It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Ch
 
 While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) Fast 1206 10A SMT fuse and the board was saved. I got lucky. A blown fuse is either a simple fix or a sign of catastrophic failure.
 
-![1206 Fuse F1](img/Fuse_1206_F1.png)
+![1206 Fuse F1](img/Fuse_1206_F1.jpg)
 
 The board is well designed with all voltage rails exposed on test points. Carefully measure each one.
 
-![Voltage Test Points](img/Voltage_Test_Points.png)
+![Voltage Test Points](img/Voltage_Test_Points.jpg)
 
 
 ### Disable or Enable Resizable BAR Support
@@ -1622,7 +1622,7 @@ If you are experiencing PCIe communication problems, flip this setting in your B
 
 It should have no effect when running a 64-Bit OS but sometimes it does. Flip this setting in your BIOS if you have any problems or throughput bandwidth seems low.
 
-![Disable Above-4G Memory](img/Above-4G_Memory_in_BIOS.png)
+![Disable Above-4G Memory](img/Above-4G_Memory_in_BIOS.jpg)
 
 
 ## JTAG Using UrJTAG
