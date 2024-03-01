@@ -12,6 +12,10 @@ A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakou
 
 ![Testing Innova2 OpenCAPI GTY Connections](img/Innova2_4GB_MNV303212A-ADIT_Testing_OpenCAPI_GTY.jpg)
 
+The [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board uses a **Host** version of the OpenCAPI **Carrier** pinout from the [ADM-PCIE-9V5 User Manual (Pg15-19of38)](https://www.alpha-data.com/xml/user_manuals/adm-pcie-9v5%20user%20manual_v1_4.pdf). Labels are relative to the Host. Host RX is Carrier TX and vice versa so the **Rx** pins on the board have transmitter signals from the Add-in card on them. **Tx** pins connect to the Add-in card's receiver signals.
+
+![OpenCAPI Pinout](img/OpenCAPI_Pinout.jpg)
+
 A [PCIe_x8_Breakout](https://github.com/mwrnd/PCIe_x8_Breakout) in a PCIe socket was used as the source for the OpenCAPI 100MHz `GTREFCLK` clock.
 
 ![PCIe Socket Used as Clock Source](img/Innova2_4GB_ADIT_Testing_OpenCAPI_GTY-PCIe_as_Clock_Source.jpg)
@@ -87,6 +91,10 @@ The following are Eye Diagram Scans for all the OpenCAPI GTY Channels:
 A [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board and the [IBERT for GTY Demo Project](https://github.com/mwrnd/innova2_experiments/tree/main/xcku15p_ffve1517_GTY_IBERT) can be used to test OpenCAPI port connections. Testing works well using a [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)).
 
 ![Testing Innova2 OpenCAPI GTY Connections](img/Innova2_4GB_MNV303212A-ADIT_Testing_OpenCAPI_GTY.jpg)
+
+The [`v0.1-alpha` **OpenCAPI_Breakout**](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha) board uses a **Host** version of the OpenCAPI **Carrier** pinout from the [ADM-PCIE-9V5 User Manual (Pg15-19of38)](https://www.alpha-data.com/xml/user_manuals/adm-pcie-9v5%20user%20manual_v1_4.pdf). Labels are relative to the Host. Host RX is Carrier TX and vice versa so the **Rx** pins on the board have transmitter signals from the Add-in card on them. **Tx** pins connect to the Add-in card's receiver signals.
+
+![OpenCAPI Pinout](img/OpenCAPI_Pinout.jpg)
 
 A [PCIe_x8_Breakout](https://github.com/mwrnd/PCIe_x8_Breakout) in a PCIe socket was used as the source for the OpenCAPI 100MHz `GTREFCLK` clock.
 
