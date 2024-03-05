@@ -253,7 +253,7 @@ The [Xilinx Platform Cable USB II](https://docs.xilinx.com/v/u/en-US/ds593) is b
 ![Xilinx DLC10 Platform Cable USB II PCB Top](img/Xilinx_DLC10_Platform_Cable_USB_II_PCB.jpg)
 
 
-### Xilinx DLC10 Platform Cable USB II
+### Waveshare Platform Cable USB Clone
 
 The [Waveshare Platform USB Cable clone](https://www.waveshare.com/platform-cable-usb.htm) is also based on an [FX2 USB MCU](https://www.infineon.com/cms/en/product/universal-serial-bus/usb-2.0-peripheral-controllers/ez-usb-fx2lp-fx2g2-usb-2.0-peripheral-controller/) but instead uses a [Lattice MachXO2 CPLD](https://www.latticesemi.com/Products/FPGAandCPLD/MachXO2).
 
