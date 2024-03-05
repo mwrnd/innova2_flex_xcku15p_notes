@@ -1,8 +1,10 @@
 # Debug Notes
 
+
+
 ## Delay Motherboard Boot Using RESET Capacitor
 
-Slowing down BIOS boot is a simple trick that solves many PCIe issues. You can do this by pressing the POWER button, then pressing and holding the RESET button for a second before releasing it. Or, connect a capacitor across the reset pins of your motherboard's [Front Panel Header](https://www.intel.com/content/www/us/en/support/articles/000007309/intel-nuc.html). This prevents you from using the RESET button as that would short the capacitor. Try values between 100uF and 1000uF. Optimal value depends on required delay and motherboard design.
+Slowing down BIOS boot is a simple trick that solves many PCIe issues. You can do this by pressing the POWER button, then pressing and holding the RESET button for a second before releasing it. Or, connect a capacitor across the reset pins of your motherboard's [Front Panel Header](https://www.intel.com/content/www/us/en/support/articles/000007309/intel-nuc.html). This prevents you from using the RESET button as that would short the capacitor. Try capacitors with values such as 330uF or 680uF. Optimal value depends on required delay and motherboard design.
 
 ![Delay Motherboard Boot Using RESET Capacitor](img/Delay_Boot_Using_Capacitor.jpg)
 
@@ -10,7 +12,7 @@ The capacitor across RESET works thanks to an [RC Delay](https://en.wikipedia.or
 
 ![RESET Button Schematic](img/Server_Motherboard_RESET_Button_Schematic.png)
 
-A standard Schmitt-Trigger inverter such as the [SN74LVC1G14](https://www.ti.com/lit/gpn/SN74LVC1G14) has a positive-going threshold voltage of about 1.5V with a 3.3V supply. I have measured 1k-Ohm between the RESET+ pin and the 3.3V ATX Power supply rail. A 330uF capacitor [delays](http://ladyada.net/library/rccalc.html) boot by about 200ms.
+A standard Schmitt-Trigger inverter such as the [SN74LVC1G14](https://www.ti.com/lit/gpn/SN74LVC1G14) has a positive-going threshold voltage of about 1.5V with a 3.3V supply. I have measured 1k-Ohm between the RESET+ pin and the 3.3V ATX Power supply rail. A 330uF capacitor therefore [delays](http://ladyada.net/library/rccalc.html) boot by about 200ms.
 
 ![RC Delay Calculator](img/RC_Delay_Calculator.png)
 
@@ -21,11 +23,112 @@ I found out about this technique [here](https://hackaday.com/2018/02/17/catching
 
 
 
-## Discerning ADLT vs ADAT and ADIT Variants
+## Recreating innova2_flex_app Functionality for latest MLNX OFED
 
-[Innova2 8GB MNV303212A-ADLT](https://www.mellanox.com/files/doc-2020/pb-innova-2-flex.pdf) boards have [`MT40A1G16KNR-075`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) DDR4 ICs with [**D9WFR** FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA). [Innova2 4GB MNV303212A-ADAT/MNV303212A-ADIT](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) boards have [`MT40A512M16JY-083E`](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/8gb_ddr4_sdram.pdf) DDR4 ICs with [**D9TBK** FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA).
+**Work-In-Progress**
 
-![DDR4 IC Comparison](img/Innova2_Variant_DDR4_Comparison.jpg)
+[MLNX_OFED](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) versions > 5.2 do not include `mlx5_fpga_tools` which is required by `innova2_flex_app` to program the FPGA, switch the active image, and enable/disable JTAG.
+
+Check if your current kernel supports tracing.
+```
+cat /boot/config-`uname -r` | grep -e "CONFIG_FUNCTION[[:print:]]*TRACER\|CONFIG_KPROBES"
+```
+
+Results should be:
+```
+CONFIG_FUNCTION_TRACER=y
+CONFIG_FUNCTION_GRAPH_TRACER=y
+CONFIG_KPROBES=y
+CONFIG_KPROBES_ON_FTRACE=y
+```
+
+I used [ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html)([Quick Introduction](https://opensource.com/article/21/7/linux-kernel-ftrace)) to figure out the call tree when JTAG is enabled in `innova2_flex_app`.
+
+```
+sudo su
+cd /sys/kernel/tracing
+ps aux | grep innova
+echo PID_FROM_ABOVE > set_ftrace_pid
+echo function_graph > current_tracer
+### run a command in innova2_flex_app now
+cat trace > /home/fpga/trace_enablejtag
+echo nop > current_tracer
+exit
+```
+
+![Tracing innova2_flex_app during JTAG Enable](img/tracing_innova2_flex_app_Enable_JTAG.png)
+
+The results show that the `mlx5_core_access_reg` from the `mlx5_core` driver is the function that changes JTAG status.
+
+![Results of tracing innova2_flex_app](img/trace_Enable_JTAG.png)
+
+I then used a [kprobe event tracer](https://www.kernel.org/doc/html/latest/trace/kprobetrace.html) to figure out the arguments to `mlx5_core_access_reg`.
+
+```
+sudo su
+cd /sys/kernel/tracing
+echo 'p:myprobe mlx5_core_access_reg dev=$arg1:x64 data_in=$arg2:x64 di0=+0($arg2):x32 di1=+4($arg2):x32 di2=+8($arg2):x32 di3=+12($arg2):x32 size_in=$arg3:s32 data_out=$arg4:x64 size_out=$arg5:s32 reg_id=$arg6:x16 arg=$arg7:s32 write=$arg8:s32' > kprobe_events
+echo 'r:myretprobe mlx5_core_access_reg ret=$retval'  >> kprobe_events
+echo 1 > events/kprobes/myprobe/enable
+echo 1 > events/kprobes/myretprobe/enable
+echo 1 > tracing_on
+## Enable JTAG Access in innova2_flex_app ##
+cat trace | grep myprobe
+echo 0 > tracing_on
+echo 0 > events/kprobes/myprobe/enable
+echo 0 > events/kprobes/myretprobe/enable
+echo   > kprobe_events  # deletes all probes
+exit
+```
+
+![Tracing mlx5_core_access_reg](img/tracing_mlx5_core_access_reg_Enable_JTAG.png)
+
+JTAG is enabled by writing `0x900` to register `0x4023`.
+```
+ innova2_flex_ap-5513    [003] ....  2971.678544: myprobe: (mlx5_core_access_reg+0x0/0x130 [mlx5_core]) dev=0xffff98bed2b40140 data_in=0xffffbc6c03283d08 di0=0x900 di1=0x0 di2=0x0 di3=0x0 size_in=16 data_out=0xffffbc6c03283d18 size_out=16 reg_id=0x4023 arg=0 write=1
+```
+
+`mlx5_fpga_ctrl_connect` is in `cmd.c` in the `mlnx-ofed-kernel-5.2` archive.
+
+![mlx5_fpga_ctrl_connect in cmd.c](img/mlx5_fpga_ctrl_connect_in_cmd_c.png)
+
+`MLX5_ST_SZ_DW` sets the value to send.
+
+![MLX5_ST_SZ_DW in driver.h](img/MLX5_ST_SZ_DW_in_driver_h.png)
+
+The values are defined in `mlx_ifc_fpga.h`. The `0x900` is in Little-Endian (`0x00090000` in Big-Endian) so it is written to the `operation[0x8]` bits of the `FPGA_CTRL` register.
+
+![FPGA_CTRL Bit Defines in mlx_ifc_fpga.h](img/mlx_ifc_fpga_h_FPGA_CTRL_Bit_Defines.png)
+
+[`mlxreg`](https://docs.nvidia.com/networking/display/mftv4250/mlxreg+utility) can be used to access registers. By running `innova2_flex_app` in one window and `mlxreg` in another, the `FPGA_CTRL` register can be watched.
+
+```
+sudo mst start
+sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --get
+```
+
+![mlxreg after innova2_flex_app Started](img/mlxreg_get_after_innova2_flex_app_Started.png)
+
+After enabling JTAG, the `status[0x8]` bits are `0x3`:
+
+![mlxreg after Enable_JTAG](img/mlxreg_get_after_Enable_JTAG.png)
+
+After enabling the Flex Image, the `flash_select_admin[0x8]` bits are `0x01`:
+
+![mlxreg after Flex Image Active](img/mlxreg_get_after_Flex_Image_Active.png)
+
+Unfortunately, `mlxreg --set` fails with `-E- Failed send access register: ME_ICMD_OPERATIONAL_ERROR` when trying to write the register.
+```
+sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --get
+sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --set "0x0.16:4=0xA"
+sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --set "0x0.16:4=0x9"
+echo Try to set reserved bits:
+sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --set "0x0.12:4=0x9"
+```
+
+![mlxreg Register Write Fails](img/mlxreg_Register_Write_Fails.png)
+
+**TODO**: Figure out how to write the `FPGA_CTRL` register so that `mlx5_fpga_tools.ko` and `innova2_flex_app` are no longer needed to allow using the latest `MLNX_OFED` releases.
 
 
 
