@@ -29,7 +29,7 @@ A [PCIe_x8_Breakout](https://github.com/mwrnd/PCIe_x8_Breakout) in a PCIe socket
 
 ![PCIe Socket Used as Clock Source](img/Innova2_4GB_ADIT_Testing_OpenCAPI_GTY-PCIe_as_Clock_Source.jpg)
 
-Using a multimeter I was able to trace FPGA pin `A33` ([`MGTYTXP3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B23` and FPGA pin `A34` ([`MGTYTXN3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to pin `B24`. A SlimSAS cables swaps rows so these become `A23` and `A24` on the [OpenCAPI_Breakout](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha). Its U.FL connectors are labeled relative to the Host so **Rx** connectors on the OpenCAPI_Breakout have **Tx** signals from the FPGA on them.
+Using a multimeter I was able to trace FPGA pin `A33` ([`MGTYTXP3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B23`, and FPGA pin `A34` ([`MGTYTXN3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B24`. A SlimSAS cables swaps rows so these become `A23` and `A24` on the [OpenCAPI_Breakout](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha). Its U.FL connectors are labeled relative to the Host so **Rx** connectors on the OpenCAPI_Breakout have **Tx** signals from the FPGA on them.
 
 ![Pinout of Rx7](img/Innova2_8GB_ADLT_Partial_Pinout_Rx7.jpg)
 
@@ -109,7 +109,7 @@ A [PCIe_x8_Breakout](https://github.com/mwrnd/PCIe_x8_Breakout) in a PCIe socket
 
 ![PCIe Socket Used as Clock Source](img/Innova2_4GB_ADIT_Testing_OpenCAPI_GTY-PCIe_as_Clock_Source.jpg)
 
-Using a multimeter I was able to trace FPGA pin `A33` ([`MGTYTXP3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B23` and FPGA pin `A34` ([`MGTYTXN3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to pin `B24`. A SlimSAS cables swaps rows so these become `A23` and `A24` on the [OpenCAPI_Breakout](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha). Its U.FL connectors are labeled relative to the Host so **Rx** connectors on the OpenCAPI_Breakout have **Tx** signals from the FPGA on them.
+Using a multimeter I was able to trace FPGA pin `A33` ([`MGTYTXP3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B23`, and FPGA pin `A34` ([`MGTYTXN3` in Bank 132](https://www.xilinx.com/content/dam/xilinx/support/packagefiles/usapackages/xcku15pffve1517pkg.txt)) to OpenCAPI pin `B24`. A SlimSAS cables swaps rows so these become `A23` and `A24` on the [OpenCAPI_Breakout](https://github.com/mwrnd/OpenCAPI_Breakout/releases/tag/v0.1-alpha). Its U.FL connectors are labeled relative to the Host so **Rx** connectors on the OpenCAPI_Breakout have **Tx** signals from the FPGA on them.
 
 ![Pinout of Rx7](img/Innova2_8GB_ADLT_Partial_Pinout_Rx7.jpg)
 

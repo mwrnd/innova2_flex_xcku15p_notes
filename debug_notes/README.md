@@ -25,8 +25,6 @@ I found out about this technique [here](https://hackaday.com/2018/02/17/catching
 
 ## Recreating innova2_flex_app Functionality for latest MLNX OFED
 
-**Work-In-Progress**
-
 [MLNX_OFED](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) versions > 5.2 do not include `mlx5_fpga_tools` which is required by `innova2_flex_app` to program the FPGA, switch the active image, and enable/disable JTAG.
 
 Check if your current kernel supports tracing.
@@ -50,8 +48,8 @@ cd /sys/kernel/tracing
 ps aux | grep innova
 echo PID_FROM_ABOVE > set_ftrace_pid
 echo function_graph > current_tracer
-### run a command in innova2_flex_app now
 cat trace > /home/fpga/trace_enablejtag
+### run a command in innova2_flex_app now
 echo nop > current_tracer
 exit
 ```
@@ -92,6 +90,10 @@ JTAG is enabled by writing `0x900` to register `0x4023`.
 
 ![mlx5_fpga_ctrl_connect in cmd.c](img/mlx5_fpga_ctrl_connect_in_cmd_c.png)
 
+`mlx5_core_access_reg` is an [EXPORT_SYMBOL](https://lkw.readthedocs.io/en/latest/doc/04_exporting_symbols.html) so it can be called from other kernel modules.
+
+![mlx5_core_access_reg is an EXPORT_SYMBOL](img/mlx5_core_access_reg_is_an_EXPORT_SYMBOL.png)
+
 `MLX5_ST_SZ_DW` sets the value to send.
 
 ![MLX5_ST_SZ_DW in driver.h](img/MLX5_ST_SZ_DW_in_driver_h.png)
@@ -128,7 +130,80 @@ sudo mlxreg -d /dev/mst/mt4119_pciconf0 --yes --reg_id 0x4023 --reg_len 0x4 --se
 
 ![mlxreg Register Write Fails](img/mlxreg_Register_Write_Fails.png)
 
-**TODO**: Figure out how to write the `FPGA_CTRL` register so that `mlx5_fpga_tools.ko` and `innova2_flex_app` are no longer needed to allow using the latest `MLNX_OFED` releases.
+
+### Using mstreg to write FPGA Control Register
+
+`mstreg` from [**mstflint v4.26.0-1**](https://github.com/Mellanox/mstflint/releases/tag/v4.26.0-1) is able to write the FPGA Control registers.
+
+```
+wget https://github.com/Mellanox/mstflint/releases/download/v4.26.0-1/mstflint-4.26.0-1.tar.gz
+tar -xvf mstflint-4.26.0-1.tar.gz
+cd mstflint-4.26.0
+./configure --enable-adb-generic-tools --enable-rdmem
+make
+cd mlxreg/
+lspci | grep Mellanox | grep Ethernet
+sudo find / * -name register_access_table.adb
+```
+
+![mstflint compile and prepare](img/mstreg_compile_and_prepare.png)
+
+Note the Ethernet Controller PCIe address, `04:00.0` above, and the ADB File location, `usr/share/mft/prm_dbs/hca/ext/register_access_table.adb` above.
+
+
+#### Enable or Disable JTAG Connector
+
+`mstreg` can be used to *DISCONNECT* the FPGA's JTAG from the ConnectX-5 to enable the board's JTAG header to be used.
+
+```
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --set "0x0.16:4=0x9"
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+```
+
+![mstreg DISCONNECT to Enable JTAG](img/mstreg_DISCONNECT_to_Enable_JTAG.png)
+
+Similarly, writing the `4`-bit value `0xA` at the `16`th bit position of register `0x0` connects JTAG signals to the ConnectX-5 and disables the board's JTAG header.
+```
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --set "0x0.16:4=0xA"
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+```
+
+
+#### Set Active FPGA Configuration Bitstream Image
+
+The [FPGA Configuration Memory Layout](https://docs.nvidia.com/networking/display/innova2flex/using+the+mellanox+innova-2+flex+open+bundle#src-11995976_UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) allows for 3 configuration bitstreams, *Factory*, *Flex*, and *User*.
+
+![FPGA Configuration Memory Layout](../img/FPGA_Configuration_Memory_Layout.png)
+
+When the User Image is scheduled using `innova2_flex_app` under *MLNX_OFED 5.2*, `0x00030000` is written to word `0` of the control register `0x4023`.
+
+![kprobe of Set User Image Active](img/kprobe_Set_User_Image_Active.png)
+
+When the Flex Image is scheduled using `innova2_flex_app` under *MLNX_OFED 5.2*, `0x00030001` is written to word `0` of the control register `0x4023`.
+
+![kprobe of Set Flex Image Active](img/kprobe_Set_Flex_Image_Active.png)
+
+The User Image can be activated using `mstreg`:
+
+```
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --set "0x0.16:4=0x3,0x4.16:4=0x1"
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+```
+
+![mstreg Set User Image Active](img/mstreg_Set_User_Image_Active.png)
+
+The Flex Image can be activated using `mstreg`:
+
+```
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --set "0x0.16:4=0x3,0x4.16:4=0x0"
+sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/register_access_table.adb --reg_id 0x4023 --reg_len 0x8 --get
+```
+
+![mstreg Set Flex Image Active](img/mstreg_Set_Flex_Image_Active.png)
 
 
 
