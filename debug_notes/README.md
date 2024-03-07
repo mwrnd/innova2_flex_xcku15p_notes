@@ -40,7 +40,7 @@ CONFIG_KPROBES=y
 CONFIG_KPROBES_ON_FTRACE=y
 ```
 
-I used [ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html)([Quick Introduction](https://opensource.com/article/21/7/linux-kernel-ftrace)) to figure out the call tree when JTAG is enabled in `innova2_flex_app`.
+I used [ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html) ([Quick Introduction](https://opensource.com/article/21/7/linux-kernel-ftrace)) to figure out the call tree when JTAG is enabled in `innova2_flex_app`.
 
 ```
 sudo su
@@ -60,7 +60,7 @@ The results show that the `mlx5_core_access_reg` from the `mlx5_core` driver is 
 
 ![Results of tracing innova2_flex_app](img/trace_Enable_JTAG.png)
 
-I then used a [kprobe event tracer](https://www.kernel.org/doc/html/latest/trace/kprobetrace.html) to figure out the arguments to `mlx5_core_access_reg`.
+I then used a [kprobe event tracer](https://www.kernel.org/doc/html/latest/trace/kprobetrace.html) ([Quick Introduction](https://events19.linuxfoundation.org/wp-content/uploads/2017/12/oss-eu-2018-fun-with-dynamic-trace-events_steven-rostedt.pdf)) to figure out the arguments to `mlx5_core_access_reg`.
 
 ```
 sudo su
