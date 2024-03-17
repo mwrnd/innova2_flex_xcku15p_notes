@@ -245,7 +245,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports i2c_scl]
 set_property IOSTANDARD LVCMOS33 [get_ports i2c_sda]
 ```
 
-I have a `Rev.A2` board. I flattened an axial resistor with pliers and wound it around a multimeter lead so that I could get under the FPGA and try to trace the `D1-SDA` signal.
+I have a `Rev.A2` board. I flattened the tip of an axial resistor's lead with pliers and wound it around a multimeter lead so that I could get under the FPGA and try to trace the `D1-SDA` signal.
 
 ![Tracing I2C Connection](img/Innova2_RevA2_Tracing_I2C_Connection.jpg)
 
@@ -253,7 +253,7 @@ Luckily the I2C pull-up resistors are nearby.
 
 ![FPGA-to-CX5 I2C Pins D1 D2](img/Innova2_RevA2_FPGA-to-CX5_I2C_D1_D2.jpg)
 
-I traced the signals to test points on the opposite side of the board and soldered some wires so that I can capture the I2C bus data.
+I traced the signals to test points on the opposite side of the board and soldered some wires to them so that I can capture the I2C bus data. I also soldered a 0.1" header across a 3.3V capacitor for access to an associated power supply.
 
 ![FPGA-to-CX5 I2C Pins Tap](img/Innova2_RevA2_FPGA-to-CX5_I2C_Tap.jpg)
 
@@ -291,6 +291,7 @@ Use JTAG to write your configuration image to the Innova2 initially.
 Subsequently, the [`xbflash`](https://xilinx.github.io/XRT/master/html/xbflash2.html) command can be used to program new bitstreams over existing ones.
 
 ```
+lspci -d 10ee:
 xbflash --card 3:00.0 --primary PROJECT_NAME_primary.mcs --secondary PROJECT_NAME_secondary.mcs
 ```
 
