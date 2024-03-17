@@ -205,6 +205,97 @@ sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/r
 
 ![mstreg Set Flex Image Active](img/mstreg_Set_Flex_Image_Active.png)
 
+The `innova2_flex_app` Status and Image Register Defines may prove useful:
+
+![innova2_flex_app Status and Image Register Defines](img/innova2_flex_app_status_and_image_Register_Defines.png)
+
+
+### How Does the Flex Image Work?
+
+To see if the Flex and/or Factory Images alter FPGA configuration I ran [readback](https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging/Readback-and-Verify) after making changes in `innova2_flex_app`.
+
+Connect a **1.8V** [Xilinx-compatible JTAG Adapter](https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server), then Open Vivado Hardware Manager and *Add Configuration Memory Device*:
+
+![Add Configuration Memory Device](img/Add_Configuration_Memory_Device.png)
+
+Right-click and *Readback Configuration Memory Device*:
+
+![Run Readback Configuration Memory Device](img/Run_Readback_Configuration_Memory_Device.png)
+
+The Flex Image is at offset `03000000` and I read `0x1000 = 4096 bytes` as the [`BITSTREAM.CONFIG.NEXT_CONFIG_ADDR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/Golden-Image-and-MultiBoot-Image-Design-Requirements)/[`WBSTAR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/WBSTAR-Register) is at the [start of the bitstream configuration image](https://docs.amd.com/r/en-US/ug570_7Series_Config/Bitstream-Composition). The Factory Image is at `0`. There were no changes in the images after changing the settings in `innova2_flex_app`. The Factory and Flex Images do not appear to make use of a standard multiboot setup.
+
+![Readback Configuration Memory Device](img/Readback_Configuration_Memory_Device.png)
+
+However, when the Flex Image is running, [`IPROG`](https://docs.amd.com/r/en-US/ug570_7Series_Config/IPROG) has been run.
+
+![Flex Image Running Boot Status Register](img/Flex_Image_Running_Boot_Status_Register.png)
+
+That implies the Factory Image used [ICAP](https://docs.amd.com/v/u/en-US/pg134-axi-hwicap) to [run the IPROG command](https://docs.amd.com/r/en-US/ug570_7Series_Config/IPROG-Using-ICAP). The Factory and/or Flex images must be communicating with the ConnectX-5.
+
+
+#### Tracing FPGA-to-ConnectX-5 I2C Signals
+
+The [Original Constraints XDC File](https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip)([Archive](https://web.archive.org/web/20220706190318/https://docs.nvidia.com/networking/download/attachments/11995849/Verilog_VHDL_and_Xilinx_Design_Constrains.zip?api=v2&modificationDate=1554374888353&version=3)) lists I2C signals that connect the FPGA to the ConnectX-5:
+
+```
+#i2c (from ConnectX)
+set_property PACKAGE_PIN D2 [get_ports i2c_scl] 
+set_property PACKAGE_PIN D1 [get_ports i2c_sda]		
+set_property IOSTANDARD LVCMOS33 [get_ports i2c_scl]
+set_property IOSTANDARD LVCMOS33 [get_ports i2c_sda]
+```
+
+I have a `Rev.A2` board. I flattened an axial resistor with pliers and wound it around a multimeter lead so that I could get under the FPGA and try to trace the `D1-SDA` signal.
+
+![Tracing I2C Connection](img/Innova2_RevA2_Tracing_I2C_Connection.jpg)
+
+Luckily the I2C pull-up resistors are nearby.
+
+![FPGA-to-CX5 I2C Pins D1 D2](img/Innova2_RevA2_FPGA-to-CX5_I2C_D1_D2.jpg)
+
+I traced the signals to the opposite side of the board and soldered some wires so that I can capture the I2C bus data.
+
+![FPGA-to-CX5 I2C Pins Tap](img/Innova2_RevA2_FPGA-to-CX5_I2C_Tap.jpg)
+
+**TODO**: Capture the I2C bus. Do the Flex and/or Factory Images communicate with the CX5?
+
+
+
+
+## Ignoring Innova2 Flex Multiboot and innova2_flex_app
+
+If you have a JTAG adapter so that you can recover from failed bitstream writes you can ignore the Innova2 configuration system. Simply add a [Quad SPI IP Block](https://docs.amd.com/r/en-US/pg153-axi-quad-spi) to your designs and use [XRT](https://github.com/Xilinx/XRT) for configuration.
+
+Configure your project's XDMA Block to include the `M_AXI_Lite` interface:
+
+![Configure XDMA to include M_AXI_Lite](img/innova2_golden_image_XDMA-PCIe-BARs_Settings.png)
+
+Add a [Quad SPI IP Block](https://docs.amd.com/r/en-US/pg153-axi-quad-spi) block and configure it for `2` devices, *Dual Quad Mode*, `256` *FIFO Depth*, and *Use STARTUP Primitive Internal to IP*:
+
+![Configure Quad SPI Block](img/Flash_Programmer_AXI-Quad_SPI_Settings.png)
+
+Assign the block an address of `0x40000`:
+
+![AXI Lite Address Assignment](img/innova2_golden_image_AXI_Lite_Address.png)
+
+Connect `usrcclkts` to `0`. The Block Diagram should look something like the following, plus the rest of your system.
+
+![Simple XDMA Block Design with Quad SPI Programmer](img/innova2_golden_image_Basic_Block_Diagram.png)
+
+After Synthesis+Implementation write your Memory Configuration File as an `mcs` file:
+
+![Write Memory Configuration File mcs](img/Write_Memory_Configuration_File_mcs.png)
+
+Use JTAG to write your configuration image to the Innova2 initially.
+
+Subsequently, the [`xbflash`](https://xilinx.github.io/XRT/master/html/xbflash2.html) command can be used to program new bitstreams over existing ones.
+
+```
+xbflash --card 3:00.0 --primary PROJECY_NAME_primary.mcs --secondary PROJECY_NAME_secondary.mcs
+```
+
+![XRT xbflash Programming Dual QSPI](img/XRT_xbflash_Programming_Dual_QSPI.png)
+
 
 
 

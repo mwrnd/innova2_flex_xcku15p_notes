@@ -186,3 +186,12 @@ The PLL loses lock.
 
 
 
+## Innova2 MNV303212A-ADIT Hardware Notes
+
+The `MNV303611A-EDLT` has dual 100Gbps QSFP ports but no DDR4 memory or OpenCAPI connector.
+
+![MNV303611A-EDLT](../img/Innova-2_Flex_QSFP_XCKU15P_MT28808A0_MNV303611A-EDLT_Front.jpg)
+
+
+
+
