@@ -222,7 +222,7 @@ Right-click and *Readback Configuration Memory Device*:
 
 ![Run Readback Configuration Memory Device](img/Run_Readback_Configuration_Memory_Device.png)
 
-The Flex Image is at offset `03000000` and I read `0x1000 = 4096 bytes` as the [`BITSTREAM.CONFIG.NEXT_CONFIG_ADDR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/Golden-Image-and-MultiBoot-Image-Design-Requirements)/[`WBSTAR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/WBSTAR-Register) is at the [start of the bitstream configuration image](https://docs.amd.com/r/en-US/ug570_7Series_Config/Bitstream-Composition). The Factory Image is at `0`. There were no changes in the images after changing the settings in `innova2_flex_app`. The Factory and Flex Images do not appear to make use of a standard multiboot setup.
+The Flex Image is at offset `03000000` and I read `0x1000 = 4096 bytes` as [`BITSTREAM.CONFIG.NEXT_CONFIG_ADDR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/Golden-Image-and-MultiBoot-Image-Design-Requirements)/[`WBSTAR`](https://docs.amd.com/r/en-US/ug570_7Series_Config/WBSTAR-Register) is at the [start of the bitstream configuration image](https://docs.amd.com/r/en-US/ug570_7Series_Config/Bitstream-Composition). The Factory Image is at `0`. There were no changes in the images after changing the settings in `innova2_flex_app`. The Factory and Flex Images do not appear to make use of a standard multiboot setup.
 
 ![Readback Configuration Memory Device](img/Readback_Configuration_Memory_Device.png)
 
@@ -253,7 +253,7 @@ Luckily the I2C pull-up resistors are nearby.
 
 ![FPGA-to-CX5 I2C Pins D1 D2](img/Innova2_RevA2_FPGA-to-CX5_I2C_D1_D2.jpg)
 
-I traced the signals to the opposite side of the board and soldered some wires so that I can capture the I2C bus data.
+I traced the signals to test points on the opposite side of the board and soldered some wires so that I can capture the I2C bus data.
 
 ![FPGA-to-CX5 I2C Pins Tap](img/Innova2_RevA2_FPGA-to-CX5_I2C_Tap.jpg)
 
@@ -291,7 +291,7 @@ Use JTAG to write your configuration image to the Innova2 initially.
 Subsequently, the [`xbflash`](https://xilinx.github.io/XRT/master/html/xbflash2.html) command can be used to program new bitstreams over existing ones.
 
 ```
-xbflash --card 3:00.0 --primary PROJECY_NAME_primary.mcs --secondary PROJECY_NAME_secondary.mcs
+xbflash --card 3:00.0 --primary PROJECT_NAME_primary.mcs --secondary PROJECT_NAME_secondary.mcs
 ```
 
 ![XRT xbflash Programming Dual QSPI](img/XRT_xbflash_Programming_Dual_QSPI.png)
