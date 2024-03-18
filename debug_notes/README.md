@@ -282,6 +282,26 @@ Connect `usrcclkts` to `0`. The Block Diagram should look something like the fol
 
 ![Simple XDMA Block Design with Quad SPI Programmer](img/innova2_golden_image_Basic_Block_Diagram.png)
 
+Add the following to your project's constraints `.xdc` file:
+```
+# Secondary Quad SPI Configuration Flash - Bank 65
+# Primary Quad SPI Configuration Flash pins are single-purpose in STARTUPE3
+set_property PACKAGE_PIN AM12     [get_ports spi_rtl_0_io0_io]
+set_property IOSTANDARD  LVCMOS18 [get_ports spi_rtl_0_io0_io]
+set_property PACKAGE_PIN AN12     [get_ports spi_rtl_0_io1_io]
+set_property IOSTANDARD  LVCMOS18 [get_ports spi_rtl_0_io1_io]
+set_property PACKAGE_PIN AR13     [get_ports spi_rtl_0_io2_io]
+set_property IOSTANDARD  LVCMOS18 [get_ports spi_rtl_0_io2_io]
+set_property PACKAGE_PIN AR12     [get_ports spi_rtl_0_io3_io]
+set_property IOSTANDARD  LVCMOS18 [get_ports spi_rtl_0_io3_io]
+set_property PACKAGE_PIN AV11     [get_ports spi_rtl_0_ss_io]
+set_property IOSTANDARD  LVCMOS18 [get_ports spi_rtl_0_ss_io]
+
+# Differential System Clock - 100MHz - Bank 65
+set_property PACKAGE_PIN AR14        [get_ports {sys_clk_100MHz_clk_p[0]}]
+set_property IOSTANDARD  DIFF_SSTL12 [get_ports {sys_clk_100MHz_clk_p[0]}]
+```
+
 After Synthesis+Implementation write your Memory Configuration File as an `mcs` file:
 
 ![Write Memory Configuration File mcs](img/Write_Memory_Configuration_File_mcs.png)
