@@ -84,7 +84,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
 
 ## Required Materials
 
-* Innova-2 Flex
+* Innova-2 Flex SmartNIC
 * Computer with 16GB+ of RAM (preferably 32GB+ and a CPU with Integrated Graphics)
 * Cooling Solution (blower fan, large heatsink, thermal pads)
 * [Xilinx-Compatible](https://docs.xilinx.com/r/en-US/ug908-vivado-programming-debugging/JTAG-Cables-and-Devices-Supported-by-hw_server) **1.8V** [JTAG Adapter](https://www.waveshare.com/platform-cable-usb.htm)
@@ -1850,10 +1850,12 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 * SlimSAS SFF-8654 8i 85-Ohm Cable is required for OpenCAPI. A [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)) is the most reliable cable I have found.
 * [SocketDirect](https://support.mellanox.com/s/article/How-to-Work-with-Socket-Direct) is an example of OpenCAPI use.
 * The [XCKU15P is an XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
+* MNV303212A-AD**I**T and MNV303212A-AD**A**T are **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [have some caveats to their use](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/3)
+* MNV303611A-EDLT is a variant of the Innova-2 with 40GbE/100GbE QSFP connectors but **no DDR4**. Its codename is `MorseQ`
+* [MNV303212A-ADLT and MNV303611A-EDLT EOL Notice](https://network.nvidia.com/pdf/eol/LCR-000885.pdf)
+* [MNV303212A-ADIT and MNV303212A-ADAT EOL Notice](https://network.nvidia.com/pdf/eol/LCR-000437.pdf)
 * According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
-* MNV303212A-AD**I**T and MNV303212A-AD**A**T are [EOL](https://network.nvidia.com/pdf/eol/LCR-000437.pdf) **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [have some caveats to their use](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/3)
-* MNV303611A-EDLT variant of the Innova-2 has 40GbE/100GbE QSFP connectors but **no DDR4**
 * DDR4 Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) x16 Twin Die with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
 * FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
