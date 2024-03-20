@@ -305,7 +305,7 @@ Configure your project's XDMA Block to include the `M_AXI_Lite` interface:
 
 ![Configure XDMA to include M_AXI_Lite](img/innova2_golden_image_XDMA-PCIe-BARs_Settings.png)
 
-Add a [Quad SPI IP Block](https://docs.amd.com/r/en-US/pg153-axi-quad-spi) block and configure it for `2` devices, *Dual Quad Mode*, `256` *FIFO Depth*, and *Use STARTUP Primitive Internal to IP*:
+Add a [Quad SPI IP Block](https://docs.amd.com/r/en-US/pg153-axi-quad-spi) and configure it for `2` devices, *Dual Quad Mode*, `256` *FIFO Depth*, and *Use STARTUP Primitive Internal to IP*:
 
 ![Configure Quad SPI Block](img/innova2_golden_image_AXI_Quad_SPI_Settings.png)
 
@@ -343,7 +343,7 @@ After Synthesis+Implementation write your Memory Configuration File as an `mcs` 
 
 Use JTAG to write your configuration image to the Innova2 initially.
 
-Subsequently, the [`xbflash`](https://xilinx.github.io/XRT/master/html/xbflash2.html) command can be used to program new bitstreams over existing ones.
+Subsequently, the [`xbflash`](https://xilinx.github.io/XRT/master/html/xbflash2.html) command can be used to program new bitstreams over existing ones. Ubuntu and RedHat/CentOS packages of [XRT](https://www.xilinx.com/bin/public/openDownload?filename=xrt_202320.2.16.204_22.04-amd64-xrt.deb) are [available on the Getting Started pages of Alveo boards](https://www.xilinx.com/products/boards-and-kits/alveo/u200.html#gettingStarted).
 
 ```
 lspci -d 10ee:
