@@ -257,7 +257,42 @@ I traced the signals to test points on the opposite side of the board and solder
 
 ![FPGA-to-CX5 I2C Pins Tap](img/Innova2_RevA2_FPGA-to-CX5_I2C_Tap.jpg)
 
-**TODO**: Capture the I2C bus. Do the Flex and/or Factory Images communicate with the CX5?
+I then connected a [Raspberry Pi Pico](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html) programmed with [`pico_i2c_sniffer`](https://github.com/jjsch-dev/pico_i2c_sniffer/tree/804733144159d9c3b830eea70e9c6b4a23d41a67) firmware to capture I2C Bus data. To the same I2C bus I connected an [Adafruit MCP2221A Breakout Board](https://www.adafruit.com/product/4471) to be able to write data.
+
+![Innova2 RPi-Pico MCP2221A I2C Bus Data Capture](img/CX5-FPGA_I2C_Bus_Capture_Setup_RPi-Pico_MCP2221.jpg)
+
+With the Flex Image enabled, I captured the I2C Bus data during boot. The following repeats twice:
+```
+s80a00a00a00a00a00a90a00a0Cas81a00a00a00a04np
+s80a00a00a00a00a00a90a00a10as81a00a00a00a0Anp
+s80a00a00a00a00a00a90a00a00as81a00a00a00aC1np
+s80a00a00a00a00a00a90a00a04as81a27a11a20a18np
+s80a00a00a00a00a00a90a00a08as81a00a11a56a32np
+s80a00a00a00a00a00a90a00a14as81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a1Cas81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a18as81a8BaADaF0a0Dnp
+s80a8BaADaF0a0Da8BaADaF0a0Das81a00a00a00a00np
+s80a00a00a00a00a00a90a00a1Cas81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a18as81a8BaADaF0a0Dnp
+s80a8BaADaF0a0Da8BaADaF0a11as81a00a00a00a00np
+s80a00a00a00a00a00a90a00a1Cas81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a18as81a8BaADaF0a0Dnp
+s80a8BaADaF0a0Da8BaADaF0a15as81a00a00a00a00np
+s80a00a00a00a00a00a90a00a20as81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a24as81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a28as81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a2Cas81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a30as81a8BaADaF0a0Dnp
+s80a00a00a00a00a00a90a00a34as81a8BaADaF0a0Dnp
+```
+
+![I2C Bus Capture During Boot of Flex Image](img/I2C_Bus_Capture_During_Boot_of_Flex_Image.png)
+
+The I2C communication happens when the `mlx5_core` driver is being loaded by Linux. Using the [MCP2221A](https://www.adafruit.com/product/4471) and [EasyMCP2221](https://github.com/electronicayciencia/EasyMCP2221/tree/0f1eeb624ec45f94200ed80abcf4d99792d2eb9d) I was able to reproduce the same communication sequence with [`cx5i2c.py`](cx5i2c.py). Before using EasyMCP2221, run `sudo rmmod hid_mcp2221` as it causes conflicts.
+
+![cx5i2c.py I2C Bus Data](img/gtkterm_cx5i2c_py_run.png)
+
+**TODO**: Implement an FPGA design that behaves the same way on the I2C bus.
 
 
 
@@ -272,7 +307,7 @@ Configure your project's XDMA Block to include the `M_AXI_Lite` interface:
 
 Add a [Quad SPI IP Block](https://docs.amd.com/r/en-US/pg153-axi-quad-spi) block and configure it for `2` devices, *Dual Quad Mode*, `256` *FIFO Depth*, and *Use STARTUP Primitive Internal to IP*:
 
-![Configure Quad SPI Block](img/Flash_Programmer_AXI-Quad_SPI_Settings.png)
+![Configure Quad SPI Block](img/innova2_golden_image_AXI_Quad_SPI_Settings.png)
 
 Assign the block an address of `0x40000`:
 
