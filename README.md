@@ -295,7 +295,7 @@ sudo /etc/init.d/openibd restart
 sudo reboot
 ```
 
-![MLNX OFED Install Successful](img/Mellanox_OFED_Install_Successful.png)
+![MLNX OFED Install Successful](img/Mellanox_OFED_Install_Successful.jpg)
 
 `apt-mark hold` should prevent `apt` from updating any of the packages installed by `MLNX_OFED`.
 ```Shell
@@ -588,7 +588,7 @@ If you have decided to install full Vivado, select Vitis (which will include Viv
 
 Refer to the [Vivado Release Notes](https://www.xilinx.com/content/dam/xilinx/support/documents/sw_manuals/xilinx2021_2/ug973-vivado-release-notes-install-license.pdf) for more info. You will also need to obtain a Vivado License, such as an [Evaluation License](https://www.xilinx.com/getlicense.html).
 
-![Vivado Install Options](img/Vivado_Install_Options.png)
+![Vivado Install Options](img/Vivado_Install_Options.jpg)
 
 Run the following commands individually.
 ```Shell
@@ -1054,7 +1054,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 sudo reboot
 ```
 
-![Disable JTAG Access](img/Disable_JTAG_Access.png)
+![Disable JTAG Access](img/Disable_JTAG_Access.jpg)
 
 ### Loading a User Image
 
@@ -1387,7 +1387,7 @@ Shut down your Innova2 system and unplug power, wait a minute, then power the sy
 
 The *Factory Image* (FLASH IC Address `0x00000000`) is *Running* even though the *Flex Image* (FLASH IC Address `0x03000000`) is the *Scheduled* image. This implies there is a fault with the *Flex Image*, or it was overwritten, or a *User Image* was written to address `0x00000000` by mistake, instead of `0x01000000`. The Innova2 Flex App will **not** be able to program a *User Image* into the FPGA Configuration Memory.
 
-![Factory Image is Running](img/Factory_Image_Running.png)
+![Factory Image is Running](img/Factory_Image_Running.jpg)
 
 [Enable JTAG Access](#enable-jtag-access-to-the-xcku15p) and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
 
@@ -1592,7 +1592,7 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 
 `xsdb` then works:
 
-![xsdb successful program download](img/xsdb_successful_program_download.png)
+![xsdb successful program download](img/xsdb_successful_program_download.jpg)
 
 
 ### Nothing Seems to Work
