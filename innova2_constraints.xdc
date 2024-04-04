@@ -1,12 +1,12 @@
 
 # Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC MNV303212A-ADLT
-# Kintex Ultrascale+ xcku15p-ffve1517-2-i
+# Kintex UltraScale+ xcku15p-ffve1517-2-i
 # https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/
 
 
 
 
-# LEDs - A6=D19, B6=D18 - A6 and B6 are in Bank 90
+# LEDs - LED_D18=Pin_B6, LED_D19=Pin_A6 - Bank 90
 
 set_property PACKAGE_PIN A6 [get_ports {GPIO_0_tri_o[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO_0_tri_o[0]}]
@@ -28,7 +28,7 @@ set_property OFFCHIP_TERM NONE [get_ports {Dout_0[0]}]
 # GTY Quad 128 == Quad_X0Y1
 # AD36=MGTYRXP0=CHANNEL_X0Y4, AC38=MGTYRXP1=CHANNEL_X0Y5,
 # AB36=MGTYRXP2=CHANNEL_X0Y6, AA38=MGTYRXP3=CHANNEL_X0Y7
-
+#
 set_property PACKAGE_PIN AA38 [get_ports {pcie_7x_mgt_rtl_0_rxp[7]}]
 set_property PACKAGE_PIN AB36 [get_ports {pcie_7x_mgt_rtl_0_rxp[6]}]
 set_property PACKAGE_PIN AC38 [get_ports {pcie_7x_mgt_rtl_0_rxp[5]}]
@@ -38,7 +38,7 @@ set_property PACKAGE_PIN AF36 [get_ports {pcie_7x_mgt_rtl_0_rxp[2]}]
 set_property PACKAGE_PIN AG38 [get_ports {pcie_7x_mgt_rtl_0_rxp[1]}]
 set_property PACKAGE_PIN AH36 [get_ports {pcie_7x_mgt_rtl_0_rxp[0]}]
 
-# PCIe Clock - AB27 is MGTREFCLK0 in GTY Quad/Bank 128 - X0Y1
+# PCIe Clock - AB27 is MGTREFCLK0 in GTY Quad/Bank 128 (Quad_X0Y1)
 set_property PACKAGE_PIN AB27 [get_ports {diff_clock_rtl_0_clk_p[0]}]
 create_clock -name sys_clk -period 10.000 [get_ports diff_clock_rtl_0_clk_p]
 
@@ -62,7 +62,7 @@ set_false_path -from [get_ports reset_rtl_0]
 # H36=MGTYRXP0=CHANNEL_X0Y20, G38=MGTYRXP1=CHANNEL_X0Y21,
 # E38=MGTYRXP2=CHANNEL_X0Y22, C38=MGTYRXP3=CHANNEL_X0Y23
 # P27=MGTREFCLK0_P, N29=MGTREFCLK1_P
-
+#
 #set_property PACKAGE_PIN M36 [get_ports {pcie_7x_mgt_rtl_0_rxp[0]}]
 #set_property PACKAGE_PIN L38 [get_ports {pcie_7x_mgt_rtl_0_rxp[1]}]
 #set_property PACKAGE_PIN K36 [get_ports {pcie_7x_mgt_rtl_0_rxp[2]}]
@@ -73,11 +73,11 @@ set_false_path -from [get_ports reset_rtl_0]
 #set_property PACKAGE_PIN C38 [get_ports {pcie_7x_mgt_rtl_0_rxp[7]}]
 
 # OpenCAPI Clock Pins T27 and P27 are connected together
-# OpenCAPI - Clock - T27 is MGTREFCLK0 in GTY_Quad/Bank 131 - X0Y4
+# OpenCAPI - Clock - T27 is MGTREFCLK0 in GTY_Quad/Bank 131 (Quad_X0Y4)
 #set_property PACKAGE_PIN T27 [get_ports diff_clock_rtl_1_clk_p]
 #create_clock -name gty_clk1 -period 10.000 [get_ports diff_clock_rtl_1_clk_p]
 
-# OpenCAPI - Clock - P27 is MGTREFCLK0 in GTY_Quad/Bank 132 - X0Y5
+# OpenCAPI - Clock - P27 is MGTREFCLK0 in GTY_Quad/Bank 132 (Quad_X0Y5)
 #set_property PACKAGE_PIN P27 [get_ports diff_clock_rtl_1_clk_p]
 #create_clock -name gty_clk1 -period 10.000 [get_ports diff_clock_rtl_1_clk_p]
 
@@ -86,6 +86,20 @@ set_false_path -from [get_ports reset_rtl_0]
 #set_property IOSTANDARD LVCMOS33 [get_ports reset_rtl_0]
 #set_property PULLUP true [get_ports reset_rtl_0]
 #set_false_path -from [get_ports reset_rtl_0]
+
+
+
+
+# OpenCAPI IIC (I2C) - C2=SCL, B2=SDA - Bank 90
+set_property PACKAGE_PIN C2 [get_ports iic_rtl_0_scl_io]
+set_property IOSTANDARD LVCMOS33 [get_ports iic_rtl_0_scl_io]
+set_property OFFCHIP_TERM NONE [get_ports iic_rtl_0_scl_io]
+#set_property PULLTYPE PULLUP [get_ports iic_rtl_0_scl_io]
+
+set_property PACKAGE_PIN B2 [get_ports iic_rtl_0_sda_io]
+set_property IOSTANDARD LVCMOS33 [get_ports iic_rtl_0_sda_io]
+set_property OFFCHIP_TERM NONE [get_ports iic_rtl_0_sda_io]
+#set_property PULLTYPE PULLUP [get_ports iic_rtl_0_sda_io]
 
 
 
@@ -145,6 +159,11 @@ set_property PACKAGE_PIN AT24 [get_ports {ddr4_rtl_0_ba[0]}]
 set_property PACKAGE_PIN AU23 [get_ports {ddr4_rtl_0_ba[1]}]
 set_property PACKAGE_PIN AV23 [get_ports {ddr4_rtl_0_bg[0]}]
 set_property PACKAGE_PIN AT27 [get_ports {ddr4_rtl_0_bg[1]}]
+
+# Unused
+#set_property PACKAGE_PIN AR23 [get_ports ddr4_rtl_0_alert_n]
+#set_property PACKAGE_PIN AJ23 [get_ports ddr4_rtl_0_par]
+
 
 # DDR4 Address Pins - Bank 66
 set_property PACKAGE_PIN AN23 [get_ports {ddr4_rtl_0_adr[0]}]
@@ -309,7 +328,30 @@ set_property PACKAGE_PIN AH33 [get_ports {ddr4_rtl_0_dq[71]}]
 
 
 
-# Memory Configuration File Settings
+# Secondary Quad SPI Configuration Flash - Bank 65
+# Primary Quad SPI Configuration Flash pins are single-purpose in STARTUPE3
+set_property PACKAGE_PIN AM12    [get_ports spi_rtl_0_io0_io]
+set_property IOSTANDARD LVCMOS18 [get_ports spi_rtl_0_io0_io]
+set_property PACKAGE_PIN AN12    [get_ports spi_rtl_0_io1_io]
+set_property IOSTANDARD LVCMOS18 [get_ports spi_rtl_0_io1_io]
+set_property PACKAGE_PIN AR13    [get_ports spi_rtl_0_io2_io]
+set_property IOSTANDARD LVCMOS18 [get_ports spi_rtl_0_io2_io]
+set_property PACKAGE_PIN AR12    [get_ports spi_rtl_0_io3_io]
+set_property IOSTANDARD LVCMOS18 [get_ports spi_rtl_0_io3_io]
+set_property PACKAGE_PIN AV11    [get_ports spi_rtl_0_ss_io]
+set_property IOSTANDARD LVCMOS18 [get_ports spi_rtl_0_ss_io]
+
+
+
+
+# I2C to ConnectX-5 - Bank 90
+set_property PACKAGE_PIN D1 [get_ports iic_rtl_0_sda_io]
+set_property PACKAGE_PIN D2 [get_ports iic_rtl_0_scl_io]
+set_property IOSTANDARD LVCMOS33 [get_ports iic_rtl_0_scl_io]
+set_property IOSTANDARD LVCMOS33 [get_ports iic_rtl_0_sda_io]
+
+
+
 
 # Memory Configuration File Settings
 set_property CONFIG_MODE SPIx8 [current_design]
@@ -326,5 +368,6 @@ set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
 set_property BITSTREAM.CONFIG.UNUSEDPIN PULLUP [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 set_property BITSTREAM.GENERAL.CRC ENABLE [current_design]
-set_property BITSTREAM.GENERAL.JTAG_SYSMON ENABLE [current_design]
+set_property BITSTREAM.GENERAL.JTAG_SYSMON DISABLE [current_design]
+
 

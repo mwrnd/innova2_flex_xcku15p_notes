@@ -175,7 +175,7 @@ sudo ./mstreg --yes --device 04:00.0 --adb_file /usr/share/mft/prm_dbs/hca/ext/r
 
 The [FPGA Configuration Memory Layout](https://docs.nvidia.com/networking/display/innova2flex/using+the+mellanox+innova-2+flex+open+bundle#src-11995976_UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) allows for 3 configuration bitstreams, *Factory*, *User*, and *Flex*.
 
-![FPGA Configuration Memory Layout](../img/FPGA_Configuration_Memory_Layout.png)
+![FPGA Configuration Memory Layout](../img/FPGA_Configuration_Memory_Layout.jpg)
 
 When the User Image is scheduled using `innova2_flex_app` under *MLNX_OFED 5.2*, `0x00030000` is written to word `0` of the control register `0x4023`.
 
@@ -292,7 +292,20 @@ The I2C communication happens when the `mlx5_core` driver is being loaded by Lin
 
 ![cx5i2c.py I2C Bus Data](img/gtkterm_cx5i2c_py_run.png)
 
-**TODO**: Implement an FPGA design that behaves the same way on the I2C bus.
+[`flex_image_attempt`](https://github.com/mwrnd/innova2_experiments/tree/main/flex_image_attempt) is my attempt at recreating the functionality of the Innova-2 Flex Image. Unfortunately the *MLNX_OFED 5.2* driver does not recognize my attempt. I am missing some key insight into how the Flex Image is implemented.
+
+I dumped the state of all pins using [UrJTAG](https://github.com/mwrnd/innova2_flex_xcku15p_notes?tab=readme-ov-file#begin-a-urjtag-session) and the [`getionotddr4`](../getionotddr4) script while the User and Flex Images were running. Pin `F1` consistently changes state. I have found it is `1` when the User Image is running and `0` when the Flex Image is running. I was unable to make use of this fact. The I2C communication happens during loading of the *MLNX_OFED* driver but the decision as to which image to boot must be made right after the [FPGA configuration image is loaded](https://docs.amd.com/r/en-US/ug570_7Series_Config/MultiBoot-and-Reconfiguration).
+```
+cable xpc_ext
+detect
+print chain
+part 0
+include /home/user/getionotddr4
+```
+
+![urJTAG ](img/Using_UrJTAG_On_Possible_User-Flex_Pins.png)
+
+[MLNX_OFED](https://network.nvidia.com/products/infiniband-drivers/linux/mlnx_ofed/) > `5.2` [does not support the Innova-2](https://forums.developer.nvidia.com/t/innova-2-mlnx-ofed-5-2-has-no-mlx5-fpga-tools-so-innova2-flex-app-fails/285008) so the solution is to use your own programming infrastructure as in the following.
 
 
 
@@ -360,6 +373,19 @@ xbflash --card 3:00.0 --primary PROJECT_NAME_primary.mcs --secondary PROJECT_NAM
 ![Partial Tracing of OpenCAPI Signals](img/Innova2_ADLT_OpenCAPI_Partial_Pinout.jpg)
 
 ![Back of Board](img/Innova2_ADLT_OpenCAPI_Back_of_Board.jpg)
+
+
+
+
+## Debug JTAG Components
+
+Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
+
+![SC70 MOSFET with MXX Marking](../img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.jpg)
+
+It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Channel MOSFET.
+
+![SC70 MOSFET with MXX Marking](../img/DMN63D8LW-7_MXX-Marking.jpg)
 
 
 

@@ -928,7 +928,7 @@ Results should approach about 23Gbits/sec as there is some overhead. Change the 
 
 In order for `innova2_flex_app` to program a User Image into the FPGA's configuration memory it must communicate with the Flex Image running in the FPGA. The Flex and Factory Images must get into FPGA Configuration Memory and reproduce the Memory Layout as pictured below. The `innova2_flex_app` is faster at programming a User Image than JTAG as the Flex Image provides a PCIe interface to the FPGA's Configuration Memory FLASH ICs. Refer to the [Innova-2 User Guide](https://docs.nvidia.com/networking/display/Innova2Flex/Using+the+Mellanox+Innova-2+Flex+Open+Bundle#UsingtheMellanoxInnova2FlexOpenBundle-FlashFormat) for more info.
 
-![FPGA Configuration Memory Layout](img/FPGA_Configuration_Memory_Layout.png)
+![FPGA Configuration Memory Layout](img/FPGA_Configuration_Memory_Layout.jpg)
 
 
 #### Enable JTAG Access to the XCKU15P
@@ -1562,6 +1562,11 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ![Enable JTAG Access](img/Enable_JTAG_Access.png)
 
 
+### Board Works But Not JTAG
+
+Confirm your JTAG Adapter works by trying it with a different FPGA board. Confirm it operates at **1.8V**. The ConnectX-5 interacts with the FPGA's JTAG pins so [try enabling JTAG](#jtag-programming-failure). If you suspect a hardware fault, I found some [JTAG-related components](https://github.com/mwrnd/innova2_flex_xcku15p_notes/tree/main/debug_notes#debug-jtag-components).
+
+
 ### innova2_flex_app stuck on Erasing Flash
 
 `innova2_flex_app` will get stuck on `Erasing flash ( 0%)` if a JTAG Adapter has not released control of JTAG signals. Disconnect the JTAG Adapter from USB and perform a cold reboot of the Innova-2 system.
@@ -1590,20 +1595,9 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 ![xsdb successful program download](img/xsdb_successful_program_download.png)
 
 
-### Board Works But Not JTAG
-
-Everything but JTAG was working so I began by trying to trace out all the JTAG connections. That went nowhere so I switched my multimeter to Diode Mode and tested all two and three terminal components. Two SC70 components marked *MXX*, U41 and U49, gave significantly different values. I replaced the part with larger readings with the same part from a different board and JTAG began working! Aside from the 10k resistor, the resistance values in the diagram are measured to labeled test points on the board.
-
-![SC70 MOSFET with MXX Marking](img/MOSFET_U41_U49_MXX_Marking_DMN63D8LW.jpg)
-
-It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Channel MOSFET.
-
-![SC70 MOSFET with MXX Marking](img/DMN63D8LW-7_MXX-Marking.jpg)
-
-
 ### Nothing Seems to Work
 
-While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse F1 with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) Fast 1206 10A SMT fuse and the board was saved. I got lucky. A blown fuse is either a simple fix or a sign of catastrophic failure.
+While testing voltages next to the SFP connectors on a powered board my multimeter lead slipped and I shorted the 12V rail. I replaced fuse *F1* with a [Bel Fuse 0685P9100-01](https://belfuse.com/resources/datasheets/circuitprotection/ds-cp-0685p-series.pdf) Fast 1206 10A SMT fuse and the board was saved. I got lucky. A blown fuse is either a simple fix or a sign of catastrophic failure.
 
 ![1206 Fuse F1](img/Fuse_1206_F1.jpg)
 
@@ -1850,14 +1844,14 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 * SlimSAS SFF-8654 8i 85-Ohm Cable is required for OpenCAPI. A [3M 8ES8-1DF21 Cable](https://www.trustedparts.com/en/search/8ES8-1DF21)([Datasheet](https://multimedia.3m.com/mws/media/1398233O/3m-slimline-twin-ax-assembly-sff-8654-x8-30awg-78-5100-2665-8.pdf)) is the most reliable cable I have found.
 * [SocketDirect](https://support.mellanox.com/s/article/How-to-Work-with-Socket-Direct) is an example of OpenCAPI use.
 * The [XCKU15P is an XCZU19 with its Processing System (PS) disabled](https://en.wikipedia.org/w/index.php?title=List_of_Xilinx_FPGAs&oldid=1129244401#UltraScale_and_UltraScale+)
+* DDR4 Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) x16 Twin Die with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
+* FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
 * MNV303212A-AD**I**T and MNV303212A-AD**A**T are **4GB** ([D9TBK FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9TBK#pnlFBGA)) variants of the Innova-2 which [have some caveats to their use](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/3)
-* MNV303611A-EDLT is a variant of the Innova-2 with 40GbE/100GbE QSFP connectors but **no DDR4**. Its codename is `MorseQ`
+* MNV303611A-EDLT is a variant of the Innova-2 with 40GbE/100GbE QSFP connectors but **no DDR4**. Its codename is `MorseQ`.
 * [MNV303212A-ADLT and MNV303611A-EDLT EOL Notice](https://network.nvidia.com/pdf/eol/LCR-000885.pdf)
 * [MNV303212A-ADIT and MNV303212A-ADAT EOL Notice](https://network.nvidia.com/pdf/eol/LCR-000437.pdf)
 * According to the [FCC](https://fccid.io/RR-MLN-NV303212A) the board may also be labeled with: RR-MLN-NV303212A 01PG974 SN37A28065 SN37A48123 01FT833 MNV303212A-ADAT_C18 MNV303212A-ADLS NV303212A
 * I have also seen the Innova-2 labeled: Innova-2 Flex VPI - IBM 01FT833_Ax - MNV303212A-ADIT - MNV303212A-ADAT - MNV303212A-ADL_Ax - DP/N 0NMD3R - NMD3R - FRU PN: 01PG974
-* DDR4 Memory ICS are [MT40A1G16KNR-075](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr4/ddr4_16gb_x16_1cs_twindie.pdf) x16 Twin Die with **D9WFR** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=D9WFR#pnlFBGA)
-* FPGA Configuration is stored in paired [MT25QU512](https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/serial-nor/mt25q/die-rev-b/mt25q_qlkt_u_512_abb_0.pdf) FLASH ICs with **RW193** [FBGA Code](https://www.micron.com/support/tools-and-utilities/fbga?fbga=RW193#pnlFBGA)
 * If trying to improve PCIe DMA communication on server class systems with 64GB+ of RAM, explore [hugepages](https://wiki.debian.org/Hugepages) support from the [Linux Kernel](https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt)
 * [Mipsology's Zebra AI Accelerator](https://www.globenewswire.com/en/news-release/2018/11/08/1648425/0/en/Mipsology-Delivers-Deep-Learning-Inference-at-20X-Speedup-versus-Midrange-Xeon-CPU-Leveraging-Mellanox-SmartNIC-Adapters.html) used to be based on the Innova-2
 * A team associated with [Nvidia Networking](https://developer.nvidia.com/networking/ethernet-adapters) has the [FlexDriver](https://haggaie.github.io/files/flexdriver-preprint-asplos22.pdf) project which can supposedly do direct NIC-to-FPGA data processing via PCIe Peer-to-Peer. Unfortunately, this is a [Proprietary Feature](https://github.com/acsl-technion/flexdriver-iot-auth/issues/1). Refer to [Issue #1](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/1) for any progress with this functionality.
