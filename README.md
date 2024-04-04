@@ -116,7 +116,7 @@ Begin by updating and upgrading your [Ubuntu 20.04.4 Desktop amd64](https://rele
 sudo apt-get update  ;  sudo apt-get upgrade
 ```
 
-![apt update apt upgrade](img/apt_update_upgrade.png)
+![apt update apt upgrade](img/apt_update_upgrade.jpg)
 
 Install Linux Kernel `5.8.0-43-generic` which is the latest kernel I have found to work.
 ```Shell
@@ -377,7 +377,7 @@ echo "dpdk_conf.set('RTE_MAX_VFIO_GROUPS', 256)"  >>config/meson.build
 #define RTE_LIBRTE_QDMA_DEBUG_DRIVER 1
 ```
 
-![edit rte_config.h](img/editing_rte_config_h.png)
+![edit rte_config.h](img/editing_rte_config_h.jpg)
 
 
 `gedit usertools/dpdk-devbind.py` and add Xilinx QDMA Vendor and Device IDs amongst similar vendor definitions in `dpdk-devbind.py`:
@@ -1088,7 +1088,7 @@ After rebooting the Flex Image should be active. Look for `Class 2000: Mellanox 
 lspci | grep -i Mellanox
 ```
 
-![lspci Innova-2 Flex Burn Image](img/lspci_Innova-2_Flex_Burn_Image.png)
+![lspci Innova-2 Flex Burn Image](img/lspci_Innova-2_Flex_Burn_Image.jpg)
 
 Start MST and load FPGA Tool modules.
 ```Shell
@@ -1559,7 +1559,7 @@ cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
 
-![Enable JTAG Access](img/Enable_JTAG_Access.png)
+![Enable JTAG Access](img/Enable_JTAG_Access.jpg)
 
 
 ### Board Works But Not JTAG
