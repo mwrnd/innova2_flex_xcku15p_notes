@@ -408,7 +408,7 @@ to
 network_devices = [network_class, cavium_pkx, avp_vnic, ifpga_class, xilinx_qdma_pf, xilinx_qdma_vf]
 ```
 
-![edit dpdk-devbind.py](img/editing_dpdk-devbind_py.png)
+![edit dpdk-devbind.py](img/editing_dpdk-devbind_py.jpg)
 
 
 Build DPDK:
@@ -484,7 +484,7 @@ Above should produce output similar to:
    Cause: No Ethernet devices found. Try updating the FPGA image.
 ```
 
-![QDMA testapp runs](img/qdma_testapp-shared_runs_successfully.png)
+![QDMA testapp runs](img/qdma_testapp-shared_runs_successfully.jpg)
 
 
 #### Generate Personal Signing Key
@@ -730,7 +730,7 @@ sudo mst status
 sudo flint --device /dev/mst/mt525_pciconf0 query
 ```
 
-![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.png)
+![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.jpg)
 
 Save a copy of the current FLASH IC firmware then program the ConnectX-5 firmare using `mstflint`. The device name is the PCI address from `lspci -vnn`
 ```
@@ -767,7 +767,7 @@ Program the ConnectX-5 firmare a second time using `mstflint`'s Write Image comm
 sudo mstflint --allow_rom_change  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
 ```
 
-![Update ConnectX-5 Firmware Using mstflint](img/mstflint_Update_Firmware.png)
+![Update ConnectX-5 Firmware Using mstflint](img/mstflint_Update_Firmware.jpg)
 
 Power cycle the Innova-2 system. Completely power off, wait 15 seconds, then power back on. Confirm the ConnectX-5 firmware has been updated.
 
@@ -835,7 +835,7 @@ Confirm FLASH IC reads are sensible. Notice the `ab cd ef 00 fa de 12 34 56 78 d
 od -A x -t x1z -v W25Q128save.bin  |  head
 ```
 
-![confirm flashrom reads are sensible](img/Confirm_flashrom_Reads_are_Sensible.png)
+![confirm flashrom reads are sensible](img/Confirm_flashrom_Reads_are_Sensible.jpg)
 
 If `flashrom` successfully detected the `W25Q128.V` and reads are consistent, then the requirement for sensible reads is a judgement call on your part.
 
@@ -869,7 +869,7 @@ sudo mlxfwreset --device /dev/mst/mt4119_pciconf0 reset
 sudo flint --device /dev/mst/mt4119_pciconf0 query
 ```
 
-![flint set GUID MAC](img/flint_set_GUID_and_MAC.png)
+![flint set GUID MAC](img/flint_set_GUID_and_MAC.jpg)
 
 Power down and restart your system.
 
@@ -886,7 +886,7 @@ sudo mst cable add
 sudo mlxcables
 ```
 
-![mlxcables](img/mlxcables.png)
+![mlxcables](img/mlxcables.jpg)
 
 The Innova-2 interfaces show up as `enp4s0f0` and `enp4s0f1` or similar.
 ```Shell
@@ -948,11 +948,11 @@ cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
 
-![Flex Image Version](img/Flex_Image_Version.png)
+![Flex Image Version](img/Flex_Image_Version.jpg)
 
 If the FPGA Image is *NOT* Version `0xc1`, choose option `10`-enter to enable JTAG then `99`-enter to exit.
 
-![Enable JTAG](img/Enable_JTAG_Access.png)
+![Enable JTAG](img/Enable_JTAG_Access.jpg)
 
 
 
@@ -1032,7 +1032,7 @@ Select `mt25qu512-spi-x1_x2_x4_x8`.
 
 Program the complete memory images.
 
-![Program Complete Memory Image](img/Program_Complete_Memory_Image.png)
+![Program Complete Memory Image](img/Program_Complete_Memory_Image.jpg)
 
 Once programming finishes, which can take hours, power everything down and disconnect the JTAG adapter.
 
@@ -1066,7 +1066,7 @@ These instructions include a link to a bitstream for a working demo. Otherwise, 
 
 Select *bin*, *mt25qu512_x1_x2_x4_x8*, *SPIx8*, *Load bitstream files*, and a location and name for the output binary files. The bitstream will end up, for example, in the `DESIGN_NAME/DESIGN_NAME.runs/impl_1` subdirectory as `SOMETHING.bit`. Vivado will add the `_primary.bin` and `_secondary.bin` extensions as the Innova-2 uses dual MT25QU512 FLASH ICs in x8 for high speed programming.
 
-![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.png)
+![Vivado Write Memory Configuration File](img/Vivado_Write_Memory_Configuration_File.jpg)
 
 Before using `innova2_flex_app` for programming, **disconnect any JTAG adapter** (unplug its USB cable).
 
@@ -1116,7 +1116,7 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v \
   -b innova2_xdma_demo_secondary.bin,1
 ```
 
-![Program Innova-2 User Image](img/Program_User_Image.png)
+![Program Innova-2 User Image](img/Program_User_Image.jpg)
 
 Reboot your system.
 ```
@@ -1362,7 +1362,7 @@ sudo ./mlxup --version
 sudo ./mlxup
 ```
 
-![mlxup](img/mlxup.png)
+![mlxup](img/mlxup.jpg)
 
 The latest firmware [directy downloadable](http://www.mellanox.com/downloads/firmware/fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip) from Nvidia/Mellanox is **16.26.4012** which is older than the version included with `mlxup 4.15.2`
 
@@ -1391,14 +1391,14 @@ The *Factory Image* (FLASH IC Address `0x00000000`) is *Running* even though the
 
 [Enable JTAG Access](#enable-jtag-access-to-the-xcku15p) and [program the FPGA Configuration Memory to factory default](#programming-the-fpga).
 
-![Factory Image Running](img/Factory_Image_Running_Enable_JTAG.png)
+![Factory Image Running](img/Factory_Image_Running_Enable_JTAG.jpg)
 
 
 ### Innova2 Flex App Will Not Program
 
 Confirm the ConnectX and BOPE Devices are present when running `innova2_flex_app -v`.
 
-![ConnectX and BOPE Devices Present](img/innova2_flex_app_ConnectX_and_BOPE_Devices.png)
+![ConnectX and BOPE Devices Present](img/innova2_flex_app_ConnectX_and_BOPE_Devices.jpg	)
 
 The ConnectX device is created by running `insmod /usr/lib/modules/5.8.0-43-generic/updates/dkms/mlx5_fpga_tools.ko`
 
@@ -1475,7 +1475,7 @@ Jump-to-Innova2-User menu
 Your choice: 99
 ```
 
-![insmod mlx5_fpga_tools](img/innova2_insmod_mlx5_fpga_tools_adds_ConnectX_Device.png)
+![insmod mlx5_fpga_tools](img/innova2_insmod_mlx5_fpga_tools_adds_ConnectX_Device.jpg)
 
 The `make_device` utility creates the BOPE device:
 
@@ -1514,7 +1514,7 @@ Burn-Diagnostics menu
 Your choice: 99
 ```
 
-![innova2 make_device adds BOPE Device](img/innova2_make_device_adds_BOPE_Device.png)
+![innova2 make_device adds BOPE Device](img/innova2_make_device_adds_BOPE_Device.jpg)
 
 Once both BOPE and ConnectX devices exist and the `Flex Image` is the Active Image, you can run `innova2_flex_app` with appropriate `-b` commands to [program a design into the FPGA](#loading-a-user-image). Note the `_primary.bin,0` and `_secondary.bin,1`. Choose option `6`-enter to program the design, then `7`-enter to set the User Image as active, then `99`-enter to exit.
 ```Shell
@@ -1588,7 +1588,7 @@ xsdb% Info: Hart #0 (target 3) Running (FPGA reprogrammed, wait for debugger res
 
 *JTAG Access* must be enabled before attempting to download programs to a Soft Processor Core in the FPGA using JTAG. `3`-Enter then `99`-Enter in `innova2_flex_app`.
 
-![Enable Innova-2 JTAG Access](img/enable_innova2_JTAG_access.png)
+![Enable Innova-2 JTAG Access](img/enable_innova2_JTAG_access.jpg)
 
 `xsdb` then works:
 
@@ -1610,7 +1610,7 @@ The board is well designed with all voltage rails exposed on test points. Carefu
 
 If you are experiencing PCIe communication problems, flip this setting in your BIOS.
 
-![Enable Resizable BAR Support](img/Enable_Re-Size_BAR_Support.png)
+![Enable Resizable BAR Support](img/Enable_Re-Size_BAR_Support.jpg)
 
 ### Disable or Enable Above-4G Memory Decoding
 
@@ -1673,7 +1673,7 @@ cd ~
 sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 ```
 
-![Enable JTAG on the Innova-2](img/UrJTAG_Enable_JTAG_on_Innova2_Flex.png)
+![Enable JTAG on the Innova-2](img/UrJTAG_Enable_JTAG_on_Innova2_Flex.jpg)
 
 #### Disconnect the Innova-2 FPGA from the PCIe Bridge
 
@@ -1682,14 +1682,14 @@ sudo ~/Innova_2_Flex_Open_18_12/app/innova2_flex_app -v
 sudo setpci  -s 02:08.0  0x70.w=0x50
 ```
 
-![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_FPGA_from_PCIe_Bridge.png)
+![Disconnect FPGA from PCIe Bridge](img/setpci_Disconnect_FPGA_from_PCIe_Bridge.jpg)
 
 It can later be re-enabled with the following command or a cold reboot.
 ```Shell
 sudo setpci  -s 02:08.0  0x70.w=0x40
 ```
 
-![Disconnect FPGA from PCIe Bridge](img/setpci_Reconnect_FPGA_to_PCIe_Bridge.png)
+![Disconnect FPGA from PCIe Bridge](img/setpci_Reconnect_FPGA_to_PCIe_Bridge.jpg)
 
 
 #### Allow Vivado to Update Platform Cable USB II Firmware
@@ -1761,7 +1761,7 @@ exit
 
 `quit` exits UrJTAG
 
-![UrJTAG Session](img/UrJTAG_Session.png)
+![UrJTAG Session](img/UrJTAG_Session.jpg)
 
 
 
@@ -1789,7 +1789,7 @@ If all goes well your design will meet timing requirements:
 
 Taken from [ug575 UltraScale+ Device Packaging Pinouts](https://docs.xilinx.com/r/en-US/ug575-ultrascale-pkg-pinout).
 
-![XCKU15P FFVE1517 Banks](img/XCKU15P_FFVE1517_Banks.png)
+![XCKU15P FFVE1517 Banks](img/XCKU15P_FFVE1517_Banks.jpg)
 
 PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y0`-to-`X0Y7`. OpenCAPI connections are on Quads 131 and 132 which are [GTY Transceivers](https://www.xilinx.com/support/documentation-navigation/design-hubs/dh0085-ultrascale-gty-tabbed-hub.html) `X0Y16`-to-`X0Y23`.
 
@@ -1811,15 +1811,15 @@ LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of th
 
 `dmesg | grep -i xdma` will show you whether the Xilinx XDMA driver from *dma_ip_drivers* successully loaded for a PCIe-based FPGA design.
 
-![dmesg grep xdma](img/dmesg_xdma.png)
+![dmesg grep xdma](img/dmesg_xdma.jpg)
 
 `dmesg | grep -i mlx` will show you whether the Mellanox OFED drivers successully loaded for the ConnectX-5.
 
-![dmesg grep mlx](img/dmesg_mlx.png)
+![dmesg grep mlx](img/dmesg_mlx.jpg)
 
 `sudo lspci -tv | grep "Mellanox\|Xilinx"` displays a tree view of the PCIe bus.
 
-![lspci tree view](img/lspci_tree_view_Mellanox_and_Xilinx.png)
+![lspci tree view](img/lspci_tree_view_Mellanox_and_Xilinx.jpg)
 
 
 
