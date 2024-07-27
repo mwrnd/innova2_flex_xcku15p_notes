@@ -387,6 +387,18 @@ It is a [DMN63D8LW](https://www.diodes.com/assets/Datasheets/DMN63D8LW.pdf) N-Ch
 
 ![SC70 MOSFET with MXX Marking](../img/DMN63D8LW-7_MXX-Marking.jpg)
 
+With a multimeter in Diode Mode:
+
+![Multimeter in Diode Mode](img/Multimeter_in_Diode_Mode.jpg)
+
+I measured the transistors:
+
+![Measuring the U41 U49 Transistors](img/Measuring_U41.jpg)
+
+I measured approximately the following values on an unplugged/unpowered (out-of-system) board:
+
+![U41 U49 Transistor Measurements](img/DiodeMode_Measurements_of_U41_U49.jpg)
+
 
 
 
