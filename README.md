@@ -29,6 +29,7 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
          * [Programming the ConnectX5 FLASH IC](#programming-the-connectx5-flash-ic)
             * [Programming the ConnectX5 FLASH By Corrupting its Firmware](#programming-the-connectx5-flash-by-corrupting-its-firmware)
+            * [Programming the ConnectX5 FLASH By Forcing Recovery Mode Using FNP Header](#programming-the-connectx5-flash-by-forcing-recovery-mode-using-fnp-header)
             * [Programming the ConnectX5 FLASH By Forcing Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode)
             * [Programming the ConnectX5 FLASH Using a CH341A Programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer)
          * [Update GUID and MAC IDs](#update-guid-and-mac-ids)
@@ -711,6 +712,41 @@ sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 04:00.0  --image
 ![mstflint programming succeeds](img/mstflint_program_over_corrupt_ConnectX-5_firmware.jpg)
 
 If the above worked, proceed to [update the GUID and MAC IDs](#update-guid-and-mac-ids). If it fails, try the following method of Forcing Recovery Mode.
+
+
+##### Programming the ConnectX5 FLASH By Forcing Recovery Mode Using FNP Header
+
+Thanks [michalkouril](https://github.com/michalkouril) for [pointing out](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/10#issue-2458202296) that the unpopulated **FNP** Header stands for Firmware-Not-Present and can be shorted to boot the board into Firmware Recovery Mode if the above fails.
+
+![FNP Header front and back of board](img/FNP_Header_Back_and_Front_of_Board.jpg)
+
+Power down the system. Then short the Header using wire or tweezers and turn the system on.
+
+![FNP Header Shorted](img/FNP_Header_Shorted.jpg)
+
+If all goes well the Innova-2 should show up as `Memory controller [0580]: Mellanox Technologies MT28800 Family [ConnectX-5 Flash Recovery] [15b3:020d]` under `lspci -vnn`. It should show up as `/dev/mst/mt525_pciconf0` under `mst status`. The 25GbE SFP28 *MNV303212A-ADLT* with 8GB DDR4 is nicknamed *Morse* while the 40GbE/100GbE QSFP *MNV303611A-EDLT* **without** DDR memory is nicknamed *MorseQ*. `cd` into the appropriate directory.
+
+```
+sudo lspci -vnn
+cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
+ls
+sudo mst start
+sudo mst status
+sudo flint --device /dev/mst/mt525_pciconf0 query
+```
+
+![ConnectX-5 in Recovery Mode](img/Innova2_ConnectX-5_in_Recovery_Mode.jpg)
+
+Save a copy of the current FLASH IC firmware then program the ConnectX-5 firmare using `mstflint`. The device name is the PCI address from `lspci -vnn`
+```
+sudo mstflint --device 01:00.0  ri  innova2_CX5_FW_read1.bin
+sudo mstflint --nofs --use_image_ps --ignore_dev_data  --device 01:00.0  --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin  burn
+sudo mstflint --device 01:00.0  ri  innova2_CX5_FW_read2_after_write.bin
+```
+
+![Program ConnectX-5 Firmware Using mstflint](img/mstflint_25Q128_FLASH_Read_then_Write.jpg)
+
+Remove the FNP Header short and reboot your system. Proceed to [Update GUID and MAC IDs](#update-guid-and-mac-ids).
 
 
 ##### Programming the ConnectX5 FLASH By Forcing Recovery Mode
