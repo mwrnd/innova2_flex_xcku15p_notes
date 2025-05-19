@@ -77,6 +77,8 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
    * [FPGA Design Notes](#fpga-design-notes)
       * [Design Does Not Meet Timing Requirements](#design-does-not-meet-timing-requirements)
       * [PCIe and OpenCAPI Pinout](#pcie-and-opencapi-pinout)
+      * [LEDs](#leds)
+      * [Fan Pinout](#fan-pinout)
    * [Useful Commands](#useful-commands)
    * [Useful Links](#useful-links)
    * [Projects Tested to Work with the Innova2](#projects-tested-to-work-with-the-innova2)
@@ -1839,6 +1841,13 @@ PCIe connections are on Quads 127 and 128 which are [GTY Transceivers](https://w
 LEDs D18 and D19 are connected to pins B6 and A6, respectively, in Bank 90 of the XCKU15P.
 
 ![LEDs D18 D19](img/Innova2_LEDs_D18_D19.jpg)
+
+
+
+
+### Fan Pinout
+
+Thanks [gparmeggiani](https://github.com/gparmeggiani) for [figuring out the pinout of the fan header and how to use it](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues/11).
 
 
 
