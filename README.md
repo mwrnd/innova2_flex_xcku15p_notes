@@ -27,6 +27,8 @@ If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https
       * [Install Vivado or Vivado Lab Edition](#install-vivado-or-vivado-lab-edition)
    * [Test the Innova-2](#test-the-innova-2)
       * [Innova-2 ConnectX-5 Firmware](#innova-2-connectx-5-firmware)
+         * [Get Latest ConnectX-5 Firmware](#get-latest-connectx-5-firmware)
+         * [Programming the ConnectX5 FLASH IC Using flint](#programming-the-connectx5-flash-ic-using-flint)
          * [Programming the ConnectX5 FLASH IC](#programming-the-connectx5-flash-ic)
             * [Programming the ConnectX5 FLASH By Corrupting its Firmware](#programming-the-connectx5-flash-by-corrupting-its-firmware)
             * [Programming the ConnectX5 FLASH By Forcing Recovery Mode Using FNP Header](#programming-the-connectx5-flash-by-forcing-recovery-mode-using-fnp-header)
@@ -543,26 +545,29 @@ sudo reboot
 
 ### Set up Innova-2 Flex Application
 
-The `innova2_flex_app`, part of the [Innova-2 Flex Firmware Release](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/), allows software update of the XCKU15P FPGA User Image as well as basic diagnostics of the Innova-2.
+Lenovo Support currently distributes a copy of the [Innova-2 Flex SW/FW Bundle](https://support.lenovo.com/us/en/downloads/ds539910) as `mlnx-lnvgy_utl_nic_in2-18.12_linux_x86-64.tgz`.
 
-![Innova-2 Flex Firmware 18.12](img/Innova-2_Flex_Release_18_12.jpg)
+![Innova-2 Flex SW FW Bundle 18.12](img/Download_mlnx-lnvgy_utl_nic_in2-18.12_linux_x86-64.tgz.png)
 
+It contains `innova2_flex_app` which allows software update of the XCKU15P FPGA User Image as well as basic diagnostics of the Innova-2.
 
-The following commands download and install *Innova_2_Flex_Open_18_12*.
+Run the following commands after downloading `mlnx-lnvgy_utl_nic_in2-18.12_linux_x86-64.tgz`:
 ```Shell
 cd ~
-wget http://www.mellanox.com/downloads/fpga/flex/Innova_2_Flex_Open_18_12.tar.gz
-md5sum Innova_2_Flex_Open_18_12.tar.gz
-echo fdb96d4e02de11ef32bf3007281bfa53 should be the MD5 Checksum
-tar -xvf Innova_2_Flex_Open_18_12.tar.gz
-cd ~/Innova_2_Flex_Open_18_12/driver/
+md5sum mlnx-lnvgy_utl_nic_in2-18.12_linux_x86-64.tgz
+echo 257c2ad7536970caeb3300ee54602830  should be the MD5 Checksum
+tar -xf mlnx-lnvgy_utl_nic_in2-18.12_linux_x86-64.tgz
+cd ~/Innova_2_Flex_Open_18_12_Lenovo/driver/
 make
 sudo depmod -a
-cd ~/Innova_2_Flex_Open_18_12/app/
+cd ~/Innova_2_Flex_Open_18_12_Lenovo/app/
 make
 
 sudo reboot
 ```
+
+In 2026, Nvidia [stopped distributing](https://forums.developer.nvidia.com/t/innova-2-flex-open-18-12-tar-gz-not-available-anymore/359272/6) the [Innova-2 SW/FW bundle](https://www.nvidia.com/en-us/networking/ethernet/innova-2-flex/) but the Lenovo version is functionally identical.
+
 
 ### Install Vivado or Vivado Lab Edition
 
@@ -573,7 +578,7 @@ Create a symbolic link for `gmake` which Vivado requires but Ubuntu already incl
 sudo ln -s  /usr/bin/make  /usr/bin/gmake
 ```
 
-Install `libpng12` which is required by Vivado.
+Install `libpng12` which is required by some versions of Vivado.
 ```Shell
 cd ~
 mkdir tmppng12
@@ -647,10 +652,20 @@ Make sure to **write down the GUID and MAC values**.
 
 If the FW Version is `16.24.4020` or newer then proceed to [Testing The Network Ports](#testing-the-network-ports) as firmware is already up-to-date.
 
-Attempt to program the firmware using `flint`. The 25GbE SFP28 MT27808A0 *MNV303212A-ADLT* with 8GB of DDR4 is nicknamed *Morse* while the 100GbE QSFP MT28808A0 *MNV303611A-EDLT* is nicknamed *MorseQ* and its firmware is in `MorseQ_FW`. `cd` into the appropriate directory.
+
+#### Get Latest ConnectX-5 Firmware
+
+The latest firmware [directy downloadable](https://network.nvidia.com/support/firmware/connectx5en/) from Nvidia/Mellanox is **16.26.4012**. The 25GbE SFP28 MT27808A0 with 8GB of DDR4 is the *MNV303212A-ADLT* while the 100GbE QSFP MT28808A0 without DDR is the *MNV303611A-EDLT*.
+
+![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
+
+
+#### Programming the ConnectX5 FLASH IC Using flint
+
+If your board's `PSID` is `MT_0000000158` then attempt to program the firmware using `flint`. For example, for the *MNV303212A-ADLT*:
 ```Shell
-cd ~/Innova_2_Flex_Open_18_12/FW/Morse_FW/
-sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_24_4020-MNV303212A-ADL_Ax.bin --allow_rom_change burn
+unzip fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip
+sudo flint --device /dev/mst/mt4119_pciconf0 --image fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin --allow_rom_change burn
 ```
 
 ![flint burn](img/flint_burn_attempt.png)
@@ -660,7 +675,7 @@ If the above works, proceed to [Testing The Network Ports](#testing-the-network-
 
 #### Programming the ConnectX5 FLASH IC
 
-If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to update it so that it works with `innova2_flex_app`. There are three methods: [Corrupting the firmware and using `mstflint`](#programming-the-connectx5-flash-by-corrupting-its-firmware), [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer), or by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode). Each option has associated risks.
+If your ConnectX-5 Firmware shows up as `PSID: IBM0000000018` or is too old to update with `flint` you will need to update it so that it works with `innova2_flex_app`. There are three methods: [Corrupting the firmware and using `mstflint`](#programming-the-connectx5-flash-by-corrupting-its-firmware), by [forcing the board into Recovery Mode](#programming-the-connectx5-flash-by-forcing-recovery-mode), or by [using a programmer](#programming-the-connectx5-flash-using-a-ch341a-programmer). Each option has associated risks.
 
 
 ##### Programming the ConnectX5 FLASH By Corrupting its Firmware
@@ -1385,7 +1400,7 @@ sudo ./innova2_xdma_test
 
 ## Upgrading the ConnectX5 Firmware
 
-If you are experiencing issues with your Innova-2 or require PXE Boot capability, explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.mellanox.com/display/MLXUPFWUTILITY). The latest version to support the Innova-2 is [`4.15.2`](http://www.mellanox.com/downloads/firmware/mlxup/4.15.2/SFX/linux_x64/mlxup) and will upgrade your ConnectX-5 firmware to **16.28.2006** and PXE Boot `3.6.0102`.
+If you are experiencing issues with your Innova-2 or require PXE Boot capability, explore upgrading the ConnectX-5 using the [mlxup](https://network.nvidia.com/support/firmware/mlxup-mft/) utility. Check out the [mlxup User Guide](https://docs.nvidia.com/networking/display/mlxupfwutility). The latest version to support the Innova-2 is [`4.15.2`](http://www.mellanox.com/downloads/firmware/mlxup/4.15.2/SFX/linux_x64/mlxup) and will upgrade your ConnectX-5 firmware to **16.28.2006** and PXE Boot `3.6.0102`.
 
 ![mlxup 4.15.2](img/mlxup-mft_Download.png)
 
@@ -1401,10 +1416,6 @@ sudo ./mlxup
 ```
 
 ![mlxup](img/mlxup.jpg)
-
-The latest firmware [directy downloadable](http://www.mellanox.com/downloads/firmware/fw-ConnectX5-rel-16_26_4012-MNV303212A-ADL_Ax-UEFI-14.19.17-FlexBoot-3.5.805.bin.zip) from Nvidia/Mellanox is **16.26.4012** which is older than the version included with `mlxup 4.15.2`
-
-![Firmware 16.26.4012](img/MT_0000000158_Latest_Downloadable_Firmware_16_26_4012.png)
 
 
 ## Troubleshooting
