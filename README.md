@@ -6,6 +6,10 @@ The [Nvidia Mellanox Innova-2 Flex Open Programmable SmartNIC](https://www.nvidi
 
 These notes include step-by-step instructions for setting up an Innova-2 system and preparing the Innova-2 for FPGA development.
 
+Pictured above is a **Rev:A2** board. Later **Rev:A7** boards do not include the OpenCAPI connector:
+
+![RevA7 boards do not include OpenCAPI](img/RevA7_Has_No_OpenCAPI.jpg)
+
 If you experience any problems, search the [Nvidia SoC and SmartNIC Forum](https://forums.developer.nvidia.com/c/infrastructure/software-and-drivers/soc-and-smartnic/530) and this project's [Issues](https://github.com/mwrnd/innova2_flex_xcku15p_notes/issues?q=is%3Aissue).
 
 # Table of Contents
